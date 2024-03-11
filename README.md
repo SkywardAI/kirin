@@ -159,6 +159,13 @@ This backend application is setup with `Docker`. Nevertheless, you can see the f
 
     echo "SECRET_VARIABLE=SECRET_VARIABLE_VALUE" >> .env
     ```
+    
+    For test usage , you can simplely use .env.example
+    ```shell
+    cp .env.example .env
+    ```
+
+
 
 6. `CODEOWNERS` setup:
     Go to `.github/` and open `CODEOWNERS` file. This file is to assign the code to a specific team member so you can distribute the weights of the project clearly.

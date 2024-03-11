@@ -162,3 +162,6 @@ node_modules/
 # Yarn
 .yarn/*
 !.yarn/releases
+
+# Volumes
+volumes/
