@@ -165,3 +165,7 @@ node_modules/
 
 # Volumes
 volumes/
+
+# Uploaded file
+uploaded_files/
+uploaded_files/*
