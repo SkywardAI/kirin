@@ -81,5 +81,4 @@ class ChatHistoryCRUDRepository(BaseCRUDRepository):
         # .order_by(ChatHistory.created_at)
         # .limit(limit_num)
         query = await self.async_session.execute(statement=stmt)
-        print("111111111111")
         return query.scalars().all()  # type: ignore
