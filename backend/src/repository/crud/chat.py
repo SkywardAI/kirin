@@ -49,9 +49,10 @@ class SessionCRUDRepository(BaseCRUDRepository):
             return query.scalar()  # type: ignore
 
     async def read_sessions_by_account_id(self, id: int) -> typing.Sequence[Session]:
+        # stmt = sqlalchemy.select(Session).where(Session.account_id == id)
         stmt = sqlalchemy.select(Session).where(Session.account_id == id)
         query = await self.async_session.execute(statement=stmt)
-        return query.fetchall()
+        return query.scalars().all()
 
 
 class ChatHistoryCRUDRepository(BaseCRUDRepository):
@@ -76,15 +77,9 @@ class ChatHistoryCRUDRepository(BaseCRUDRepository):
     async def read_chat_history_by_session_id(self, id: int) -> typing.Sequence[ChatHistory]:
         # TODO limit num = 50 is a temp number
         limit_num = 50
-        stmt = (
-            sqlalchemy.select(ChatHistory)
-            .where(ChatHistory.session_id == id)
-            .order_by(ChatHistory.created_at)
-            .limit(limit_num)
-        )
+        stmt = sqlalchemy.select(ChatHistory).where(ChatHistory.session_id == id)
+        # .order_by(ChatHistory.created_at)
+        # .limit(limit_num)
         query = await self.async_session.execute(statement=stmt)
-
-        if not query:
-            raise EntityDoesNotExist("ChatHistory with session_id `{id}` does not exist!")
-
-        return query.scalar().all()  # type: ignore
+        print("111111111111")
+        return query.scalars().all()  # type: ignore

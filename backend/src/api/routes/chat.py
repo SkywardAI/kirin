@@ -53,13 +53,16 @@ async def get_session(
 ) -> list[Session]:
     sessions = await session_repo.read_sessions_by_account_id(id=id)
     sessions_list: list = list()
-
     for session in sessions:
-        res_session = Session(
-            id=session.id,
-            name=session.name,
-        )
-        sessions_list.append(res_session)
+        print(session.name)
+        try:
+            res_session = Session(
+                id=session.id,
+                name=session.name,
+            )
+            sessions_list.append(res_session)
+        except Exception as e:
+            print(e)
 
     return sessions_list
 
@@ -98,7 +101,7 @@ async def get_chathistory(
 ) -> list[ChatHistory]:
     chats = await chat_repo.read_chat_history_by_session_id(id=id)
     chats_list: list = list()
-
+    print("2222222222")
     for chat in chats:
         res_session = ChatHistory(
             id=chat.id,
