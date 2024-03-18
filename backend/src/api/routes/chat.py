@@ -1,8 +1,9 @@
 import fastapi
 
-from src.api.dependencies.repository import get_repository
+from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.models.schemas.chat import ChatHistory, ChatInMessage, ChatInResponse, Session
 from src.repository.crud.chat import ChatHistoryCRUDRepository, SessionCRUDRepository
+from src.repository.rag.chat import RAGChatModelRepository
 from src.securities.authorizations.jwt import jwt_generator
 from src.utilities.exceptions.database import EntityDoesNotExist
 
@@ -19,6 +20,7 @@ async def chat(
     chat_in_msg: ChatInMessage,
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     chat_repo: ChatHistoryCRUDRepository = fastapi.Depends(get_repository(repo_type=ChatHistoryCRUDRepository)),
+    rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
 ) -> ChatInResponse:
     # if not chat_in_msg.accountID:
     #     chat_in_msg.accountID = 0
@@ -32,8 +34,7 @@ async def chat(
         # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:40])
         session_id = chat_in_msg.sessionId
     await chat_repo.create_chat_history(session_id=session_id, is_bot_msg=False, message=chat_in_msg.message)
-    # TODO use RAG framework to generate the response message
-    response_msg = "Oh, really? It's amazing !"
+    response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message)
     await chat_repo.create_chat_history(session_id=session_id, is_bot_msg=True, message=response_msg)
     return ChatInResponse(
         sessionId=session_id,
@@ -101,7 +102,6 @@ async def get_chathistory(
 ) -> list[ChatHistory]:
     chats = await chat_repo.read_chat_history_by_session_id(id=id)
     chats_list: list = list()
-    print("2222222222")
     for chat in chats:
         res_session = ChatHistory(
             id=chat.id,
