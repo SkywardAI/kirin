@@ -110,7 +110,8 @@ For the team development environment:
 
 This backend application is setup with `Docker`. Nevertheless, you can see the full local setup without `Docker` in [backend/README.md](https://github.com/SkywardAI/chat-backend/blob/trunk/backend/README.md).
 
-For quick setup: 
+### For quick setup: 
+
     ```shell
     cp .env.example .env
     chmod +x backend/entrypoint.sh
