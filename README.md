@@ -112,13 +112,13 @@ This backend application is setup with `Docker`. Nevertheless, you can see the f
 
 ### For quick setup: 
 
-    ```shell
-    cp .env.example .env
-    chmod +x backend/entrypoint.sh
-    cd backend && mkdir coverage
-    docker-compose build
-    docker-compose up
-    ```
+```shell
+cp .env.example .env
+chmod +x backend/entrypoint.sh
+cd backend && mkdir coverage
+docker-compose build
+docker-compose up
+```
 
 ## Regular Setup
 
