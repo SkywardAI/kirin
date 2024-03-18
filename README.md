@@ -110,6 +110,17 @@ For the team development environment:
 
 This backend application is setup with `Docker`. Nevertheless, you can see the full local setup without `Docker` in [backend/README.md](https://github.com/SkywardAI/chat-backend/blob/trunk/backend/README.md).
 
+For quick setup: 
+    ```shell
+    cp .env.example .env
+    chmod +x backend/entrypoint.sh
+    cd backend && mkdir coverage
+    docker-compose build
+    docker-compose up
+    ```
+
+## Regular Setup
+
 1. Before setting up the backend app, please create a new directory called `coverage` for the testing report purpose:
    ```shell
    cd backend && mkdir coverage
@@ -215,10 +226,15 @@ backend/
     ├── api/
         ├── dependencies/               # Dependency injections
             ├── session.py
-            ├──repository.py
+            ├── repository.py
         ├── routes/                     # Endpoints
             ├── account.py              # Account routes
+            ├── ai_model.py             # AI model routes
             ├── authentication.py       # Signup and Signin routes
+            ├── chat.py                 # Chat and session routes
+            ├── data_analyze.py         # Data anaylisis routes
+            ├── file.py                 # File upload routes
+            ├── train.py                # Training routes
         ├── endpoints.py                # Endpoint registration
     ├── config/
         ├── settings/
@@ -232,13 +248,23 @@ backend/
     ├── models/
         ├── db/
             ├── account.py              # Account class for database entity
+            ├── ai_model.py             # AiModel class for database entity
+            ├── chat.py                 # ChatHistory and Session class for database entity
+            ├── file.py                 # File class for database entity
         ├── schemas/
             ├── account.py              # Account classes for data validation objects
+            ├── ai_model.py             # AiModel class for database entity
             ├── base.py                 # Base class for data validation objects
+            ├── chat.py                 # ChatHistory and Session class for database entity
+            ├── data_analyze.py         # DataAnlyze class for database entity
+            ├── file.py                 # File class for database entity
     ├── repository/
         ├── crud/
             ├── account.py              # C. R. U. D. operations for Account entity
+            ├── ai_model.py             # C. R. U. D. operations for AiModel entity
             ├── base.py                 # Base class for C. R. U. D. operations
+            ├── chat.py                 # C. R. U. D. operations for ChatHistory and Session entities
+            ├── file.py                 # C. R. U. D. operations for File entity
         ├── migrations/
             ├── versions/
             ├── env.py                  # Generated via alembic for automigration
@@ -269,7 +295,7 @@ backend/
             ├── field_formatter.py      # Reformat snake_case to camelCase
         ├── messages/
             ├── http/
-                ├── http_exc_details.py	# Custom message for HTTP exceptions
+                ├── http_exc_details.py # Custom message for HTTP exceptions
     ├── main.py                         # Our main backend server app
 ├── tests/
     ├── end_to_end_tests/               # End-to-end tests
