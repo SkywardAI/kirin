@@ -1,0 +1,21 @@
+name-template: 'Kirin v$NEXT_PATCH_VERSION'
+tag-template: 'v$NEXT_PATCH_VERSION'
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'enhancement'
+      - 'feature'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'bugfix'
+  - title: '🧰 Maintenance'
+    label: 'CI'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+template: |
+  ## What's New
+  $CHANGES
+  
+  ## Contributors
+  
+  Thank you to our contributors for making this release possible:
+  $CONTRIBUTORS
