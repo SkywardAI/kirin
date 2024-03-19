@@ -169,3 +169,5 @@ volumes/
 # Uploaded file
 uploaded_files/
 uploaded_files/*
+
+.devcontainer/
