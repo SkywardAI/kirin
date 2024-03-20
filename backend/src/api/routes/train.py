@@ -33,9 +33,8 @@ async def check_status(
     id: int,
 ) -> TrainStatusInResponse:
 
-    # TODO check process status of training
     choices = [0, 1, -1]
     # 0 for in process
     # 1 for complete successfully
     # -1 for error
-    return TrainStatusInResponse(status=random.choice(choices))
+    return TrainStatusInResponse(status=1)
