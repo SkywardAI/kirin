@@ -26,6 +26,8 @@
  </a>
 </div>
 
+[![CI - Backend](https://github.com/SkywardAI/chat-backend/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/ci-backend.yaml)
+
 <br>
 
 This is a repository is the backend of the chat machine trainer websit. It's using the following tech stack:
