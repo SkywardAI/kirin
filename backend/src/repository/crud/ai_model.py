@@ -27,57 +27,54 @@ class AiModelCRUDRepository(BaseCRUDRepository):
 
     async def read_aimodel_by_id(self, id: int) -> AiModel:
         stmt = sqlalchemy.select(AiModel).where(AiModel.id == id)
-        query = await self.async_session.execute(statement=stmt)
-
-        if not query:
-            raise EntityDoesNotExist("Account with id `{id}` does not exist!")
-
-        return query.scalar()  # type: ignore
+        result = await self.async_session.execute(statement=stmt)
+        ai_model = result.scalar_one_or_none()
+        if ai_model is None:
+            raise EntityDoesNotExist(f"AiModel with id `{id}` does not exist!")
+        return ai_model
 
     async def read_aimodel_by_name(self, name: str) -> AiModel:
         stmt = sqlalchemy.select(AiModel).where(AiModel.name == name)
         query = await self.async_session.execute(statement=stmt)
 
-        if not query:
-            raise EntityDoesNotExist("Account with username `{name}` does not exist!")
+        if not query.scalar():
+            raise EntityDoesNotExist(f"AiModel with name `{name}` does not exist!")
 
-        return query.scalar()  # type: ignore
+        return query.scalar()
 
-    async def update_aimodel_by_id(self, id: int, aicount_update: AiModelInUpdate) -> AiModel:
-        new_aicount_data = aicount_update.dict()
+    async def update_aimodel_by_id(self, id: int, aimodel_update: AiModelInUpdate) -> AiModel:
+        new_aimodel_data = aimodel_update.dict()
 
         select_stmt = sqlalchemy.select(AiModel).where(AiModel.id == id)
         query = await self.async_session.execute(statement=select_stmt)
         update_aimodel = query.scalar()
 
         if not update_aimodel:
-            raise EntityDoesNotExist(f"AiModel with id `{id}` does not exist!")  # type: ignore
+            raise EntityDoesNotExist(f"AiModel with id `{id}` does not exist!")
 
-        update_stmt = sqlalchemy.update(table=AiModel).where(AiModel.id == update_aimodel.id).values()  # type: ignore
-
-        if new_aicount_data["name"]:
-            update_stmt = update_stmt.values(username=new_aicount_data["name"])
-
-        if new_aicount_data["des"]:
-            update_stmt = update_stmt.values(username=new_aicount_data["des"])
+        update_stmt = (
+            sqlalchemy.update(AiModel)
+            .where(AiModel.id == update_aimodel.id)
+            .values(name=new_aimodel_data["name"], des=new_aimodel_data["des"])
+        )
 
         await self.async_session.execute(statement=update_stmt)
         await self.async_session.commit()
         await self.async_session.refresh(instance=update_aimodel)
 
-        return update_aimodel  # type: ignore
+        return update_aimodel
 
-    async def delete_account_by_id(self, id: int) -> str:
+    async def delete_aimodel_by_id(self, id: int) -> str:
         select_stmt = sqlalchemy.select(AiModel).where(AiModel.id == id)
         query = await self.async_session.execute(statement=select_stmt)
         delete_aimodel = query.scalar()
 
         if not delete_aimodel:
-            raise EntityDoesNotExist(f"Ai Model with id `{id}` does not exist!")  # type: ignore
+            raise EntityDoesNotExist(f"AiModel with id `{id}` does not exist!")
 
-        stmt = sqlalchemy.delete(table=AiModel).where(AiModel.id == delete_aimodel.id)
+        stmt = sqlalchemy.delete(AiModel).where(AiModel.id == delete_aimodel.id)
 
         await self.async_session.execute(statement=stmt)
         await self.async_session.commit()
 
-        return f"Ai Model with id '{id}' is successfully deleted!"
+        return f"AiModel with id '{id}' is successfully deleted!"
