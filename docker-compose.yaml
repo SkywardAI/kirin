@@ -80,6 +80,7 @@ services:
       - 8001:8000
     depends_on:
       - db
+    command: ["--gpus", "all"]
 
   etcd:
     container_name: milvus-etcd

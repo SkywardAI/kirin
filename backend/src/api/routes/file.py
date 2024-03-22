@@ -2,18 +2,20 @@ import os
 import random
 
 import fastapi
-from src.config.settings.const import UPLOAD_FILE_PATH
+from fastapi import BackgroundTasks
+
 from src.api.dependencies.repository import get_repository
+from src.config.settings.const import UPLOAD_FILE_PATH
 from src.models.schemas.file import FileInResponse, FileStatusInResponse
 from src.repository.crud.file import UploadedFileCRUDRepository
-from fastapi import BackgroundTasks
 
 router = fastapi.APIRouter(prefix="/file", tags=["file"])
 
-async def save_upload_file(file: fastapi.UploadFile, save_file: str):
+
+async def save_upload_file(contents: bytes, save_file: str):
     with open(save_file, "wb") as f:
-        contents = await file.read()
         f.write(contents)
+
 
 @router.post(
     "",
@@ -33,10 +35,11 @@ async def upload_and_return_id(
     if not os.path.exists(save_path):
         os.mkdir(save_path)
     save_file = os.path.join(save_path, file.filename)
-
-    background_tasks.add_task(save_upload_file, file, save_file)
+    contents = await file.read()
+    background_tasks.add_task(save_upload_file, contents, save_file)
 
     return FileInResponse(fileID=new_file.id)
+
 
 @router.get(
     path="/{id}",
