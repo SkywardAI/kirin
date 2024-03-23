@@ -13,6 +13,9 @@ class Session(Base):  # type: ignore
     id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(primary_key=True, autoincrement="auto")
     account_id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(nullable=True)
     name: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=64), nullable=True)
+    created_at: SQLAlchemyMapped[datetime.datetime] = sqlalchemy_mapped_column(
+        sqlalchemy.DateTime(timezone=True), nullable=False, server_default=sqlalchemy_functions.now()
+    )
 
     __mapper_args__ = {"eager_defaults": True}
 

@@ -26,12 +26,12 @@ async def chat(
     #     chat_in_msg.accountID = 0
     if not hasattr(chat_in_msg, "sessionId") or not chat_in_msg.sessionId:
         new_session = await session_repo.create_session(
-            account_id=chat_in_msg.accountID, name=chat_in_msg.message[:40]
+            account_id=chat_in_msg.accountID, name=chat_in_msg.message[:20]
         )
         session_id = new_session.id
     else:
         # TODO need verify if sesson exist
-        # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:40])
+        # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:20])
         session_id = chat_in_msg.sessionId
     await chat_repo.create_chat_history(session_id=session_id, is_bot_msg=False, message=chat_in_msg.message)
     response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message)
@@ -60,6 +60,7 @@ async def get_session(
             res_session = Session(
                 id=session.id,
                 name=session.name,
+                created_at=session.created_at,
             )
             sessions_list.append(res_session)
         except Exception as e:
@@ -84,6 +85,7 @@ async def get_all_sessions(
         res_session = Session(
             id=session.id,
             name=session.name,
+            created_at=session.created_at,
         )
         sessions_list.append(res_session)
 
@@ -105,7 +107,7 @@ async def get_chathistory(
     for chat in chats:
         res_session = ChatHistory(
             id=chat.id,
-            type="out" if chat.is_bot_msg else "out",
+            type="out" if chat.is_bot_msg else "in",
             message=chat.message,
         )
         chats_list.append(res_session)

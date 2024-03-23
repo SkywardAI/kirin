@@ -35,6 +35,13 @@ services:
   backend_app:
     container_name: backend_app
     restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
     build:
       dockerfile: Dockerfile
       context: ./backend/
@@ -78,6 +85,7 @@ services:
       - 8001:8000
     depends_on:
       - db
+    # command: ["--gpus", "all"]
 
   etcd:
     container_name: milvus-etcd
@@ -127,7 +135,7 @@ services:
       - "minio"
 
   frontend:
-    image: ghcr.io/skywardai/rebel:v0.0.4
+    image: ghcr.io/skywardai/rebel:v0.0.5
     container_name: frontend
     restart: always
     expose:

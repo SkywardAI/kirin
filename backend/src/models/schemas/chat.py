@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional
 
 from pydantic import Field
@@ -19,6 +20,7 @@ class ChatInResponse(BaseSchemaModel):
 class Session(BaseSchemaModel):
     id: int
     name: str | None
+    created_at: datetime.datetime
 
 
 class ChatHistory(BaseSchemaModel):
