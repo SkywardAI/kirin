@@ -135,7 +135,7 @@ services:
       - "minio"
 
   frontend:
-    image: ghcr.io/skywardai/rebel:v0.0.4
+    image: ghcr.io/skywardai/rebel:v0.0.5
     container_name: frontend
     restart: always
     expose:

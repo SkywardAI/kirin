@@ -105,7 +105,7 @@ async def get_chathistory(
     for chat in chats:
         res_session = ChatHistory(
             id=chat.id,
-            type="out" if chat.is_bot_msg else "out",
+            type="out" if chat.is_bot_msg else "in",
             message=chat.message,
         )
         chats_list.append(res_session)

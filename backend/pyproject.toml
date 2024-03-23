@@ -1,9 +1,9 @@
 [project]
-name = "DAPSQL QWIK-Stack Application"
-version = "0.0.1"
-description = "A comprehensive template to start a real-world quality project."
+name = "ChatBot Application"
+version = "0.1"
+description = "A chat bot and model training backend project"
 authors = [
-    {name = "Aeternalis-Ingenium", email="aeternalisingenium@proton.me"},
+    {name = "Rob-Zhang", email="chuan.z@hotmail.com"},
 ]
 classifiers = [
     "Topic :: Software Development"
@@ -18,9 +18,9 @@ requires-python = ">=3.11"
 dependencies = {file = ["requirements.txt"]}
 
 [project.urls]
-homepage = "https://github.com/Aeternalis-Ingenium/DAPSQL-FAQ-Stack-Template"
-documentation = "https://github.com/Aeternalis-Ingenium/DAPSQL-FAQ-Stack-Template"
-repository = "https://github.com/Aeternalis-Ingenium/DAPSQL-FAQ-Stack-Template"
+homepage = "https://github.com/SkywardAI/chat-backend"
+documentation = "https://github.com/SkywardAI/chat-backend"
+repository = "https://github.com/SkywardAI/chat-backend"
 
 [tool.black]
 color=true
