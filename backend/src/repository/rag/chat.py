@@ -27,7 +27,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         return True
 
     async def get_response(self, session_id: int, input_msg: str) -> str:
-        # TODO use RAG framework to generate the response message
+        # TODO use RAG framework to generate the response message @Aisuko
         # query_embedding = self.model.encode(input_msg, convert_to_tensor=True).to("cuda")
         # print(self.embeddings)
         # print(query_embedding)
@@ -42,7 +42,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         return res["answer"]
 
     async def load_csv_file(self, file_name: str, model_name: str) -> bool:
-        # read file named file_name and convert the content into a list of strings
+        # read file named file_name and convert the content into a list of strings @Aisuko
         print(file_name)
         print(model_name)
         self.data = []

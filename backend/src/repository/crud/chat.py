@@ -21,12 +21,12 @@ class SessionCRUDRepository(BaseCRUDRepository):
         return new_session
 
     async def read_sessions(self) -> typing.Sequence[Session]:
-        stmt = sqlalchemy.select(Session)
+        stmt = sqlalchemy.select(Session).order_by(Session.created_at.desc())
         query = await self.async_session.execute(statement=stmt)
         return query.scalars().all()
 
     async def read_sessions_by_id(self, id: int) -> Session:
-        stmt = sqlalchemy.select(Session).where(Session.id == id)
+        stmt = sqlalchemy.select(Session).where(Session.id == id).order_by(Session.created_at.desc())
         query = await self.async_session.execute(statement=stmt)
 
         if not query:
