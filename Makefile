@@ -9,3 +9,8 @@ build: env
 .PHONY: up
 up: env build
 	docker-compose up -d
+
+
+.PHONY: stop
+stop:
+	docker-compose stop

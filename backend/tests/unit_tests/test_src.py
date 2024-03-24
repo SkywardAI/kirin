@@ -14,3 +14,9 @@ def test_application_is_fastapi_instance() -> None:
     assert backend_app.docs_url == "/docs"
     assert backend_app.openapi_url == "/openapi.json"
     assert backend_app.redoc_url == "/redoc"
+
+
+def test_get_device() -> None:
+    from src.utilities.devices.devices import get_device
+
+    assert get_device() in ["mps", "cuda", "cpu"]
