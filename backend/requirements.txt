@@ -28,7 +28,6 @@ python-dotenv==1.0.1
 python-jose==3.3.0
 python-multipart==0.0.9
 python-slugify==8.0.4
-sentence-transformers==2.3.1
 SQLAlchemy==2.0.0b3
 transformers==4.38.2
 trio==0.24.0
