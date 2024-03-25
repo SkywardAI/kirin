@@ -35,13 +35,7 @@ services:
   backend_app:
     container_name: backend_app
     restart: always
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
+
     build:
       dockerfile: Dockerfile
       context: ./backend/
