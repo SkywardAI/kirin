@@ -5,13 +5,13 @@ from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import cos_sim
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline
 
-
 from src.config.settings.const import CHAT_COMTEXT, DEFAULT_MODEL, MAX_SQL_LENGTH, UPLOAD_FILE_PATH
 from src.repository.rag.base import BaseRAGRepository
 from src.utilities.devices.devices import get_device
 
 
 class RAGChatModelRepository(BaseRAGRepository):
+    # TODO init model with default model @Aisuko
     model_name = "deepset/roberta-base-squad2"
 
     nlp = pipeline("question-answering", model=model_name, tokenizer=model_name)

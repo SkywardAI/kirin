@@ -71,6 +71,8 @@ services:
       - HASHING_ALGORITHM_LAYER_1=${HASHING_ALGORITHM_LAYER_1}
       - HASHING_ALGORITHM_LAYER_2=${HASHING_ALGORITHM_LAYER_2}
       - HASHING_SALT=${HASHING_SALT}
+      - MILVUS_HOST=${MILVUS_HOST}
+      - MILVUS_PORT=${MILVUS_PORT}
     volumes:
       - ./backend/:/usr/backend/
     expose:
@@ -115,7 +117,7 @@ services:
 
   standalone:
     container_name: milvus-standalone
-    image: milvusdb/milvus:v2.0.2
+    image: milvusdb/milvus:v2.3.12
     command: [ "milvus", "run", "standalone" ]
     environment:
       ETCD_ENDPOINTS: etcd:2379
