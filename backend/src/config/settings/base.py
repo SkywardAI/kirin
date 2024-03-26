@@ -3,7 +3,6 @@ import pathlib
 
 import decouple
 import pydantic
-
 from pydantic_settings import BaseSettings
 
 ROOT_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent.parent.parent.parent.resolve()
@@ -25,6 +24,8 @@ class BackendBaseSettings(BaseSettings):
     REDOC_URL: str = "/redoc"
     OPENAPI_PREFIX: str = ""
 
+    MILVUS_HOST: str = decouple.config("MILVUS_HOST", cast=str)  # type: ignore
+    MILVUS_PORT: int = decouple.config("MILVUS_PORT", cast=int)  # type: ignore
     DB_POSTGRES_HOST: str = decouple.config("POSTGRES_HOST", cast=str)  # type: ignore
     DB_MAX_POOL_CON: int = decouple.config("DB_MAX_POOL_CON", cast=int)  # type: ignore
     DB_POSTGRES_NAME: str = decouple.config("POSTGRES_DB", cast=str)  # type: ignore
