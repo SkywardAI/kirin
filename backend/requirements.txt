@@ -31,4 +31,4 @@ python-slugify==8.0.4
 SQLAlchemy==2.0.29
 transformers==4.38.2
 trio==0.25.0
-uvicorn==0.28.0
+uvicorn==0.29.0
