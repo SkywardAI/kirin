@@ -29,6 +29,6 @@ python-jose==3.3.0
 python-multipart==0.0.9
 python-slugify==8.0.4
 SQLAlchemy==2.0.29
-transformers==4.38.2
+transformers==4.39.1
 trio==0.25.0
 uvicorn==0.28.0
