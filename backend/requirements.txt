@@ -21,11 +21,7 @@ pydantic-settings==2.2.1
 pymilvus==2.3.7
 pytest==8.1.1
 pytest-asyncio==0.23.6
-<<<<<<< HEAD
 pytest-cov==5.0.0
-=======
-pytest-cov==4.1.0
->>>>>>> 3792713 (chore(deps): bump pytest-asyncio from 0.23.5.post1 to 0.23.6 in /backend)
 pytest-xdist==3.5.0
 python-decouple==3.8
 python-dotenv==1.0.1
