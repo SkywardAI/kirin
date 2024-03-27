@@ -1,4 +1,4 @@
-from pymilvus import connections
+from pymilvus import connections, db
 
 from src.config.manager import settings
 
