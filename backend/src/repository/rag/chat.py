@@ -10,6 +10,8 @@ from src.repository.vector_database import vector_db
 
 class RAGChatModelRepository(BaseRAGRepository):
 
+    # nlp = pipeline("question-answering", model=model_name, tokenizer=model_name)
+
     async def load_model(self, session_id: int, model_name: str) -> bool:
         # Init model with input model_name
         try:
