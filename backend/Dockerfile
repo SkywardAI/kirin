@@ -26,7 +26,6 @@ COPY . .
 
 # Copy entrypoint.sh for auto connection with account_db service
 COPY ./entrypoint.sh .
-RUN chmod +x /usr/backend/entrypoint.sh
 
 # Execute entrypoint.sh
 ENTRYPOINT ["bash", "/usr/backend/entrypoint.sh"]
