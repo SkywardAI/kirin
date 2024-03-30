@@ -12,10 +12,6 @@ ENV VIRTUAL_ENV=/opt/venv
 # Set the server port
 EXPOSE 8000
 
-# Install system dependencies
-RUN apt-get update \
-  && apt-get -y install netcat-traditional gcc postgresql \
-  && apt-get clean
 
 # Install Python dependencies
 COPY ./requirements.txt ./
@@ -26,7 +22,6 @@ COPY . .
 
 # Copy entrypoint.sh for auto connection with account_db service
 COPY ./entrypoint.sh .
-RUN chmod +x /usr/backend/entrypoint.sh
 
 # Execute entrypoint.sh
 ENTRYPOINT ["bash", "/usr/backend/entrypoint.sh"]
