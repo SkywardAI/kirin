@@ -46,12 +46,12 @@ async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
     loguru.logger.info("Database Connection --- Successfully Established!")
 
 
-async def initialize_vectordb_connection(backend_app: fastapi.FastAPI) -> None:
-    loguru.logger.info("Vector Database Connection --- Establishing . . .")
+# async def initialize_vectordb_connection(backend_app: fastapi.FastAPI) -> None:
+#     loguru.logger.info("Vector Database Connection --- Establishing . . .")
 
-    backend_app.state.vdb = vector_db
+#     backend_app.state.vdb = vector_db
 
-    loguru.logger.info("Vector Database Connection --- Successfully Established!")
+#     loguru.logger.info("Vector Database Connection --- Successfully Established!")
 
 
 async def dispose_db_connection(backend_app: fastapi.FastAPI) -> None:
