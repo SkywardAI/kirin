@@ -1,4 +1,4 @@
-FROM gclub/skywardai:v0.1.1
+FROM gclub/skywardai:v0.1.2
 
 WORKDIR /app
 
