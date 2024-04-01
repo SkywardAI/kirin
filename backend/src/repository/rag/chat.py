@@ -45,8 +45,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         return text
 
     def search_context(self, query, n_results=1):
-        query_embeddings = ai_model.encode_string(query)
-        print(query_embeddings.shape)
+        query_embeddings = self.encoder.encode(query).tolist()
         return vector_db.search(data=query_embeddings, n_results=n_results)
 
     async def get_response(self, session_id: int, input_msg: str) -> str:
@@ -61,6 +60,9 @@ class RAGChatModelRepository(BaseRAGRepository):
         print(file_name)
         print(model_name)
         data = []
+        embedding_list = []
+        # self.embeddings = []
+        # Open the CSV file
         with open(UPLOAD_FILE_PATH + file_name, "r") as file:
             # Create a CSV reader
             reader = csv.reader(file)

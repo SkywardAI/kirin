@@ -72,5 +72,9 @@ class MilvusHelper:
     def __del__(self):
         self.client.close()
 
+    def create_collection(self, collection_name=DEFAULT_COLLECTION, dimension=DEFAULT_DIM, recreate=True):
+        if recreate and self.client.has_collection(collection_name):
+            print(f"Milvus: collection {collection_name} exist, dropping..")
+            self.client.drop_collection(collection_name)
 
 vector_db: MilvusHelper = MilvusHelper()
