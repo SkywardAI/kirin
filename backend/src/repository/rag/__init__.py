@@ -8,7 +8,7 @@ from src.repository.vector_database import vector_db
 # TODO init tokenizer
 # TODO init model with default model @Aisuko
 # model_name = "deepset/roberta-base-squad2"
-model_name = "tiiuae/falcon-7b-instruct'"
+model_name = "tiiuae/falcon-7b-instruct"
 dataset = load_dataset("databricks/databricks-dolly-15k", split="train[:5]")
 print(dataset)
 

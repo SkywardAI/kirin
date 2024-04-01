@@ -48,8 +48,6 @@ class RAGChatModelRepository(BaseRAGRepository):
 
     async def get_response(self, session_id: int, input_msg: str) -> str:
         # TODO use RAG framework to generate the response message @Aisuko
-        # TODO get chat history first
-
         context = self.search_context(input_msg)
         prompt = self.get_prompt(session_id, input_msg, context)
         sequences = model_pipeline(
