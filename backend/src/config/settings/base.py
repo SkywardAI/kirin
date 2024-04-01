@@ -10,8 +10,8 @@ ROOT_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent.parent.parent.pare
 
 
 class BackendBaseSettings(BaseSettings):
-    TITLE: str = "DAPSQL FARN-Stack Template Application"
-    VERSION: str = "0.1.0"
+    TITLE: str = "Kirin API"
+    VERSION: str = "0.1.1"
     TIMEZONE: str = "UTC"
     DESCRIPTION: str | None = None
     DEBUG: bool = False

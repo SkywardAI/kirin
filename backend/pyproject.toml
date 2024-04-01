@@ -1,6 +1,6 @@
 [project]
 name = "ChatBot Application"
-version = "0.1"
+version = "0.1.1"
 description = "A chat bot and model training backend project"
 authors = [
     {name = "Rob-Zhang", email="chuan.z@hotmail.com"},
