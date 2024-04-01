@@ -44,7 +44,7 @@ class RAGChatModelRepository(BaseRAGRepository):
 
     def search_context(self, query, n_results=1):
         query_embeddings = encoder.encode(query).tolist()
-        return vector_db.client.collection.query(query_embeddings=query_embeddings, n_results=n_results)
+        return vector_db.search(data=query_embeddings, n_results=n_results)
 
     async def get_response(self, session_id: int, input_msg: str) -> str:
         # TODO use RAG framework to generate the response message @Aisuko
@@ -66,6 +66,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         print(file_name)
         print(model_name)
         data = []
+        embedding_list = []
         # self.embeddings = []
         # Open the CSV file
         with open(UPLOAD_FILE_PATH + file_name, "r") as file:
@@ -77,8 +78,9 @@ class RAGChatModelRepository(BaseRAGRepository):
                 # Add the row to the list
                 data.extend(row)
         for i, item in enumerate(data):
-            embeddings = encoder.encode(item).tolist()
-            print(i)
-            res = vector_db.client.insert(collection_name="quick_setup", data={"id": i, "vector": embeddings})
+            embedding = encoder.encode(item).tolist()
+            embedding_list.extend(embedding)
 
-        return res.success
+        vector_db.insert_list(embedding_list)
+
+        return True

@@ -5,9 +5,12 @@ from transformers import AutoTokenizer, pipeline
 
 from src.repository.vector_database import vector_db
 
+# init vectorDB create the default collection
+vector_db.create_collection()
+
 # TODO init tokenizer
 # TODO init model with default model @Aisuko
-# model_name = "deepset/roberta-base-squad2"
+model_name = "deepset/roberta-base-squad2"
 model_name = "tiiuae/falcon-7b-instruct"
 dataset = load_dataset("databricks/databricks-dolly-15k", split="train[:5]")
 print(dataset)
@@ -27,10 +30,3 @@ model_pipeline = pipeline(
     trust_remote_code=True,
     device_map="auto",
 )
-
-
-# TODO init vectorDB create the default collection
-if vector_db.client.has_collection("quick_setup"):
-    vector_db.client.drop_collection("quick_setup")
-
-vector_db.client.create_collection(collection_name="quick_setup", dimension=384)
