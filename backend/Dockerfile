@@ -1,35 +1,13 @@
-# Pull official latest Python Docker image (Pulished with version 3.11.0)
-FROM --platform=linux/amd64 python:latest
+FROM gclub/skywardai:v0.1.2
 
-# Set the working directory
-WORKDIR /usr/backend
+WORKDIR /app
 
-# Set up Python behaviour
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV VIRTUAL_ENV=/opt/venv
-
-# Set the server port
 EXPOSE 8000
 
-# Install system dependencies
-RUN apt-get update \
-  && apt-get -y install netcat-traditional gcc postgresql \
-  && apt-get clean
-
-# Install Python dependencies
-COPY ./requirements.txt ./
-RUN pip3 install -r requirements.txt
-
-# Copy all files
 COPY . .
 
-# Copy entrypoint.sh for auto connection with account_db service
-COPY ./entrypoint.sh .
-RUN chmod +x /usr/backend/entrypoint.sh
-
 # Execute entrypoint.sh
-ENTRYPOINT ["bash", "/usr/backend/entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
 
 # Start up the backend server
 CMD uvicorn src.main:backend_app --reload --workers 4 --host 0.0.0.0 --port 8000

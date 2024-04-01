@@ -1,6 +1,6 @@
-<h1 align=center><strong>Backend Application 🐍</strong></h1>
+<h1 align=center><strong>Kirin Platform</strong></h1>
 
-This backend application template consists of:
+This repo consists of:
 
 * Configure the [TOML](https://toml.io/en/) file for testing and linting.
 * Create the backend server with FastAPI and Uvicorn,
@@ -55,7 +55,7 @@ All secret variables are configured in the `.env`, but in this case since it is 
 
 The secret variables are accessed by 2 different files:
 
-1. `backend7src/config/settings/base.py` $\rightarrow$ The `BackendBaseSettings` class contains all the secret variables. This allows us to set the values dynamically through out the backend application ("dynamic" because we only need to change the value in `.env` file without breaking any code).
+1. `backend/src/config/settings/base.py` $\rightarrow$ The `BackendBaseSettings` class contains all the secret variables. This allows us to set the values dynamically through out the backend application ("dynamic" because we only need to change the value in `.env` file without breaking any code).
 2. `docker-compose.yaml` $\rightarrow$ When we initialize the `backend_app` container, we register all the secret variables as well for our containerized backend application.
 
 ## Database
