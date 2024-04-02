@@ -1,3 +1,5 @@
+import time
+
 from pymilvus import connections, Milvus, MilvusClient
 
 from src.config.manager import settings
@@ -6,13 +8,18 @@ from src.config.settings.const import DEFAULT_COLLECTION, DEFAULT_DIM
 
 class MilvusHelper:
     def __init__(self):
-        try:
-            url = f"http://{settings.MILVUS_HOST}:{settings.MILVUS_PORT}"
-            self.client = MilvusClient(url)
-            print("Connected to Milvus.")
-        except Exception as e:
-            print(f"Failed to connect to Milvus: {e}")
-            raise
+        for _ in range(3):
+            try:
+                url = f"http://{settings.MILVUS_HOST}:{settings.MILVUS_PORT}"
+                self.client = MilvusClient(url)
+                print("Connected to Milvus.")
+                break
+            except Exception as e:
+                err = e
+                # print(f"Failed to connect to Milvus: {e}")
+                time.sleep(10)
+        else:
+            raise Exception(f"Failed to connect to Milvus after 3 attempts:{err}")
 
     def create_collection(self, collection_name=DEFAULT_COLLECTION, dimension=DEFAULT_DIM, recreate=True):
         if recreate and self.client.has_collection(collection_name):

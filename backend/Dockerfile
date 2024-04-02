@@ -6,7 +6,7 @@ EXPOSE 8000
 
 # Install Python dependencies
 COPY ./requirements.txt ./
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 COPY . .
 
@@ -14,4 +14,4 @@ COPY . .
 ENTRYPOINT ["./entrypoint.sh"]
 
 # Start up the backend server
-CMD uvicorn src.main:backend_app --reload --workers 4 --host 0.0.0.0 --port 8000
+CMD uvicorn src.main:backend_app --workers 1 --host 0.0.0.0 --port 8000
