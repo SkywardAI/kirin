@@ -41,7 +41,7 @@ uvicorn==0.29.0
 # python-jose==3.3.0
 # python-multipart==0.0.9
 # python-slugify==8.0.4
-sentence-transformers==2.5.1
+# sentence-transformers==2.5.1
 # SQLAlchemy==2.0.29
 # trio==0.25.0
 # uvicorn==0.29.0

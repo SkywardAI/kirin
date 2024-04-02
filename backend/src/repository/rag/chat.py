@@ -10,8 +10,6 @@ from src.repository.vector_database import vector_db
 
 class RAGChatModelRepository(BaseRAGRepository):
 
-    # nlp = pipeline("question-answering", model=model_name, tokenizer=model_name)
-
     async def load_model(self, session_id: int, model_name: str) -> bool:
         # Init model with input model_name
         try:
@@ -60,9 +58,6 @@ class RAGChatModelRepository(BaseRAGRepository):
         print(file_name)
         print(model_name)
         data = []
-        embedding_list = []
-        # self.embeddings = []
-        # Open the CSV file
         with open(UPLOAD_FILE_PATH + file_name, "r") as file:
             # Create a CSV reader
             reader = csv.reader(file)
