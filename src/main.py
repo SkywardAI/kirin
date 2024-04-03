@@ -7,6 +7,7 @@ from src.config.events import execute_backend_server_event_handler, terminate_ba
 from src.config.manager import settings
 
 
+
 def initialize_backend_application() -> fastapi.FastAPI:
     app = fastapi.FastAPI(**settings.set_backend_app_attributes)  # type: ignore
 

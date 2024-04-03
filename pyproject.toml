@@ -1,0 +1,33 @@
+[tool.poetry]
+description = "Open-source RAG framework"
+authors = ["Aisuko <urakiny@gmail.com>"]
+license = "Apache 2.0"
+readme = "README.md"
+package-mode = false
+
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "0.110.0"
+uvicorn = "0.29.0"
+sqlalchemy = "2.0.29"
+python-decouple = "3.8"
+pydantic-settings = "2.2.1"
+asyncpg = "0.29.0"
+email-validator = "2.1.1"
+pathlib = "1.0.1"
+passlib = "1.7.4"
+python-jose = "3.3.0"
+python-multipart = "0.0.9"
+loguru = "0.7.2"
+
+[tool.poetry.group.dev.dependencies]
+sqlalchemy = "2.0.29"
+fastapi = "0.110.0"
+uvicorn = "0.29.0"
+pre-commit = "3.7.0"
+black = "24.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

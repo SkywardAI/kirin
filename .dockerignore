@@ -10,6 +10,7 @@ env
 Dockerfile
 Dockerfile.prod
 docker-compose.yaml
+docker-compose.demo.yaml
 .eslintrc.js
 requirements-build.txt
 requirements-lint.txt
