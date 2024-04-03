@@ -1,4 +1,4 @@
-FROM gclub/skywardai:v0.1.2
+FROM gclub/skywardai:v0.1.3
 
 WORKDIR /app
 
@@ -6,8 +6,6 @@ EXPOSE 8000
 
 # Install Python dependencies
 COPY ./requirements.txt ./
-RUN pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-
 COPY . .
 
 # Execute entrypoint.sh
