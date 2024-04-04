@@ -50,11 +50,9 @@ class MilvusHelper:
 
     def search(self, data, n_results, collection_name=DEFAULT_COLLECTION):
         dim = self._get_collection_dimension_(collection_name)
-        if len(data) < dim:
-            data += [0] * (dim - len(data))
-        search_params = {"metric_type": "COSINE", "params": {}}
-
-        # Search with limit
+        # if len(data) < dim:
+        #     data += [0] * (dim - len(data))
+        search_params = {"metric_type": "IP", "params": {}}
         res = self.client.search(
             collection_name=collection_name, data=data, limit=n_results, search_params=search_params
         )
@@ -63,9 +61,13 @@ class MilvusHelper:
     def create_index(self, index_name, index_params, collection_name=DEFAULT_COLLECTION):
         self.client.create_index(collection_name, index_name, index_params)
 
+    # def _get_collection_dimension_(self, collection_name=DEFAULT_COLLECTION):
+    #     collection_stats = self.client.get_collection_stats(collection_name)
+    #     return collection_stats['partitions'][0]['segments'][0]['data_size']
     def _get_collection_dimension_(self, collection_name=DEFAULT_COLLECTION):
-        collection_info = self.client.get_collection_info(collection_name)
-        return collection_info.dimension
+        # collection_info = self.client.get_collection(collection_name)
+        # return collection_info.schema.dimension
+        return DEFAULT_DIM
 
     def __del__(self):
         self.client.close()

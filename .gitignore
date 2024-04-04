@@ -151,6 +151,8 @@ cov.html
 *.cover
 .hypothesis/
 
+# Models
+backend/models/*
 
 # Virtual Environment & packages
 .python-version

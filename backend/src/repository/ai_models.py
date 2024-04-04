@@ -1,9 +1,9 @@
 import torch
 import transformers
 from kimchima import Auto
-from transformers import AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL
+from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAULT_MODEL_PATH
 
 
 class ModelPipeline:
@@ -13,7 +13,7 @@ class ModelPipeline:
         self.initialize_encoder(DEFAULT_ENCODER)
 
     def encode_string(self, data):
-        embeddings = self.encoder.get_embeddings(data)
+        embeddings = self.encoder.get_embeddings(text=data)
         return embeddings
 
     def initialize_encoder(self, model_name):
@@ -21,14 +21,15 @@ class ModelPipeline:
 
     def initialize_model(self, model_name):
 
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        # model = AutoModelForCausalLM.from_pretrained(model_name)
+        tokenizer = AutoTokenizer.from_pretrained(DEFAULT_MODEL_PATH)
+        # tokenizer = AutoTokenizer.from_pretrained(model_name)
 
         # handle multiple steps internally, like tokenizing, feeding tokens into model, and processing the output into a human-readble form
         pipeline = transformers.pipeline(
             "text-generation",
             model=model_name,
             tokenizer=tokenizer,
-            torch_dtype=torch.bfloat16,
             trust_remote_code=True,
             device_map="auto",
         )

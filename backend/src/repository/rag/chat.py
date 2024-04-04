@@ -34,16 +34,17 @@ class RAGChatModelRepository(BaseRAGRepository):
         message = message.strip() if do_strip else message
 
         texts.append(f"{message} [/INST]")
-
         return "".join(texts)
 
     def search_context(self, query, n_results=1):
         query_embeddings = ai_model.encode_string(query)
+        print(query_embeddings)
         return vector_db.search(data=query_embeddings, n_results=n_results)
 
     async def get_response(self, session_id: int, input_msg: str) -> str:
         context = self.search_context(input_msg)
         prompt = self.get_prompt(session_id, input_msg, context)
+        print(prompt)
         answer = ai_model.generate_answer(prompt)
         # TODO stream output
         return answer
@@ -60,7 +61,9 @@ class RAGChatModelRepository(BaseRAGRepository):
             for row in reader:
                 # Add the row to the list
                 data.extend(row)
+        print(data)
         embedding_list = ai_model.encode_string(data)
+        print(embedding_list)
         vector_db.insert_list(embedding_list)
 
         return True

@@ -80,7 +80,8 @@ services:
       - MILVUS_HOST=${MILVUS_HOST}
       - MILVUS_PORT=${MILVUS_PORT}
     volumes:
-      - ./backend/:/usr/backend/
+      - ./backend/:/app/
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
     expose:
       - 8000
     ports:
