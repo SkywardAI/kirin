@@ -43,7 +43,8 @@ class RAGChatModelRepository(BaseRAGRepository):
         return text
 
     def search_context(self, query, n_results=1):
-        query_embeddings = self.encoder.encode(query).tolist()
+        query_embeddings = ai_model.encode_string(query)
+        print(query_embeddings.shape)
         return vector_db.search(data=query_embeddings, n_results=n_results)
 
     async def get_response(self, session_id: int, input_msg: str) -> str:

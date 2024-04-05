@@ -38,8 +38,6 @@ class ModelPipeline:
 
     def generate_answer(self, prompt):
         # generating responses
-        print(prompt)
-        print("----------------------")
         sequences = self.pipeline(
             prompt,
             max_length=150,

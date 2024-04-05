@@ -14,6 +14,7 @@ greenlet==3.0.3
 httpx==0.27.0
 isort==5.13.2
 loguru==0.7.2
+passlib==1.7.4
 pathlib==1.0.1
 pre-commit==3.7.0
 pydantic-settings==2.2.1
@@ -30,4 +31,3 @@ python-slugify==8.0.4
 SQLAlchemy==2.0.29
 trio==0.25.0
 uvicorn==0.29.0
-

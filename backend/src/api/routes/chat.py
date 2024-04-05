@@ -35,8 +35,6 @@ async def chat(
         session_id = chat_in_msg.sessionId
     await chat_repo.create_chat_history(session_id=session_id, is_bot_msg=False, message=chat_in_msg.message)
     response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message)
-    print("----------------")
-    print(response_msg)
     await chat_repo.create_chat_history(session_id=session_id, is_bot_msg=True, message=response_msg)
     return ChatInResponse(
         sessionId=session_id,
