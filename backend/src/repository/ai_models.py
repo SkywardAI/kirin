@@ -38,17 +38,29 @@ class ModelPipeline:
 
     def generate_answer(self, prompt):
         # generating responses
+        print(prompt)
+        print("----------------------")
         sequences = self.pipeline(
             prompt,
-            max_length=500,
+            max_length=150,
+            truncation=True,
             do_sample=True,
-            top_k=10,
+            top_k=1,
+            no_repeat_ngram_size=2,
             num_return_sequences=1,
             eos_token_id=self.tokenizer.eos_token_id,
         )
-
+        # res = self.tokenizer.decode(sequences[0], skip_special_tokens=True)
+        res = (
+            sequences[0]
+            .get("generated_text")
+            .replace("string<|endoftext|>", "")
+            .replace("<|endoftext|>", "")
+            .replace("\n", "")
+        )
+        print(res)
         # extracting and return the generated text
-        return sequences
+        return res
 
 
 ai_model: ModelPipeline = ModelPipeline()

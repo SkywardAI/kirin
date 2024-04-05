@@ -23,18 +23,24 @@ class RAGChatModelRepository(BaseRAGRepository):
     def get_prompt(self, session_id: int, message: str, context: str) -> str:
         system_prompt = """"""
         # TODO get chat_history by session_id
-        chat_history: list[tuple[str, str]] = []
-        texts = [f"<s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n"]
+        # chat_history: list[tuple[str, str]] = []
+        # texts = [f"<s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n"]
 
-        do_strip = False
-        for user_input, response in chat_history:
-            user_input = user_input.strip() if do_strip else user_input
-            do_strip = True
-            texts.append(f"{user_input} [/INST] {response.strip()} </s><s>[INST] ")
-        message = message.strip() if do_strip else message
-
-        texts.append(f"{message} [/INST]")
-        return "".join(texts)
+        # do_strip = False
+        # for user_input, response in chat_history:
+        #     user_input = user_input.strip() if do_strip else user_input
+        #     do_strip = True
+        #     texts.append(f"{user_input} [/INST] {response.strip()} </s><s>[INST] ")
+        # message = message.strip() if do_strip else message
+        messages = [
+            {
+                "role": "user",
+                "content": message,
+            },
+            {"role": "assistant", "content": context},
+        ]
+        text = ai_model.tokenizer.apply_chat_template(messages, tokenize=False)
+        return text
 
     def search_context(self, query, n_results=1):
         query_embeddings = ai_model.encode_string(query)
@@ -42,9 +48,6 @@ class RAGChatModelRepository(BaseRAGRepository):
         return vector_db.search(data=query_embeddings, n_results=n_results)
 
     async def get_response(self, session_id: int, input_msg: str) -> str:
-        print("------------------------")
-        print(input_msg)
-        print("------------------------")
         context = self.search_context(input_msg)
         prompt = self.get_prompt(session_id, input_msg, context)
         answer = ai_model.generate_answer(prompt)

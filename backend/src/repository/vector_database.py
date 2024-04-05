@@ -29,21 +29,12 @@ class MilvusHelper:
         self.client.create_collection(collection_name=collection_name, dimension=dimension)
         print(f"Milvus: collection {collection_name} created")
 
-    # def insert_single(self, data, collection_name=DEFAULT_COLLECTION):
-    #     try:
-    #         dim = self._get_collection_dimension_(collection_name)
-    #         if len(data) < dim:
-    #             data += [0] * (dim - len(data))
-    #         self.client.insert(collection_name, data)
-    #     except Exception as e:
-    #         print(f"Error: {e}")
-
     def insert_list(self, embedding, data, collection_name=DEFAULT_COLLECTION):
         try:
             dim = self._get_collection_dimension_(collection_name)
             for i, item in enumerate(embedding):
-                if len(item) < dim:
-                    item += [0] * (dim - len(item))
+                # if len(item) < dim:
+                #     item += [0] * (dim - len(item))
                 self.client.insert(collection_name=collection_name, data={"id": i, "vector": item, "doc": data[i]})
         except Exception as e:
             print(f"Error: {e}")
@@ -52,21 +43,27 @@ class MilvusHelper:
         print(res)
 
     def search(self, data, n_results, collection_name=DEFAULT_COLLECTION):
-        # dim = self._get_collection_dimension_(collection_name)
-        # if len(data) < dim:
-        #     data += [0] * (dim - len(data))
-        search_params = {"metric_type": "IP", "params": {}}
+
+        search_params = {"metric_type": "COSINE", "params": {}}
+        data_list = data.tolist()
         res = self.client.search(
-            collection_name=collection_name, data=data[0], limit=n_results, search_params=search_params
+            collection_name=collection_name,
+            data=data_list,
+            limit=n_results,
+            search_params=search_params,
+            output_fields=["doc"],
         )
-        return res
+        print(res)
+        sentences = []
+        for hits in res:
+            for hit in hits:
+                sentences.append(hit.get("entity").get("doc"))
+        context = ". ".join(sentences)
+        return context
 
     def create_index(self, index_name, index_params, collection_name=DEFAULT_COLLECTION):
         self.client.create_index(collection_name, index_name, index_params)
 
-    # def _get_collection_dimension_(self, collection_name=DEFAULT_COLLECTION):
-    #     collection_stats = self.client.get_collection_stats(collection_name)
-    #     return collection_stats['partitions'][0]['segments'][0]['data_size']
     def _get_collection_dimension_(self, collection_name=DEFAULT_COLLECTION):
         # collection_info = self.client.get_collection(collection_name)
         # return collection_info.schema.dimension
