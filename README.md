@@ -204,6 +204,13 @@ docker-compose up
     # Every time you write a new code, update your container with:
     docker-compose up -d --build
    ```
+    If there's a network issue , Dockerfile_alternative can be used instead of Dockerfile
+
+   ```shell
+    mv backend/Dockerfile backend/Dockerfile_backup
+    mv backend/Dockerfile_alternative backend/Dockerfile
+   ```
+
 
 8. (IMPORTANT) Database setup:
 

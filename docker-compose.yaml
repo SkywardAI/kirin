@@ -77,8 +77,11 @@ services:
       - HASHING_ALGORITHM_LAYER_1=${HASHING_ALGORITHM_LAYER_1}
       - HASHING_ALGORITHM_LAYER_2=${HASHING_ALGORITHM_LAYER_2}
       - HASHING_SALT=${HASHING_SALT}
+      - MILVUS_HOST=${MILVUS_HOST}
+      - MILVUS_PORT=${MILVUS_PORT}
     volumes:
-      - ./backend/:/usr/backend/
+      - ./backend/:/app/
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
     expose:
       - 8000
     ports:

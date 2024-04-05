@@ -1,4 +1,4 @@
-FROM gclub/skywardai:v0.1.2
+FROM gclub/skywardai:v0.1.3
 
 WORKDIR /app
 
@@ -10,4 +10,4 @@ COPY . .
 ENTRYPOINT ["./entrypoint.sh"]
 
 # Start up the backend server
-CMD uvicorn src.main:backend_app --reload --workers 4 --host 0.0.0.0 --port 8000
+CMD uvicorn src.main:backend_app --reload --host 0.0.0.0 --port 8000

@@ -7,6 +7,7 @@ from sqlalchemy.pool.base import _ConnectionRecord
 
 from src.repository.database import async_db
 from src.repository.table import Base
+from src.repository.vector_database import vector_db
 
 
 @event.listens_for(target=async_db.async_engine.sync_engine, identifier="connect")
@@ -43,6 +44,14 @@ async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
         await initialize_db_tables(connection=connection)
 
     loguru.logger.info("Database Connection --- Successfully Established!")
+
+
+# async def initialize_vectordb_connection(backend_app: fastapi.FastAPI) -> None:
+#     loguru.logger.info("Vector Database Connection --- Establishing . . .")
+
+#     backend_app.state.vdb = vector_db
+
+#     loguru.logger.info("Vector Database Connection --- Successfully Established!")
 
 
 async def dispose_db_connection(backend_app: fastapi.FastAPI) -> None:
