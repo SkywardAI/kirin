@@ -29,32 +29,35 @@ class MilvusHelper:
         self.client.create_collection(collection_name=collection_name, dimension=dimension)
         print(f"Milvus: collection {collection_name} created")
 
-    def insert_single(self, data, collection_name=DEFAULT_COLLECTION):
-        try:
-            dim = self._get_collection_dimension_(collection_name)
-            if len(data) < dim:
-                data += [0] * (dim - len(data))
-            self.client.insert(collection_name, data)
-        except Exception as e:
-            print(f"Error: {e}")
+    # def insert_single(self, data, collection_name=DEFAULT_COLLECTION):
+    #     try:
+    #         dim = self._get_collection_dimension_(collection_name)
+    #         if len(data) < dim:
+    #             data += [0] * (dim - len(data))
+    #         self.client.insert(collection_name, data)
+    #     except Exception as e:
+    #         print(f"Error: {e}")
 
-    def insert_list(self, data, collection_name=DEFAULT_COLLECTION):
+    def insert_list(self, embedding, data, collection_name=DEFAULT_COLLECTION):
         try:
             dim = self._get_collection_dimension_(collection_name)
-            for i, item in enumerate(data):
+            for i, item in enumerate(embedding):
                 if len(item) < dim:
                     item += [0] * (dim - len(item))
-                self.client.insert(collection_name=collection_name, data={"id": i, "vector": item})
+                self.client.insert(collection_name=collection_name, data={"id": i, "vector": item, "doc": data[i]})
         except Exception as e:
             print(f"Error: {e}")
+        res = self.client.get(collection_name=collection_name, ids=[0, 1, 2])
+
+        print(res)
 
     def search(self, data, n_results, collection_name=DEFAULT_COLLECTION):
-        dim = self._get_collection_dimension_(collection_name)
+        # dim = self._get_collection_dimension_(collection_name)
         # if len(data) < dim:
         #     data += [0] * (dim - len(data))
         search_params = {"metric_type": "IP", "params": {}}
         res = self.client.search(
-            collection_name=collection_name, data=data, limit=n_results, search_params=search_params
+            collection_name=collection_name, data=data[0], limit=n_results, search_params=search_params
         )
         return res
 

@@ -6,4 +6,6 @@ from src.repository.vector_database import vector_db
 vector_db.create_collection()
 # create sample csv
 embedding_list = ai_model.encode_string(SAMPLE_CONTEXT)
-vector_db.insert_list(embedding_list)
+print(embedding_list.shape)
+vector_db.insert_list(embedding_list, SAMPLE_CONTEXT)
+print("Sample inserted")

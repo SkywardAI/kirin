@@ -22,8 +22,8 @@ class ModelPipeline:
     def initialize_model(self, model_name):
 
         # model = AutoModelForCausalLM.from_pretrained(model_name)
-        tokenizer = AutoTokenizer.from_pretrained(DEFAULT_MODEL_PATH)
-        # tokenizer = AutoTokenizer.from_pretrained(model_name)
+        # tokenizer = AutoTokenizer.from_pretrained(DEFAULT_MODEL_PATH)
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
 
         # handle multiple steps internally, like tokenizing, feeding tokens into model, and processing the output into a human-readble form
         pipeline = transformers.pipeline(
