@@ -32,3 +32,8 @@ def http_404_username_details(username: str) -> str:
 
 def http_404_email_details(email: str) -> str:
     return f"Either the account with email `{email}` doesn't exist, has been deleted, or you are not authorized!"
+
+
+
+def http_400_file_name_details()->str:
+    return f"The file_name already exists. Please refrain from uploading it again, or try uploading with a different name!"

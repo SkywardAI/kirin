@@ -5,12 +5,21 @@ from sqlalchemy.sql import functions as sqlalchemy_functions
 
 from src.models.db.file import UploadedFile
 from src.repository.crud.base import BaseCRUDRepository
-from src.securities.verifications.credentials import credential_verifier
+from src.utilities.verifier.file import file_verifier # type: ignore
 from src.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
 
 
 class UploadedFileCRUDRepository(BaseCRUDRepository):
     async def create_uploadfile(self, file_name: str) -> UploadedFile:
+
+        file_name_stmt = sqlalchemy.select(UploadedFile.name).select_from(UploadedFile).where(UploadedFile.name == file_name)
+        file_name_query = await self.async_session.execute(file_name_stmt)
+        db_file_name = file_name_query.scalar()
+                
+        if not file_verifier.is_file_available(name=db_file_name):
+            raise EntityAlreadyExists(f"The file_name `{file_name}` is already file_name!")  
+   
+   
         uploaded_file = UploadedFile(name=file_name)
 
         self.async_session.add(instance=uploaded_file)
