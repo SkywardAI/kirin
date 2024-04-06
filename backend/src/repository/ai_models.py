@@ -1,4 +1,3 @@
-import torch
 import transformers
 from kimchima import Auto
 from transformers import AutoModelForCausalLM, AutoTokenizer
