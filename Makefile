@@ -22,7 +22,6 @@ stop:
 # For demo, without GPU augumentation, but slow for inference. Might include some bugs.
 .PHONY: demo
 demo: env
-	docker-compose -f docker-compose.demo.yaml build
 	docker-compose -f docker-compose.demo.yaml up -d
 
 .PHONY: demo-stop

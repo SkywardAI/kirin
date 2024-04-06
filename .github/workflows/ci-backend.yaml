@@ -105,6 +105,8 @@ jobs:
       HASHING_ALGORITHM_LAYER_1: ${{ secrets.HASHING_ALGORITHM_LAYER_1 }}
       HASHING_ALGORITHM_LAYER_2: ${{ secrets.HASHING_ALGORITHM_LAYER_2 }}
       HASHING_SALT: ${{ secrets.HASHING_SALT }}
+      MILVUS_HOST: ${{ secrets.MILVUS_HOST }}
+      MILVUS_PORT: ${{ secrets.MILVUS_PORT }}
 
     runs-on: ${{ matrix.os }}
     steps:
