@@ -32,7 +32,6 @@ celerybeat-schedule
 .classpath
 .project
 .settings/
-.vscode/
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -171,5 +170,3 @@ volumes/
 # Uploaded file
 uploaded_files/
 uploaded_files/*
-
-.devcontainer/

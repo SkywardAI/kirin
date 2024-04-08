@@ -73,10 +73,13 @@ class BackendBaseSettings(BaseSettings):
     HASHING_SALT: str = decouple.config("HASHING_SALT", cast=str)  # type: ignore
     JWT_ALGORITHM: str = decouple.config("JWT_ALGORITHM", cast=str)  # type: ignore
 
-    class Config(pydantic.BaseConfig):
+    class Config(pydantic.ConfigDict):
         case_sensitive: bool = True
         env_file: str = f"{str(ROOT_DIR)}/.env"
         validate_assignment: bool = True
+        # https://docs.pydantic.dev/latest/api/config/#pydantic.config.ConfigDict.extra
+        #TODO: We need to make sure pydanic is really useful
+        extra='allow'
 
     @property
     def set_backend_app_attributes(self) -> dict[str, str | bool | None]:

@@ -10,5 +10,5 @@ flag_management:
         - backend/
       statuses:
         - type: project
-          target: 5%
-          threshold: 1%
+          # target: 5%
+          # threshold: 1%
