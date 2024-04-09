@@ -33,12 +33,9 @@ services:
       - db
 
   backend_app:
+    image: gclub/kirin:v0.1.3
     container_name: backend_app
     restart: always
-
-    build:
-      dockerfile: Dockerfile
-      context: ./backend/
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - DEBUG=${DEBUG}
@@ -74,7 +71,8 @@ services:
       - MILVUS_HOST=${MILVUS_HOST}
       - MILVUS_PORT=${MILVUS_PORT}
     volumes:
-      - ./backend/:/usr/backend/
+      - ./backend/:/app/
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
     expose:
       - 8000
     ports:
