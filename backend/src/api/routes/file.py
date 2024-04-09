@@ -49,6 +49,18 @@ async def upload_and_return_id(
 
     return FileInResponse(fileID=new_file.id)
 
+@router.get(
+    path="/dataset",
+    name="dataset:get-dataset-list",
+    response_model=list[str],
+    status_code=fastapi.status.HTTP_200_OK,
+)
+async def get_dataset(
+) -> list[str]:
+    #TODO return the names of recently used dataset order by last used time desc
+    res = ["dataset1","dataset2"]
+
+    return res
 
 @router.get(
     path="/{id}",
@@ -66,3 +78,4 @@ async def check_status(
     # 1 for complete successfully
     # -1 for error
     return FileStatusInResponse(status=1)
+
