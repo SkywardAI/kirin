@@ -1,5 +1,5 @@
-name-template: 'Kirin v$NEXT_PATCH_VERSION'
-tag-template: 'v$NEXT_PATCH_VERSION'
+name-template: 'v$RESOLVED_VERSION 🌈'
+tag-template: 'v$RESOLVED_VERSION 🌈'
 categories:
   - title: '🚀 Features'
     labels:
@@ -8,9 +8,15 @@ categories:
   - title: '🐛 Bug Fixes'
     labels:
       - 'bugfix'
+      - 'fix'
+      - 'bug'
   - title: '🧰 Maintenance'
-    label: 'CI'
+    label: 
+      - 'ci'
+      - 'refactor'
+      - 'chore'
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&'
 version-resolver:
   major:
     labels:
