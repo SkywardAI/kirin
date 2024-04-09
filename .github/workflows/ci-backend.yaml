@@ -135,7 +135,7 @@ jobs:
 
   docker_operations:
     name: 'Docker Build and Push🐳'
-    needs: [code-quality, test]
+    needs: [code-quality]
     strategy:
       matrix:
         os:
