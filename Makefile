@@ -18,6 +18,10 @@ up: env build
 stop:
 	docker-compose -f docker-compose.yaml stop
 
+.PHONY: logs
+logs:
+	@docker-compose -f docker-compose.yaml logs -f
+
 ############################################################################################################
 # For demo, without GPU augumentation, but slow for inference. Might include some bugs.
 .PHONY: demo
