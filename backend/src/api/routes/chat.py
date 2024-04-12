@@ -87,6 +87,7 @@ async def get_all_sessions(
             name=session.name,
             created_at=session.created_at,
         )
+        print(f"res_session:{res_session}") 
         sessions_list.append(res_session)
 
     return sessions_list

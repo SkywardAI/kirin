@@ -78,6 +78,7 @@ class ModelPipeline:
         r"""
         Inference by using transformers pipeline
         """
+        print(f"promptaaa:{prompt}")        
         sequences = self.pipe(
             prompt,
             max_length=50,
