@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: FastAPI",
+            "name": "Launch backend server",
             "type": "debugpy",
             "request": "launch",
             "cwd": "${workspaceFolder}/backend",
