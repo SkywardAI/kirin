@@ -10,6 +10,7 @@ env
 Dockerfile
 Dockerfile.prod
 docker-compose.yaml
+docker-compose.demo.yaml
 .eslintrc.js
 requirements-build.txt
 requirements-lint.txt
@@ -19,3 +20,11 @@ requirements-prod.txt
 CONTAINER.md
 README.md
 node_modules/
+
+.devcontainer
+.vscode
+volumes
+.pre-commit-config.yaml
+.codecov.yaml
+LICENSE.md
+Makefile

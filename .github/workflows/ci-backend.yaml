@@ -151,7 +151,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Login to Github Container Registry
+      - name: Login to DockerHub
         uses: docker/login-action@v3
         if: github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/') && success()
         with:
@@ -160,9 +160,9 @@ jobs:
       - name: Build Docker image
         if: startsWith(github.ref, 'refs/tags/') != true && success()
         run: |
-          docker build -t ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.IMAGE_NAME }}:${GITHUB_SHA::7} .
+          docker build -t ${{ secrets.DOCKER_REGISTRY_KIRIN }}/${{ secrets.IMAGE_NAME_KIRIN }}:${GITHUB_SHA::7} .
       - name: Push Docker image
         if: github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/') && success()
         run: |
-          docker build -t ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.IMAGE_NAME }}:${GITHUB_REF/refs\/tags\//} .
-          docker push ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.IMAGE_NAME }}:${GITHUB_REF/refs\/tags\//}
+          docker build -t ${{ secrets.DOCKER_REGISTRY_KIRIN }}/${{ secrets.IMAGE_NAME_KIRIN }}:${GITHUB_REF/refs\/tags\//} .
+          docker push ${{ secrets.DOCKER_REGISTRY_KIRIN }}/${{ secrets.IMAGE_NAME_KIRIN }}:${GITHUB_REF/refs\/tags\//}
