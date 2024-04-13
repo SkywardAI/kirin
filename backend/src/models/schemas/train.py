@@ -2,7 +2,8 @@ from src.models.schemas.base import BaseSchemaModel
 
 
 class TrainFileIn(BaseSchemaModel):
-    fileID: int
+    fileID: int | None = None
+    dataSet: str | None = None
     modelID: int
 
 
