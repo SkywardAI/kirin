@@ -23,7 +23,10 @@ async def train(
     file_repo: UploadedFileCRUDRepository = fastapi.Depends(get_repository(repo_type=UploadedFileCRUDRepository)),
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
 ) -> TrainFileInResponse:
-
+    #TODO train can be performed by csv file or dataset
+    # 1, either fileID or dataset should be shown in input
+    # 2, validate fileID or dataset
+    # 3, use file and or dataset perform the training logic (csv id done)
     ai_model = await aimodel_repo.read_aimodel_by_id(id=train_in_msg.modelID)
     file_csv = await file_repo.read_uploadedfiles_by_id(id=train_in_msg.fileID)
 
