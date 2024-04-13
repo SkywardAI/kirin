@@ -17,7 +17,8 @@ SAMPLE_CONTEXT = [
     "Melbourne is home to iconic landmarks like the Royal Exhibition Building and Flinders Street Station.",
     "The Yarra River runs through the heart of the city, providing a picturesque setting.",
     "The Melbourne Cricket Ground (MCG) is a historic sports venue and a key part of the city's identity.",
-    "The city hosts various events, including the Australian Open, Melbourne Fashion Week, and the Melbourne International Comedy Festival.Melbourne's street art scene is renowned, with vibrant murals adorning many laneways.",
+    "The city hosts various events, including the Australian Open, Melbourne Fashion Week, and the Melbourne International Comedy Festival.",
+    "Melbourne's street art scene is renowned, with vibrant murals adorning many laneways.",
     "The Queen Victoria Market is a popular spot for fresh produce, local crafts, and diverse international cuisines.",
-    "Melbourne is often considered one of the most livable cities globally, offering a high quality of life.",
+    "Melbourne is often considered one of the most livable cities globally, offering a high quality of life."
 ]
