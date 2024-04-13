@@ -31,4 +31,4 @@ python-slugify==8.0.4
 SQLAlchemy==2.0.29
 trio==0.25.0
 uvicorn==0.29.0
-kimchima==0.3.0
+kimchima==0.4.1
