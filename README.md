@@ -1,33 +1,15 @@
 <h1 align=center><strong>Chat machine trainer backend</strong></h1>
 
-<div align=center>
- <a href="https://github.com/SkywardAI/chat-backend/actions/workflows/ci-backend.yaml">
-  <img src="https://github.com/SkywardAI/chat-backend/actions/workflows/ci-backend.yaml"/>
- </a>
-
- <a href="https://codecov.io/gh/SkywardAI/chat-backend">
-  <img src="https://codecov.io/gh/SkywardAI/chat-backend/branch/trunk/graph/badge.svg?token=1hiVayuLRl"/>
- </a>
+<div style="display: flex; justify-content: flex-start;">
 
  <a href="https://github.com/pre-commit/pre-commit">
   <img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit" alt="pre-commit" style="max-width:100%;">
  </a>
 
- <a href="https://github.com/psf/black">
-  <img src="https://img.shields.io/badge/code%20style-black-000000.svg">
- </a>
-
- <a href="https://pycqa.github.io/isort/">
-  <img src="https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336">
- </a>
-
- <a href="http://www.mypy-lang.org/static/mypy_badge.svg">
-  <img src="https://camo.githubusercontent.com/59eab954a267c6e9ff1d80e8055de43a0ad771f5e1f3779aef99d111f20bee40/687474703a2f2f7777772e6d7970792d6c616e672e6f72672f7374617469632f6d7970795f62616467652e737667" alt="check with mypy" style="max-width:100%;">
- </a>
-</div>
 
 [![CI - Backend](https://github.com/SkywardAI/chat-backend/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/ci-backend.yaml)
 [![Release Drafter 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml/badge.svg?branch=main)](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml)
+</div>
 <br>
 
 This is a repository is the backend of the chat machine trainer websit. It's using the following tech stack:
