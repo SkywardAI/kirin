@@ -44,7 +44,7 @@ This repo consists of:
 * Step 4 $\rightarrow$ Install the initial project requirements with `pip3`:
 
     ```shell
-    pip3 install -r requirements.txt
+    pip3 install -r https://raw.githubusercontent.com/SkywardAI/containers/main/requirements.txt
     ```
 
 ---
