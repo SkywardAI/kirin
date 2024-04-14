@@ -125,7 +125,7 @@ docker-compose up
     pyenv local any_venv_name
 
     # Install dependencies
-    pip3 install -r requirements.txt
+    pip3 install -r https://raw.githubusercontent.com/SkywardAI/containers/main/requirements.txt
 
     # Test run your backend server
     uvicorn src.main:backend_app --reload
@@ -311,7 +311,7 @@ backend/
 ├── entrypoint.sh                       # A script to restart backend app container if postgres is not started
 ├── alembic.ini                         # Automatic database migration configuration
 ├── pyproject.toml                      # Linter and test main configuration file
-├── requirements.txt                    # Packages installed for backend app
+├── https://raw.githubusercontent.com/SkywardAI/containers/main/requirements.txt                    # Packages installed for backend app
 .dockerignore                           # A file that list files to be excluded in Docker container
 .gitignore                              # A file that list files to be excluded in GitHub repository
 .pre-commit-config.yaml                 # A file with Python linter hooks to ensure conventional commit when committing

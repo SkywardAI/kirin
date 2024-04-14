@@ -116,7 +116,7 @@ jobs:
   #     - name: Install dependencies
   #       run:  |
   #         python -m pip install --upgrade pip
-  #         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+  #         pip install -r https://raw.githubusercontent.com/SkywardAI/containers/main/requirements.txt
   #     - name: Install Dependencies for Testing
   #       run: |
   #         pip install pytest pytest-asyncio pytest-xdist
