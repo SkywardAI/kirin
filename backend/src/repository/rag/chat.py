@@ -1,8 +1,11 @@
 import csv
 
+import sqlalchemy
+from src.models.schemas.chat import MessagesResponse
 from pymilvus import db
 
 from kimchima.chat_template import ChatTemplateFactory
+from src.models.db.chat import ChatHistory
 from src.config.settings.const import UPLOAD_FILE_PATH
 from src.repository.ai_models import ai_model
 from src.repository.rag.base import BaseRAGRepository
@@ -19,30 +22,38 @@ class RAGChatModelRepository(BaseRAGRepository):
             return False
         return True
 
-    def get_prompt(self, session_id: int, message: str) -> str:
-        system_prompt = """"""
-        # TODO get chat_history by session_id
-        # chat_history: list[tuple[str, str]] = []
-        # texts = [f"<s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n"]
+    async def get_prompt(self, session_id: int, message: str) -> str:
+            # TODO get chat_history by session_id
+            # chat_history: list[tuple[str, str]] = []
+            # texts = [f"<s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n"]
+            stmt = sqlalchemy.select(ChatHistory).where(ChatHistory.session_id == session_id)
+            query = await self.async_session.execute(statement=stmt)
+            db_Historys=query.scalars().all()
 
-        # do_strip = False
-        # for user_input, response in chat_history:
-        #     user_input = user_input.strip() if do_strip else user_input
-        #     do_strip = True
-        #     texts.append(f"{user_input} [/INST] {response.strip()} </s><s>[INST] ")
-        # message = message.strip() if do_strip else message
-        messages = [
-            {
-                "role": "user",
-                "content": message,
-            }
-        ]
-        text = ChatTemplateFactory.prompt_generation(
-                model=ai_model.model_name,
-                messages=messages,
-                tokenize=False
+
+            msg_list= list()
+
+            for history in db_Historys:
+                his_model = MessagesResponse(
+                    role="assistant" if history.is_bot_msg else "user",
+                    content=history.message,
                 )
-        return text
+                msg_list.append(his_model)
+            msg_list.append(
+                MessagesResponse(
+                    role="user",
+                    content=message
+                    )
+                )
+            # messages = [
+            #     {
+            #         "role": "user",
+            #         "content": message,
+            #     },
+            #     {"role": "assistant", "content": context},
+            # ]
+            text = ai_model.tokenizer.apply_chat_template(msg_list, tokenize=False)
+            return text
 
     def search_context(self, query, n_results=1):
         query_embeddings = ai_model.encode_string(query)
@@ -50,9 +61,11 @@ class RAGChatModelRepository(BaseRAGRepository):
         return vector_db.search(data=query_embeddings, n_results=n_results)
 
     async def get_response(self, session_id: int, input_msg: str) -> str:
-        prompt = self.search_context(input_msg)
-        message = self.get_prompt(session_id, input_msg)
-        answer = ai_model.generate_answer(message, prompt)
+        context = self.search_context(input_msg)
+        messages = await self.get_prompt(session_id, input_msg)
+        print(f'session_id chatHistory value:{messages}')
+        answer = ai_model.generate_answer(messages,context)
+        print(f'ai generate_answer value:{answer}')
         # TODO stream output
         return answer
 

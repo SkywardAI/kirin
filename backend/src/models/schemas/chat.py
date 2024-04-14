@@ -27,3 +27,8 @@ class ChatHistory(BaseSchemaModel):
     id: int
     type: str
     message: str
+
+
+class MessagesResponse(BaseSchemaModel):
+    role: str
+    content: str
