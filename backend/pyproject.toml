@@ -15,7 +15,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+dependencies = {file = ["https://raw.githubusercontent.com/SkywardAI/containers/main/requirements.txt"]}
 
 [project.urls]
 homepage = "https://github.com/SkywardAI/chat-backend"
