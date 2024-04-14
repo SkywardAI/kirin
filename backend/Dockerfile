@@ -1,5 +1,5 @@
 # Our base image
-FROM gclub/skywardai:v0.1.5
+FROM gclub/skywardai:v0.1.6
 
 # We set the working directory to /app.
 # This is where the application code will be stored.

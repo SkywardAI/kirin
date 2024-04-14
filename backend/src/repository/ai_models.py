@@ -17,10 +17,11 @@ from kimchima import (
     ModelFactory,
     TokenizerFactory,
     EmbeddingsFactory,
-    PipelinesFactory
+    PipelinesFactory,
+    chat_summary
 )
 
-from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAULT_MODEL_PATH
+from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAUTL_SUMMERIZE_MODEL
 
 
 class ModelPipeline:
@@ -33,6 +34,7 @@ class ModelPipeline:
     def __init__(self, model_name=DEFAULT_MODEL):
         #TODO Logger system
         self.pipe, self.tokenizer = self.initialize_pipeline(DEFAULT_MODEL)
+        self.model_name = model_name
         # self.initialize_encoder(DEFAULT_ENCODER)
 
     def encode_string(self, data):
@@ -74,29 +76,18 @@ class ModelPipeline:
 
         return pipe, tokenizer
 
-    def generate_answer(self, prompt):
+    def generate_answer(self, messages, prompt=None, model_name=DEFAULT_MODEL):
         r"""
         Inference by using transformers pipeline
         """
-        sequences = self.pipe(
-            prompt,
-            max_length=50,
-            early_stopping=True,
-            truncation=True,
-            do_sample=True,
-            top_k=1,
-            no_repeat_ngram_size=2,
-            num_return_sequences=1,
-            pad_token_id=self.tokenizer.eos_token_id
-        )
-
-        res = (
-            sequences[0]
-            .get("generated_text")
-            .replace("string<|endoftext|>", "")
-            .replace("<|endoftext|>", "")
-            .replace("\n", "")
-        )
+        conversation_model=model_name
+        summarization_model=DEFAUTL_SUMMERIZE_MODEL
+        res = chat_summary(
+            conversation_model=conversation_model,
+            summarization_model=summarization_model,
+            messages=messages,
+            prompt=prompt
+            )
         # TODO logger
         return res
 

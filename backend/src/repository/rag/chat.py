@@ -2,14 +2,13 @@ import csv
 
 from pymilvus import db
 
+from kimchima.chat_template import ChatTemplateFactory
 from src.config.settings.const import UPLOAD_FILE_PATH
 from src.repository.ai_models import ai_model
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.vector_database import vector_db
 
-
 class RAGChatModelRepository(BaseRAGRepository):
-
     async def load_model(self, session_id: int, model_name: str) -> bool:
         # Init model with input model_name
         try:
@@ -20,7 +19,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             return False
         return True
 
-    def get_prompt(self, session_id: int, message: str, context: str) -> str:
+    def get_prompt(self, session_id: int, message: str) -> str:
         system_prompt = """"""
         # TODO get chat_history by session_id
         # chat_history: list[tuple[str, str]] = []
@@ -36,10 +35,13 @@ class RAGChatModelRepository(BaseRAGRepository):
             {
                 "role": "user",
                 "content": message,
-            },
-            {"role": "assistant", "content": context},
+            }
         ]
-        text = ai_model.tokenizer.apply_chat_template(messages, tokenize=False)
+        text = ChatTemplateFactory.prompt_generation(
+                model=ai_model.model_name,
+                messages=messages,
+                tokenize=False
+                )
         return text
 
     def search_context(self, query, n_results=1):
@@ -48,9 +50,9 @@ class RAGChatModelRepository(BaseRAGRepository):
         return vector_db.search(data=query_embeddings, n_results=n_results)
 
     async def get_response(self, session_id: int, input_msg: str) -> str:
-        context = self.search_context(input_msg)
-        prompt = self.get_prompt(session_id, input_msg, context)
-        answer = ai_model.generate_answer(prompt)
+        prompt = self.search_context(input_msg)
+        message = self.get_prompt(session_id, input_msg)
+        answer = ai_model.generate_answer(message, prompt)
         # TODO stream output
         return answer
 
@@ -66,9 +68,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             for row in reader:
                 # Add the row to the list
                 data.extend(row)
-        print(data)
         embedding_list = ai_model.encode_string(data)
-        print(embedding_list)
         vector_db.insert_list(embedding_list, data)
 
         return True
