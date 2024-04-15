@@ -31,9 +31,11 @@ class ModelPipeline:
     - to generate an answer by using the transformers pipeline.
     """
 
-    def __init__(self, model_name=DEFAULT_MODEL):
+    async def init(self, model_name=DEFAULT_MODEL,model_sum=DEFAUTL_SUMMERIZE_MODEL):
         #TODO Logger system
-        self.pipe, self.tokenizer = self.initialize_pipeline(DEFAULT_MODEL)
+        self.pipe, self.tokenizer = self.initialize_pipeline(model_name)
+        self.pipe_con = self.initialize_pip_con(model_name)
+        self.pipe_sum = self.initialize_pip_sum(model_sum)
         self.model_name = model_name
         # self.initialize_encoder(DEFAULT_ENCODER)
 
@@ -58,6 +60,13 @@ class ModelPipeline:
         # TODO download model by using kimchima Model Gallery
         pass
 
+    def initialize_pip_con(self, pretrained_model_name_or_path):
+        pip = PipelinesFactory.customized_pipe(model=pretrained_model_name_or_path, device_map='auto')
+        return pip
+
+    def initialize_pip_sum(self, pretrained_model_name_or_path):
+        pip = PipelinesFactory.customized_pipe(model=pretrained_model_name_or_path, device_map='auto')
+        return pip
 
     def initialize_pipeline(self, model_name):
         r"""
@@ -80,11 +89,9 @@ class ModelPipeline:
         r"""
         Inference by using transformers pipeline
         """
-        conversation_model=model_name
-        summarization_model=DEFAUTL_SUMMERIZE_MODEL
         res = chat_summary(
-            conversation_model=conversation_model,
-            summarization_model=summarization_model,
+            pipe_con=self.pipe_con,
+            pipe_sum=self.pipe_sum,
             messages=messages,
             prompt=prompt
             )
