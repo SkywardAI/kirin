@@ -4,15 +4,14 @@ import sqlalchemy
 from src.models.schemas.chat import MessagesResponse
 from pymilvus import db
 
+from kimchima.chat_template import ChatTemplateFactory
 from src.models.db.chat import ChatHistory
 from src.config.settings.const import UPLOAD_FILE_PATH
 from src.repository.ai_models import ai_model
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.vector_database import vector_db
 
-
 class RAGChatModelRepository(BaseRAGRepository):
-
     async def load_model(self, session_id: int, model_name: str) -> bool:
         # Init model with input model_name
         try:
@@ -23,7 +22,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             return False
         return True
 
-    async def get_prompt(self, session_id: int, message: str, context: str) -> str:
+    async def get_prompt(self, session_id: int, message: str) -> str:
             # TODO get chat_history by session_id
             # chat_history: list[tuple[str, str]] = []
             # texts = [f"<s>[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n"]
@@ -39,8 +38,13 @@ class RAGChatModelRepository(BaseRAGRepository):
                     role="assistant" if history.is_bot_msg else "user",
                     content=history.message,
                 )
-            msg_list.append(his_model)
-
+                msg_list.append(his_model)
+            msg_list.append(
+                MessagesResponse(
+                    role="user",
+                    content=message
+                    )
+                )
             # messages = [
             #     {
             #         "role": "user",
@@ -58,9 +62,9 @@ class RAGChatModelRepository(BaseRAGRepository):
 
     async def get_response(self, session_id: int, input_msg: str) -> str:
         context = self.search_context(input_msg)
-        prompt = await self.get_prompt(session_id, input_msg, context)
-        print(f'session_id chatHistory value:{prompt}')
-        answer = ai_model.generate_answer(prompt)
+        messages = await self.get_prompt(session_id, input_msg)
+        print(f'session_id chatHistory value:{messages}')
+        answer = ai_model.generate_answer(messages,context)
         print(f'ai generate_answer value:{answer}')
         # TODO stream output
         return answer
@@ -77,9 +81,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             for row in reader:
                 # Add the row to the list
                 data.extend(row)
-        print(data)
         embedding_list = ai_model.encode_string(data)
-        print(embedding_list)
         vector_db.insert_list(embedding_list, data)
 
         return True

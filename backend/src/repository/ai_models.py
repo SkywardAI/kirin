@@ -17,10 +17,11 @@ from kimchima import (
     ModelFactory,
     TokenizerFactory,
     EmbeddingsFactory,
-    PipelinesFactory
+    PipelinesFactory,
+    chat_summary
 )
 
-from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAULT_MODEL_PATH
+from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAUTL_SUMMERIZE_MODEL
 
 
 class ModelPipeline:
@@ -30,9 +31,12 @@ class ModelPipeline:
     - to generate an answer by using the transformers pipeline.
     """
 
-    def __init__(self, model_name=DEFAULT_MODEL):
+    async def init(self, model_name=DEFAULT_MODEL,model_sum=DEFAUTL_SUMMERIZE_MODEL):
         #TODO Logger system
-        self.pipe, self.tokenizer = self.initialize_pipeline(DEFAULT_MODEL)
+        self.pipe, self.tokenizer = self.initialize_pipeline(model_name)
+        self.pipe_con = self.initialize_pip_con(model_name)
+        self.pipe_sum = self.initialize_pip_sum(model_sum)
+        self.model_name = model_name
         # self.initialize_encoder(DEFAULT_ENCODER)
 
     def encode_string(self, data):
@@ -56,6 +60,13 @@ class ModelPipeline:
         # TODO download model by using kimchima Model Gallery
         pass
 
+    def initialize_pip_con(self, pretrained_model_name_or_path):
+        pip = PipelinesFactory.customized_pipe(model=pretrained_model_name_or_path, device_map='auto')
+        return pip
+
+    def initialize_pip_sum(self, pretrained_model_name_or_path):
+        pip = PipelinesFactory.customized_pipe(model=pretrained_model_name_or_path, device_map='auto')
+        return pip
 
     def initialize_pipeline(self, model_name):
         r"""
@@ -74,29 +85,16 @@ class ModelPipeline:
 
         return pipe, tokenizer
 
-    def generate_answer(self, prompt):
+    def generate_answer(self, messages, prompt=None, model_name=DEFAULT_MODEL):
         r"""
         Inference by using transformers pipeline
         """
-        sequences = self.pipe(
-            prompt,
-            max_length=50,
-            early_stopping=True,
-            truncation=True,
-            do_sample=True,
-            top_k=1,
-            no_repeat_ngram_size=2,
-            num_return_sequences=1,
-            pad_token_id=self.tokenizer.eos_token_id
-        )
-
-        res = (
-            sequences[0]
-            .get("generated_text")
-            .replace("string<|endoftext|>", "")
-            .replace("<|endoftext|>", "")
-            .replace("\n", "")
-        )
+        res = chat_summary(
+            pipe_con=self.pipe_con,
+            pipe_sum=self.pipe_sum,
+            messages=messages,
+            prompt=prompt
+            )
         # TODO logger
         return res
 
