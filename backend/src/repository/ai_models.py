@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 
 from kimchima import (
     ModelFactory,
     TokenizerFactory,
     EmbeddingsFactory,
     PipelinesFactory,
-    chat_summary
+    chat_summary,
+    Downloader
 )
 
-from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAUTL_SUMMERIZE_MODEL
+from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAUTL_SUMMERIZE_MODEL,DEFAULT_MODEL_PATH
 
 
 class ModelPipeline:
@@ -39,11 +41,13 @@ class ModelPipeline:
         self.model_name = model_name
         # self.initialize_encoder(DEFAULT_ENCODER)
 
-    def encode_string(self, data):
+    def encode_string(self, data, model_name=DEFAULT_ENCODER):
         
         #TODO: It should be load from the local file and set cache in kimchima
-        encoder_model=ModelFactory.auto_model(pretrained_model_name_or_path=DEFAULT_ENCODER)
-        tokenizer=TokenizerFactory.auto_tokenizer(pretrained_model_name_or_path=DEFAULT_ENCODER)
+        model_path = self._check_and_download_model(model_name)
+        
+        encoder_model=ModelFactory.auto_model(pretrained_model_name_or_path=model_path)
+        tokenizer=TokenizerFactory.auto_tokenizer(pretrained_model_name_or_path=model_path)
 
         embeddings=EmbeddingsFactory.get_text_embeddings(
             model=encoder_model,
@@ -60,24 +64,24 @@ class ModelPipeline:
         # TODO download model by using kimchima Model Gallery
         pass
 
-    def initialize_pip_con(self, pretrained_model_name_or_path):
-        pip = PipelinesFactory.customized_pipe(model=pretrained_model_name_or_path, device_map='auto')
+    def initialize_pip_con(self, model_name):
+        pip = PipelinesFactory.customized_pipe(model=model_name,device_map='auto')
         return pip
 
-    def initialize_pip_sum(self, pretrained_model_name_or_path):
-        pip = PipelinesFactory.customized_pipe(model=pretrained_model_name_or_path, device_map='auto')
+    def initialize_pip_sum(self, model_name):
+        pip = PipelinesFactory.customized_pipe(model=model_name, device_map='auto')
         return pip
 
     def initialize_pipeline(self, model_name):
         r"""
         Initialize the pipeline by using tokenizer and model
         """
-
-        tokenizer= TokenizerFactory.auto_tokenizer(pretrained_model_name_or_path=model_name)
+        model_path = self._check_and_download_model(model_name)
+        tokenizer= TokenizerFactory.auto_tokenizer(pretrained_model_name_or_path=model_path)
 
         # handle multiple steps internally, like tokenizing, feeding tokens into model, and processing the output into a human-readble form
         pipe= PipelinesFactory.text_generation(
-            model=model_name,
+            model=model_path,
             tokenizer=tokenizer,
             trust_remote_code=True,
             max_new_tokens=50
@@ -97,6 +101,17 @@ class ModelPipeline:
             )
         # TODO logger
         return res
+
+    def _check_and_download_model(self, model_name):
+        r"""
+        Check the model exists or not, if not download the model
+        """
+        model_path = DEFAULT_MODEL_PATH + model_name
+        if os.path.exists(model_path):
+            return model_path
+        else:
+            Downloader.auto_downloader(model_name=model_name, folder_name=model_path)
+            return model_path
 
 
 ai_model: ModelPipeline = ModelPipeline()

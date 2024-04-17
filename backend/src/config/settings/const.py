@@ -9,7 +9,7 @@ CHAT_COMTEXT = "Melbourne is the capital city of the Australian state of Victori
 DEFAULT_ENCODER = "sentence-transformers/all-MiniLM-L6-v2"
 DEFAULT_MODEL = "gpt2"
 DEFAUTL_SUMMERIZE_MODEL="sshleifer/distilbart-cnn-12-6"
-DEFAULT_MODEL_PATH = "/models/phi-2"
+DEFAULT_MODEL_PATH = "/workspaces/chat-backend/volumes/models/"
 # SAMPLE_CONTEXT
 SAMPLE_CONTEXT = [
     "Melbourne is the capital city of the Australian state of Victoria.",
