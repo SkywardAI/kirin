@@ -110,7 +110,7 @@ class ModelPipeline:
         if os.path.exists(model_path):
             return model_path
         else:
-            Downloader.auto_downloader(model_name=model_name, folder_name=model_path)
+            Downloader.model_downloader(model_name=model_name, folder_name=model_path)
             return model_path
 
 
