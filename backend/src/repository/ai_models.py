@@ -79,27 +79,10 @@ class ModelPipeline:
                                                task="summarization")
         return pip
 
-    def initialize_pipeline(self, model_name):
-        r"""
-        Initialize the pipeline by using tokenizer and model
-        """
-        model_path = self._check_and_download_model(model_name)
-        tokenizer= TokenizerFactory.auto_tokenizer(pretrained_model_name_or_path=model_path)
-
-        # handle multiple steps internally, like tokenizing, feeding tokens into model, and processing the output into a human-readble form
-        pipe= PipelinesFactory.customized_pipe(
-            model=model_path,
-            tokenizer=tokenizer,
-            trust_remote_code=True,
-            max_new_tokens=50,
-            task="text2text-generation"
-        )
-
-        return pipe, tokenizer
-
     def generate_conversation(self, chat_history, question):
         r"""
-        Inference by using transformers pipeline
+        generate conversation using chat list and question
+        return transformer.Converaton
         """
         con = PipelinesFactory.init_conversation()
         for chat in chat_history:
@@ -111,7 +94,8 @@ class ModelPipeline:
 
     def generate_answer(self, messages, prompt=None):
         r"""
-        Inference by using transformers pipeline
+        Generate answer by generate message from converations and vector result
+        then summerize the response
         """
         response = self.pipe_con(messages, max_length=128, min_length=8, top_p=0.9, do_sample=True)
         raw_response = prompt + response.messages[-1]["content"]
