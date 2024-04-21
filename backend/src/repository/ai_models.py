@@ -36,7 +36,6 @@ class ModelPipeline:
 
     async def init(self, model_name=DEFAULT_MODEL,model_sum=DEFAUTL_SUMMERIZE_MODEL, encoder_name=DEFAULT_ENCODER) -> None:
         #TODO Logger system
-        self.pipe, self.tokenizer = self.initialize_pipeline(model_name)
         self.pipe_con = self.initialize_pip_con(model_name)
         self.pipe_sum = self.initialize_pip_sum(model_sum)
         self.encoder_model, self.encoder_tokenizer = self.initialize_encoder(encoder_name)
@@ -119,12 +118,6 @@ class ModelPipeline:
         max_length = len(raw_response)
 
         response = self.pipe_sum(raw_response, min_length=5, max_length=max_length)
-        # res = Dialog.chat_summary(
-        #     pipe_con=self.pipe_con,
-        #     pipe_sum=self.pipe_sum,
-        #     messages=messages,
-        #     prompt=prompt
-        #     )
         # TODO logger
         return response[0].get('summary_text')
 
