@@ -14,12 +14,14 @@
 
 import os
 
-from kimchima import (
+from kimchima.pkg import (
     ModelFactory,
     TokenizerFactory,
     EmbeddingsFactory,
-    PipelinesFactory,
-    chat_summary,
+    PipelinesFactory
+)
+from kimchima.utils import (
+    Dialog,
     Downloader
 )
 
@@ -96,11 +98,26 @@ class ModelPipeline:
 
         return pipe, tokenizer
 
-    def generate_answer(self, messages, prompt=None, model_name=DEFAULT_MODEL):
+    def generate_conversation(self, chat_history, question):
         r"""
         Inference by using transformers pipeline
         """
-        res = chat_summary(
+        if len(chat_history) == 0:
+            return PipelinesFactory.init_conversation(question)
+        #Use the first
+        con = PipelinesFactory.init_conversation(chat_history[0].message)
+        for i in range(1, len(chat_history)):
+            role="assistant" if chat_history[i].is_bot_msg else "user"
+            con.add_message({"role": role, "content": chat_history[i].message})
+        con.add_message({"role": "user", "content": question})
+        return con
+        
+
+    def generate_answer(self, messages, prompt=None):
+        r"""
+        Inference by using transformers pipeline
+        """
+        res = Dialog.chat_summary(
             pipe_con=self.pipe_con,
             pipe_sum=self.pipe_sum,
             messages=messages,

@@ -8,7 +8,10 @@ WORKDIR /app
 EXPOSE 8000
 
 COPY . .
-
+RUN pip install kimchima==0.4.8 \
+&& pip install -U huggingface_hub hf_transfer \
+&& export HF_HUB_HF_ENABLE_TRANSFER=1 \
+&& export HF_ENDPOINT=https://hf-mirror.com
 # Execute entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
 
