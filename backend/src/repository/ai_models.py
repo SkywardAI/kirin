@@ -21,7 +21,6 @@ from kimchima.pkg import (
     PipelinesFactory
 )
 from kimchima.utils import (
-    Dialog,
     Downloader
 )
 
@@ -89,11 +88,12 @@ class ModelPipeline:
         tokenizer= TokenizerFactory.auto_tokenizer(pretrained_model_name_or_path=model_path)
 
         # handle multiple steps internally, like tokenizing, feeding tokens into model, and processing the output into a human-readble form
-        pipe= PipelinesFactory.text_generation(
+        pipe= PipelinesFactory.customized_pipe(
             model=model_path,
             tokenizer=tokenizer,
             trust_remote_code=True,
-            max_new_tokens=50
+            max_new_tokens=50,
+            task="text2text-generation"
         )
 
         return pipe, tokenizer
@@ -114,14 +114,19 @@ class ModelPipeline:
         r"""
         Inference by using transformers pipeline
         """
-        res = Dialog.chat_summary(
-            pipe_con=self.pipe_con,
-            pipe_sum=self.pipe_sum,
-            messages=messages,
-            prompt=prompt
-            )
+        response = self.pipe_con(messages, max_length=128, min_length=8, top_p=0.9, do_sample=True)
+        raw_response = prompt + response.messages[-1]["content"]
+        max_length = len(raw_response)
+
+        response = self.pipe_sum(raw_response, min_length=5, max_length=max_length)
+        # res = Dialog.chat_summary(
+        #     pipe_con=self.pipe_con,
+        #     pipe_sum=self.pipe_sum,
+        #     messages=messages,
+        #     prompt=prompt
+        #     )
         # TODO logger
-        return res
+        return response[0].get('summary_text')
 
     def _check_and_download_model(self, model_name):
         r"""
