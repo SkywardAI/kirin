@@ -102,13 +102,10 @@ class ModelPipeline:
         r"""
         Inference by using transformers pipeline
         """
-        if len(chat_history) == 0:
-            return PipelinesFactory.init_conversation(question)
-        #Use the first
-        con = PipelinesFactory.init_conversation(chat_history[0].message)
-        for i in range(1, len(chat_history)):
-            role="assistant" if chat_history[i].is_bot_msg else "user"
-            con.add_message({"role": role, "content": chat_history[i].message})
+        con = PipelinesFactory.init_conversation()
+        for chat in chat_history:
+            role="assistant" if chat.is_bot_msg else "user"
+            con.add_message({"role": role, "content": chat.message})
         con.add_message({"role": "user", "content": question})
         return con
         
