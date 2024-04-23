@@ -9,30 +9,31 @@ class ConversationWithSession:
         self.async_session=async_session
         self.session_id=session_id
         self.conversation = PipelinesFactory.init_conversation()
-        self.load(session_id)
+        self.load()
 
     # Load conversation to chat history 
-    def load(self):
+    async def load(self):
         stmt = (
             sqlalchemy.select(ChatHistory)
             .where(ChatHistory.session_id == self.session_id)
             .order_by(ChatHistory.created_at.desc())
             .limit(10)
         )
-        query = self.async_session.execute(statement=stmt)
+        query = await self.async_session.execute(statement=stmt)
         db_Historys=query.scalars().all()
         for chat in db_Historys:
             role="assistant" if chat.is_bot_msg else "user"
             self.conversation.add_message({"role": role, "content": chat.message})
-    def save(self):
+
+    async def save(self):
         for con in self.conversation:
             is_bot_msg = (con.role == "assistant")
             chat=ChatHistory(session_id=self.session_id, is_bot_msg=is_bot_msg, message=con.content)
-            self.async_session.add(instance=chat)
-        self.async_session.commit()
+            await self.async_session.add(instance=chat)
+        await self.async_session.commit()
 
     # save converstiona to session id
-    def __del__(self):
+    async def __del__(self):
         self.save()
         pass
 

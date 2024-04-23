@@ -23,10 +23,10 @@ class RAGChatModelRepository(BaseRAGRepository):
 
     async def get_history_messages(self, session_id: int, message: str):
             # TODO get chat_history by session_id
-            stmt = sqlalchemy.select(ChatHistory).where(ChatHistory.session_id == session_id)
-            query = await self.async_session.execute(statement=stmt)
-            db_Historys=query.scalars().all()
-            conversation = ai_model.generate_conversation(db_Historys, message)
+            # stmt = sqlalchemy.select(ChatHistory).where(ChatHistory.session_id == session_id)
+            # query = await self.async_session.execute(statement=stmt)
+            # db_Historys=query.scalars().all()
+            conversation = ai_model.generate_conversation(session_id,self.async_session, message)
             return conversation
 
     def search_context(self, query, n_results=1):

@@ -25,7 +25,7 @@ from kimchima.utils import (
 )
 
 from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAUTL_SUMMERIZE_MODEL,DEFAULT_MODEL_PATH
-
+from src.repository.conversation import ConversationWithSession
 
 class ModelPipeline:
     r"""
@@ -79,16 +79,17 @@ class ModelPipeline:
                                                task="summarization")
         return pip
 
-    def generate_conversation(self, chat_history, question):
+    def generate_conversation(self, session_id, async_session,question):
         r"""
         generate conversation using chat list and question
         return transformer.Converaton
         """
-        con = PipelinesFactory.init_conversation()
-        for chat in chat_history:
-            role="assistant" if chat.is_bot_msg else "user"
-            con.add_message({"role": role, "content": chat.message})
-        con.add_message({"role": "user", "content": question})
+        con = ConversationWithSession(session_id=session_id, async_session=async_session)
+        con.load()
+        # for chat in chat_history:
+        #     role="assistant" if chat.is_bot_msg else "user"
+        #     con.add_message({"role": role, "content": chat.message})
+        con.conversation.add_message({"role": "user", "content": question})
         return con
         
 
@@ -97,11 +98,11 @@ class ModelPipeline:
         Generate answer by generate message from converations and vector result
         then summerize the response
         """
-        response = self.pipe_con(messages, max_length=128, min_length=8, top_p=0.9, do_sample=True)
-        raw_response = prompt + response.messages[-1]["content"]
-        max_length = len(raw_response)
+        response = self.pipe_con(messages.conversation, max_length=128, min_length=8, top_p=0.9, do_sample=True)
+        response.messages[-1]["content"] = prompt + response.messages[-1]["content"]
+        max_length = len(response.messages[-1]["content"])
 
-        response = self.pipe_sum(raw_response, min_length=5, max_length=max_length)
+        response = self.pipe_sum(response.messages[-1]["content"], min_length=5, max_length=max_length)
         # TODO logger
         return response[0].get('summary_text')
 
