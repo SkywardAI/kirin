@@ -25,7 +25,6 @@ from kimchima.utils import (
 )
 
 from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAUTL_SUMMERIZE_MODEL,DEFAULT_MODEL_PATH
-from src.repository.conversation import ConversationWithSession
 
 class ModelPipeline:
     r"""
@@ -79,33 +78,19 @@ class ModelPipeline:
                                                task="summarization")
         return pip
 
-    async def generate_conversation(self, session_id, async_session,question):
-        r"""
-        generate conversation using chat list and question
-        return transformer.Converaton
-        """
-        con = ConversationWithSession(session_id=session_id, async_session=async_session)
-        await con.load()
-        # for chat in chat_history:
-        #     role="assistant" if chat.is_bot_msg else "user"
-        #     con.add_message({"role": role, "content": chat.message})
-        con.conversation.add_message({"role": "user", "content": question})
-        return con
-        
-
-    def generate_answer(self, messages, prompt=None):
+    def generate_answer(self, con, prompt=None):
         r"""
         Generate answer by generate message from converations and vector result
         then summerize the response
         """
-        response = self.pipe_con(messages.conversation, max_length=128, min_length=8, top_p=0.9, do_sample=True)
+        response = self.pipe_con(con.conversation, max_length=128, min_length=8, top_p=0.9, do_sample=True)
         response.messages[-1]["content"] = prompt + response.messages[-1]["content"]
         max_length = len(response.messages[-1]["content"])
-
         response = self.pipe_sum(response.messages[-1]["content"], min_length=5, max_length=max_length)
+        answer = response[0].get('summary_text')
+        con.set_last_answer(answer)
         # TODO logger
-        return response[0].get('summary_text')
-
+        return answer
     def _check_and_download_model(self, model_name):
         r"""
         Check the model exists or not, if not download the model

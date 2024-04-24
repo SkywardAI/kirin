@@ -34,9 +34,7 @@ async def chat(
         # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:20])
         session_id = chat_in_msg.sessionId
     # 使用 conversation...
-    await chat_repo.create_chat_history(session_id=session_id, is_bot_msg=False, message=chat_in_msg.message)
-    response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message)
-    await chat_repo.create_chat_history(session_id=session_id, is_bot_msg=True, message=response_msg)
+    response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
     return ChatInResponse(
         sessionId=session_id,
         message=response_msg,
