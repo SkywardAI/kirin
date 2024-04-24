@@ -1,5 +1,6 @@
-from kimchima.pkg import PipelinesFactory
 import sqlalchemy
+import time
+from kimchima.pkg import PipelinesFactory
 from src.models.db.chat import ChatHistory
 
 class ConversationWithSession:
@@ -9,7 +10,15 @@ class ConversationWithSession:
         self.async_session=async_session
         self.session_id=session_id
         self.conversation = PipelinesFactory.init_conversation()
-        self.load()
+        self.last_used = time.time()
+
+    @property
+    def last_used(self):
+        return self._last_used
+    
+    @last_used.setter
+    def last_used(self, value):
+        self._last_used = time.time()  # 自动更新时间戳
 
     # Load conversation to chat history 
     async def load(self):
@@ -24,6 +33,7 @@ class ConversationWithSession:
         for chat in db_Historys:
             role="assistant" if chat.is_bot_msg else "user"
             self.conversation.add_message({"role": role, "content": chat.message})
+        self.last_used = time.time()
 
     async def save(self):
         for con in self.conversation:
@@ -37,3 +47,4 @@ class ConversationWithSession:
         self.save()
         pass
 
+conversations = {}

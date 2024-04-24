@@ -9,6 +9,7 @@ from src.config.settings.const import UPLOAD_FILE_PATH
 from src.repository.ai_models import ai_model
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.vector_database import vector_db
+from src.repository.conversation import ConversationWithSession, conversations
 
 class RAGChatModelRepository(BaseRAGRepository):
     async def load_model(self, session_id: int, model_name: str) -> bool:
@@ -26,7 +27,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             # stmt = sqlalchemy.select(ChatHistory).where(ChatHistory.session_id == session_id)
             # query = await self.async_session.execute(statement=stmt)
             # db_Historys=query.scalars().all()
-            conversation = ai_model.generate_conversation(session_id,self.async_session, message)
+            conversation = await ai_model.generate_conversation(session_id,self.async_session, message)
             return conversation
 
     def search_context(self, query, n_results=1):
@@ -35,6 +36,13 @@ class RAGChatModelRepository(BaseRAGRepository):
         return vector_db.search(data=query_embeddings, n_results=n_results)
 
     async def get_response(self, session_id: int, input_msg: str) -> str:
+
+        if session_id not in conversations:
+            conversations[session_id] = ConversationWithSession(session_id, self.async_session)
+            conversations[session_id].load()
+        conversation = conversations[session_id]
+        conversation.last_used = None
+        
         context = self.search_context(input_msg)
         messages = await self.get_history_messages(session_id, input_msg)
         print(f'session_id chatHistory value:{messages}')

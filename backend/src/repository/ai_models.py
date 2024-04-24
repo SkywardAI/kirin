@@ -79,13 +79,13 @@ class ModelPipeline:
                                                task="summarization")
         return pip
 
-    def generate_conversation(self, session_id, async_session,question):
+    async def generate_conversation(self, session_id, async_session,question):
         r"""
         generate conversation using chat list and question
         return transformer.Converaton
         """
         con = ConversationWithSession(session_id=session_id, async_session=async_session)
-        con.load()
+        await con.load()
         # for chat in chat_history:
         #     role="assistant" if chat.is_bot_msg else "user"
         #     con.add_message({"role": role, "content": chat.message})

@@ -59,9 +59,11 @@ async def initialize_vectordb_connection() -> None:
 
     vector_db.create_collection()
     # Create sample embeddings for testing
-    embedding_list=load_dataset('aisuko/sentences_of_Melbourne')
-    ps=embedding_list['train'].to_pandas().to_numpy()
-    vector_db.insert_list(ps, SAMPLE_CONTEXT)
+    # embedding_list=load_dataset('aisuko/sentences_of_Melbourne')
+    # ps=embedding_list['train'].to_pandas().to_numpy()
+    # vector_db.insert_list(ps, SAMPLE_CONTEXT)
+    embedding_list = ai_model.encode_string(SAMPLE_CONTEXT)
+    vector_db.insert_list(embedding_list, SAMPLE_CONTEXT)
     print("Sample inserted")
     loguru.logger.info("Vector Database Connection --- Successfully Established!")
 
