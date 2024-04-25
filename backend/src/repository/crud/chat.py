@@ -58,16 +58,6 @@ class SessionCRUDRepository(BaseCRUDRepository):
 
 
 class ChatHistoryCRUDRepository(BaseCRUDRepository):
-
-    async def create_chat_history(self, chat_list: list):
-        print("---> create_chat_history----")
-        for chat in chat_list:
-            print(chat)
-            self.async_session.add(instance=chat)
-        print("---before commit----")
-        await self.async_session.commit()
-        return
-
     async def read_chat_history_by_id(self, id: int) -> ChatHistory:
         stmt = sqlalchemy.select(ChatHistory).where(ChatHistory.id == id)
         query = await self.async_session.execute(statement=stmt)

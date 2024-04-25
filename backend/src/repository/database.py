@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine as create_sqlalchemy_async_engine,
 )
 from sqlalchemy.pool import Pool as SQLAlchemyPool, QueuePool as SQLAlchemyQueuePool
-
+from sqlalchemy import create_engine
 from src.config.manager import settings
 
 
@@ -24,6 +24,7 @@ class AsyncDatabase:
             # max_overflow=settings.DB_POOL_OVERFLOW,
             # poolclass=SQLAlchemyQueuePool,
         )
+        self.sync_engine =create_engine(f"{settings.DB_POSTGRES_SCHEMA}://{settings.DB_POSTGRES_USERNAME}:{settings.DB_POSTGRES_PASSWORD}@{settings.DB_POSTGRES_HOST}:{settings.DB_POSTGRES_PORT}/{settings.DB_POSTGRES_NAME}")
         self.async_session: SQLAlchemyAsyncSession = SQLAlchemyAsyncSession(bind=self.async_engine)
         self.pool: SQLAlchemyPool = self.async_engine.pool
 

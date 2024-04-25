@@ -1,6 +1,7 @@
-import asyncio
-import sqlalchemy
 import time
+
+from sqlalchemy.orm import Session
+from src.repository.database import async_db
 from datetime import datetime
 from kimchima.pkg import PipelinesFactory
 from src.models.db.chat import ChatHistory
@@ -30,15 +31,16 @@ class ConversationWithSession:
             self.conversation.add_message({"role": role, "content": chat.message})
 
     # save converstiona to session id
-    async def save(self):
-        print("------save--------")
+    def save(self):
         chat_list=[]
+        session = Session(async_db.sync_engine)
         for con in self.conversation:
             is_bot_msg = (con["role"] == "assistant")
-            print(con["content"])
             chat=ChatHistory(session_id=self.session_id, is_bot_msg=is_bot_msg, message=con["content"])
             chat_list.append(chat)
-        await self.chat_repo.create_chat_history(chat_list)
+            session.add(chat)
+        session.commit()
+
 
     def __del__(self):
         pass
@@ -46,15 +48,12 @@ class ConversationWithSession:
 conversations = {}
 
 
-async def cleanup_conversations():
-
+def cleanup_conversations():
     while True:
         now = datetime.now()
         for session_id, conversation in list(conversations.items()):
             if (now - conversation.get_last_used()).total_seconds() > CONVERSATION_INACTIVE_SEC:
-                await conversation.save()
+                conversation.save()
                 del conversations[session_id]
-                print("delete session id ", session_id)
         #check every 60s
-        time.sleep(20)
-        print("tick tick tick")
+        time.sleep(10)

@@ -50,7 +50,8 @@ if __name__ == "__main__":
     )
 new_loop = asyncio.new_event_loop()
 t = threading.Thread(target=start_loop, args=(new_loop,))
-t.daemon = True  # 设置为守护线程
+t.daemon = True
 t.start()
 
-asyncio.run_coroutine_threadsafe(cleanup_conversations(), new_loop)
+cleanup_thread = threading.Thread(target=cleanup_conversations)
+cleanup_thread.start()
