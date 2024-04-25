@@ -31,25 +31,30 @@ class ConversationWithSession:
 
     # save converstiona to session id
     async def save(self):
-        chat_list: list = list()
+        print("------save--------")
+        chat_list=[]
         for con in self.conversation:
             is_bot_msg = (con["role"] == "assistant")
-            chat_list.append(ChatHistory(session_id=self.session_id, is_bot_msg=is_bot_msg, message=con["content"]))
+            print(con["content"])
+            chat=ChatHistory(session_id=self.session_id, is_bot_msg=is_bot_msg, message=con["content"])
+            chat_list.append(chat)
         await self.chat_repo.create_chat_history(chat_list)
 
-    async def __del__(self):
+    def __del__(self):
         pass
 
 conversations = {}
 
 
-def cleanup_conversations():
+async def cleanup_conversations():
+
     while True:
         now = datetime.now()
         for session_id, conversation in list(conversations.items()):
             if (now - conversation.get_last_used()).total_seconds() > CONVERSATION_INACTIVE_SEC:
-                asyncio.run(conversations[session_id].save())
+                await conversation.save()
                 del conversations[session_id]
                 print("delete session id ", session_id)
         #check every 60s
-        time.sleep(60)
+        time.sleep(20)
+        print("tick tick tick")

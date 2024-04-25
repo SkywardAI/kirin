@@ -1,7 +1,10 @@
 import fastapi
 import uvicorn
+import asyncio
+import threading
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.repository.conversation import cleanup_conversations
 from src.api.endpoints import router as api_endpoint_router
 from src.config.events import execute_backend_server_event_handler, terminate_backend_server_event_handler
 from src.config.manager import settings
@@ -31,9 +34,11 @@ def initialize_backend_application() -> fastapi.FastAPI:
 
     return app
 
+def start_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
 
 backend_app: fastapi.FastAPI = initialize_backend_application()
-
 if __name__ == "__main__":
     uvicorn.run(
         app="main:backend_app",
@@ -43,3 +48,9 @@ if __name__ == "__main__":
         workers=settings.SERVER_WORKERS,
         log_level=settings.LOGGING_LEVEL,
     )
+new_loop = asyncio.new_event_loop()
+t = threading.Thread(target=start_loop, args=(new_loop,))
+t.daemon = True  # 设置为守护线程
+t.start()
+
+asyncio.run_coroutine_threadsafe(cleanup_conversations(), new_loop)

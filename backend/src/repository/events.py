@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSessionTransaction
 from sqlalchemy.pool.base import _ConnectionRecord
 
 from src.config.settings.const import SAMPLE_CONTEXT
-from src.repository.conversation import cleanup_conversations
 from src.repository.database import async_db
 from src.repository.table import Base
 from src.repository.vector_database import vector_db
@@ -69,9 +68,8 @@ async def initialize_vectordb_connection() -> None:
     # vector_db.insert_list(ps, SAMPLE_CONTEXT)
     embedding_list = ai_model.encode_string(SAMPLE_CONTEXT)
     vector_db.insert_list(embedding_list, SAMPLE_CONTEXT)
-    cleanup_thread = threading.Thread(target=cleanup_conversations)
-    cleanup_thread.daemon = True
-    cleanup_thread.start()
+
+
     loguru.logger.info("Vector Database Connection --- Successfully Established!")
 
 
