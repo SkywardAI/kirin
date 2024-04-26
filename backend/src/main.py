@@ -4,7 +4,6 @@ import asyncio
 import threading
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.repository.conversation import cleanup_conversations
 from src.api.endpoints import router as api_endpoint_router
 from src.config.events import execute_backend_server_event_handler, terminate_backend_server_event_handler
 from src.config.manager import settings
@@ -48,10 +47,3 @@ if __name__ == "__main__":
         workers=settings.SERVER_WORKERS,
         log_level=settings.LOGGING_LEVEL,
     )
-new_loop = asyncio.new_event_loop()
-t = threading.Thread(target=start_loop, args=(new_loop,))
-t.daemon = True
-t.start()
-
-cleanup_thread = threading.Thread(target=cleanup_conversations)
-cleanup_thread.start()

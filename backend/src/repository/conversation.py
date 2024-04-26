@@ -55,5 +55,5 @@ def cleanup_conversations():
             if (now - conversation.get_last_used()).total_seconds() > CONVERSATION_INACTIVE_SEC:
                 conversation.save()
                 del conversations[session_id]
-        #check every 60s
+        #check every 10s
         time.sleep(10)
