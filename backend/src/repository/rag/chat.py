@@ -1,8 +1,8 @@
 import csv
 
 import sqlalchemy
-from src.models.schemas.chat import MessagesResponse
 from pymilvus import db
+from datasets import load_dataset
 
 from src.models.db.chat import ChatHistory
 from src.config.settings.const import UPLOAD_FILE_PATH
@@ -52,10 +52,26 @@ class RAGChatModelRepository(BaseRAGRepository):
             # Create a CSV reader
             reader = csv.reader(file)
             # Iterate over each row in the CSV
+            print(f"reader Data:{reader}")
             for row in reader:
                 # Add the row to the list
                 data.extend(row)
+        print(f"load_csv_file data_row:{data}")                
         embedding_list = ai_model.encode_string(data)
         vector_db.insert_list(embedding_list, data)
 
+        return True
+
+
+
+    async def load_data_set(self, dataset_name: str)-> str:
+        reader_dataset=load_dataset(dataset_name)
+        print(f"reader_dataset：{reader_dataset}")
+        data_row = []
+        for row in reader_dataset:
+            data_row.extend(row)
+            res=reader_dataset['train'].to_pandas().to_numpy()
+        print(f"data_row:{data_row}")
+        print(f"res:{data_row}")
+        vector_db.insert_list(res, data_row)
         return True

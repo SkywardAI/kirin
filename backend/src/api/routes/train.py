@@ -1,5 +1,7 @@
 import random
 
+from src.models.schemas.dataset import DatasetCreate
+from src.repository.crud.dataset_db import DataSetCRUDRepository
 import fastapi
 
 from src.api.dependencies.repository import get_rag_repository, get_repository
@@ -22,18 +24,25 @@ async def train(
     aimodel_repo: AiModelCRUDRepository = fastapi.Depends(get_repository(repo_type=AiModelCRUDRepository)),
     file_repo: UploadedFileCRUDRepository = fastapi.Depends(get_repository(repo_type=UploadedFileCRUDRepository)),
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
+    dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
 ) -> TrainFileInResponse:
     #TODO train can be performed by csv file or dataset
     # 1, either fileID or dataset should be shown in input
     # 2, validate fileID or dataset
     # 3, use file and or dataset perform the training logic (csv id done)
-    ai_model = await aimodel_repo.read_aimodel_by_id(id=train_in_msg.modelID)
-    file_csv = await file_repo.read_uploadedfiles_by_id(id=train_in_msg.fileID)
 
-    await rag_chat_repo.load_csv_file(file_name=file_csv.name, model_name=ai_model.name)
+     if  train_in_msg.modelID is not None:  
+       ai_model = await aimodel_repo.read_aimodel_by_id(id=train_in_msg.modelID)
+       file_csv = await file_repo.read_uploadedfiles_by_id(id=train_in_msg.fileID)
+       await rag_chat_repo.load_csv_file(file_name=file_csv.name, model_name=ai_model.name)
+     else:
+       db_dataset=await dataset_repo.get_dataset_by_name(train_in_msg.dataSet)
+       if not db_dataset:
+        await rag_chat_repo.load_data_set(train_in_msg.dataSet) 
+        await dataset_repo.create_dataset(DatasetCreate(dataset_name=train_in_msg.dataSet,des=train_in_msg.dataSet)) 
 
-    return TrainFileInResponse(
-        trainID=train_in_msg.fileID + train_in_msg.modelID,
+     return TrainFileInResponse(
+        msg="successful",
     )
 
 

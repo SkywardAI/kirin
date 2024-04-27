@@ -1,11 +1,17 @@
+from typing import Optional
 from src.models.schemas.base import BaseSchemaModel
 
 
-class AiModel(BaseSchemaModel):
-    id: int
+class AiModelCreate(BaseSchemaModel):
+    # id: int | None
     name: str
     des: str
 
+class AiModelCreateResponse(BaseSchemaModel):
+    id: int
+    name: str
+    des: str
+    msg: Optional[str] = None
 
 class AiModelInResponse(BaseSchemaModel):
     id: int
