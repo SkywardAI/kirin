@@ -17,6 +17,8 @@ class ConversationWithSession:
         self._last_used= datetime.now()
     
     def set_last_answer(self, answer):
+        if len(self.conversation) > 50:
+            self.conversation = self.conversation[-50:]
         self.conversation[-1]["content"] = answer
         self._last_used= datetime.now()
 
