@@ -10,6 +10,9 @@ DEFAULT_ENCODER = "sentence-transformers/all-MiniLM-L6-v2"
 DEFAULT_MODEL = "microsoft/GODEL-v1_1-base-seq2seq"
 DEFAUTL_SUMMERIZE_MODEL="sshleifer/distilbart-cnn-12-6"
 DEFAULT_MODEL_PATH = "/models/"
+# CONVERSATION
+CONVERSATION_INACTIVE_SEC= 300
+
 # SAMPLE_CONTEXT
 SAMPLE_CONTEXT = [
     "Melbourne is the capital city of the Australian state of Victoria.",
