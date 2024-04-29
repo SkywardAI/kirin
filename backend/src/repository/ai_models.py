@@ -18,7 +18,8 @@ from kimchima.pkg import (
     ModelFactory,
     TokenizerFactory,
     EmbeddingsFactory,
-    PipelinesFactory
+    PipelinesFactory,
+    Devices
 )
 from kimchima.utils import (
     Downloader
@@ -46,7 +47,7 @@ class ModelPipeline:
             model=self.encoder_model,
             tokenizer=self.encoder_tokenizer,
             prompt=data,
-            device="cpu",
+            device=Devices.get_device().value,
             max_length=512,
         )
 
