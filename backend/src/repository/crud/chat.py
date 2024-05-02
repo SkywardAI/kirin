@@ -2,6 +2,8 @@ import typing
 from typing import Optional
 
 import sqlalchemy
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.sql import functions as sqlalchemy_functions
 
 from src.models.db.chat import ChatHistory, Session
@@ -56,15 +58,6 @@ class SessionCRUDRepository(BaseCRUDRepository):
 
 
 class ChatHistoryCRUDRepository(BaseCRUDRepository):
-    async def create_chat_history(self, session_id: int, is_bot_msg: bool, message: str) -> ChatHistory:
-        new_chat = ChatHistory(session_id=session_id, is_bot_msg=is_bot_msg, message=message)
-
-        self.async_session.add(instance=new_chat)
-        await self.async_session.commit()
-        await self.async_session.refresh(instance=new_chat)
-
-        return new_chat
-
     async def read_chat_history_by_id(self, id: int) -> ChatHistory:
         stmt = sqlalchemy.select(ChatHistory).where(ChatHistory.id == id)
         query = await self.async_session.execute(statement=stmt)
@@ -74,11 +67,13 @@ class ChatHistoryCRUDRepository(BaseCRUDRepository):
 
         return query.scalar()  # type: ignore
 
-    async def read_chat_history_by_session_id(self, id: int) -> typing.Sequence[ChatHistory]:
+    async def read_chat_history_by_session_id(self, id: int, limit_num=50) -> typing.Sequence[ChatHistory]:
         # TODO limit num = 50 is a temp number
-        limit_num = 50
-        stmt = sqlalchemy.select(ChatHistory).where(ChatHistory.session_id == id)
-        # .order_by(ChatHistory.created_at)
-        # .limit(limit_num)
+        stmt = (
+            sqlalchemy.select(ChatHistory)
+            .where(ChatHistory.session_id == id)
+            .order_by(ChatHistory.created_at.desc())
+            .limit(limit_num)
+        )
         query = await self.async_session.execute(statement=stmt)
         return query.scalars().all()  # type: ignore

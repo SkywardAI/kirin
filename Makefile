@@ -39,3 +39,21 @@ demo-logs:
 .PHONY: demo-remove
 demo-remove:
 	docker-compose -f docker-compose.demo.yaml down
+
+############################################################################################################
+# For gpu host.
+.PHONY: gpu
+gpu: env
+	docker-compose -f docker-compose.gpu.yaml up -d
+
+.PHONY: gpu-stop
+gpu-stop:
+	docker-compose -f docker-compose.gpu.yaml stop
+
+.PHONY: gpu-logs
+gpu-logs:
+	docker-compose -f docker-compose.gpu.yaml logs -f
+
+.PHONY: gpu-remove
+gpu-remove:
+	docker-compose -f docker-compose.gpu.yaml down

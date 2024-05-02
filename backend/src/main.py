@@ -1,5 +1,7 @@
 import fastapi
 import uvicorn
+import asyncio
+import threading
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.endpoints import router as api_endpoint_router
@@ -31,9 +33,11 @@ def initialize_backend_application() -> fastapi.FastAPI:
 
     return app
 
+def start_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
 
 backend_app: fastapi.FastAPI = initialize_backend_application()
-
 if __name__ == "__main__":
     uvicorn.run(
         app="main:backend_app",
