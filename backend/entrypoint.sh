@@ -11,7 +11,7 @@ while ! nc -z db 5432; do
     echo "DB Connection -- Retrying . . ."
 
 done
-
+pip install bokeh
 echo "DB Connection --- Successfully Established!"
 
 exec "$@"
