@@ -11,6 +11,7 @@ def execute_backend_server_event_handler(backend_app: fastapi.FastAPI) -> typing
         await initialize_db_connection(backend_app=backend_app)
         await initialize_aimodel()
         await initialize_vectordb_connection()
+        await initialize_data_visualization()
     return launch_backend_server_events
 
 

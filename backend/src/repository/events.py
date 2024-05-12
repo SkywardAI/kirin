@@ -9,6 +9,7 @@ from sqlalchemy.pool.base import _ConnectionRecord
 from src.config.settings.const import SAMPLE_CONTEXT
 from src.repository.conversation import cleanup_conversations
 from src.repository.database import async_db
+from src.repository.data_visualization import bk_worker
 from src.repository.table import Base
 from src.repository.vector_database import vector_db
 from src.repository.ai_models import ai_model
@@ -76,6 +77,12 @@ async def initialize_vectordb_connection() -> None:
 
     loguru.logger.info("Vector Database Connection --- Successfully Established!")
 
+async def initialize_data_visualization() -> None:
+    loguru.logger.info("Data Visualization --- Initializing . . .")
+    data_visualization_thread = threading.Thread(target=bk_worker)
+    data_visualization_thread.daemon = True
+    data_visualization_thread.start()
+    loguru.logger.info("Data Visualization --- Successfully Initialized!")
 
 async def dispose_db_connection(backend_app: fastapi.FastAPI) -> None:
     loguru.logger.info("Database Connection --- Disposing . . .")
