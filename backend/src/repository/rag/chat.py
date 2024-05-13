@@ -1,4 +1,5 @@
 import csv
+
 import sqlalchemy
 from src.models.schemas.chat import MessagesResponse
 from pymilvus import db
@@ -60,15 +61,12 @@ class RAGChatModelRepository(BaseRAGRepository):
         return True
 
 
-
     async def load_data_set(self, dataset_name: str)-> str:
         reader_dataset=load_dataset(dataset_name)
-        print(f"reader_dataset：{reader_dataset}")
-        data_row = []
-        for row in reader_dataset:
-            data_row.extend(row)
-            res=reader_dataset['train'].to_pandas().to_numpy()
-        print(f"data_row:{data_row}")
-        print(f"res:{data_row}")
-        vector_db.insert_list(res, data_row)
+        for item_dict in reader_dataset['train']:
+            for key, value in item_dict.items():
+                print(key, type(key),isinstance(key, str))
+                if(isinstance(key, str)):
+                  embedding_list = ai_model.encode_string(value)
+                  vector_db.insert_list(embedding_list, value)  
         return True
