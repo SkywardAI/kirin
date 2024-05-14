@@ -38,7 +38,7 @@ async def train(
      else:
        db_dataset=await dataset_repo.get_dataset_by_name(train_in_msg.dataSet)
        if not db_dataset:
-        await rag_chat_repo.load_data_set(train_in_msg.dataSet) 
+        await rag_chat_repo.load_data_set(train_in_msg) 
         await dataset_repo.create_dataset(DatasetCreate(dataset_name=train_in_msg.dataSet,des=train_in_msg.dataSet)) 
 
      return TrainFileInResponse(
