@@ -2,6 +2,7 @@ import csv
 
 from src.models.schemas.train import TrainFileIn
 import sqlalchemy
+import loguru
 from src.models.schemas.chat import MessagesResponse
 from pymilvus import db
 from datasets import load_dataset
@@ -38,24 +39,23 @@ class RAGChatModelRepository(BaseRAGRepository):
         con.conversation.add_message({"role": "user", "content": input_msg})
         context = self.search_context(input_msg)
         answer = ai_model.generate_answer(con,context)
-        print(f'ai generate_answer value:{answer}')
+        loguru.logger.info(f'ai generate_answer value:{answer}')
         # TODO stream output
         return answer
 
     async def load_csv_file(self, file_name: str, model_name: str) -> bool:
         # read file named file_name and convert the content into a list of strings @Aisuko
-        print(file_name)
-        print(model_name)
+        loguru.logger.info(file_name)
+        loguru.logger.info(model_name)
         data = []
         with open(UPLOAD_FILE_PATH + file_name, "r") as file:
             # Create a CSV reader
             reader = csv.reader(file)
             # Iterate over each row in the CSV
-            print(f"reader Data:{reader}")
             for row in reader:
                 # Add the row to the list
                 data.extend(row)
-        print(f"load_csv_file data_row:{data}")                
+        loguru.logger.info(f"load_csv_file data_row:{data}")                
         embedding_list = ai_model.encode_string(data)
         vector_db.insert_list(embedding_list, data)
 
@@ -65,6 +65,7 @@ class RAGChatModelRepository(BaseRAGRepository):
     async def load_data_set(self, param: TrainFileIn)-> bool:
 
         if param.embedField is None or param.resField is None:
+           loguru.logger.info(f"load_data_set param {param}")           
            await self.load_data_set_all_field(dataset_name=param.dataSet) 
         else:
            await self.load_data_set_by_field(param=param)   
@@ -73,10 +74,10 @@ class RAGChatModelRepository(BaseRAGRepository):
 
 
     async def load_data_set_all_field(self, dataset_name: str)-> bool:
-        print(f"load_data_set_all_field dataset_name:{dataset_name}")
+        loguru.logger.info(f"load_data_set_all_field dataset_name:{dataset_name}")
         reader_dataset=load_dataset(dataset_name)
         for item_dict in reader_dataset['train']:
-            print(f"load_data_set_all_field item_dict:{item_dict.get('url', '')},{type(item_dict)}")
+            loguru.logger.info(f"load_data_set_all_field item_dict:{item_dict.get('url', '')},{type(item_dict)}")
             for key, value in item_dict.items():
                 if(isinstance(key, str)):
                   embedding_list = ai_model.encode_string(value)

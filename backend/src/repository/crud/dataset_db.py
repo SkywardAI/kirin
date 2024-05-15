@@ -29,7 +29,7 @@ class DataSetCRUDRepository(BaseCRUDRepository):
 
 
     async def get_dataset_list(self)->typing.Sequence[DataSet]:
-         stmt = sqlalchemy.select(DataSet).order_by(DataSet.created_at.desc())
+         stmt = sqlalchemy.select(DataSet).order_by(DataSet.updated_at.desc())
          query = await self.async_session.execute(statement=stmt) 
          return query.scalars().all()
 

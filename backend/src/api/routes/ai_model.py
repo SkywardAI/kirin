@@ -65,7 +65,7 @@ async def choose_aimodels(
     response_model=AiModelCreateResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
-async def choose_aimodels(
+async def create_ai_model(
     ai_model: AiModelCreate,
     aimodel_repo: AiModelCRUDRepository = fastapi.Depends(get_repository(repo_type=AiModelCRUDRepository)),
 ) -> AiModelCreateResponse:
