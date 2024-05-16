@@ -1,4 +1,5 @@
 import fastapi
+import loguru
 
 from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.models.schemas.chat import ChatHistory, ChatInMessage, ChatInResponse, Session
@@ -53,7 +54,7 @@ async def get_session(
     sessions = await session_repo.read_sessions_by_account_id(id=id)
     sessions_list: list = list()
     for session in sessions:
-        print(session.name)
+        loguru.logger.info(f"Session Details --- {session.name}")
         try:
             res_session = Session(
                 id=session.id,
@@ -62,7 +63,7 @@ async def get_session(
             )
             sessions_list.append(res_session)
         except Exception as e:
-            print(e)
+            loguru.logger.info(f"Exception --- {e}")
 
     return sessions_list
 
