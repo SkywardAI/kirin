@@ -53,7 +53,6 @@ class RAGChatModelRepository(BaseRAGRepository):
             # Create a CSV reader
             reader = csv.reader(file)
             # Iterate over each row in the CSV
-            print(f"reader Data:{reader}")
             for row in reader:
                 # Add the row to the list
                 data.extend(row)
