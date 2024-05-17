@@ -1,4 +1,5 @@
 import time
+import loguru
 
 from pymilvus import connections, Milvus, MilvusClient
 from src.repository.ai_models import ai_model
@@ -12,10 +13,11 @@ class MilvusHelper:
             try:
                 url = f"http://{settings.MILVUS_HOST}:{settings.MILVUS_PORT}"
                 self.client = MilvusClient(url)
-                print("Connected to Milvus.")
+                loguru.logger.info(f"Vector Database --- Connected to Milvus.")
                 break
             except Exception as e:
                 err = e
+                #loguru.logger.info(f"Exception --- {e}")
                 # print(f"Failed to connect to Milvus: {e}")
                 time.sleep(10)
         else:
@@ -39,11 +41,11 @@ class MilvusHelper:
 
     def create_collection(self, collection_name=DEFAULT_COLLECTION, dimension=DEFAULT_DIM, recreate=True):
         if recreate and self.client.has_collection(collection_name):
-            print(f"Milvus: collection {collection_name} exist, dropping..")
+            loguru.logger.info(f"Vector Databse --- Milvus: collection {collection_name} exist, dropping..")
             self.client.drop_collection(collection_name)
 
         self.client.create_collection(collection_name=collection_name, dimension=dimension)
-        print(f"Milvus: collection {collection_name} created")
+        loguru.logger.info(f"Vector Database --- Milvus: collection {collection_name} created")
 
     def insert_list(self, embedding, data, collection_name=DEFAULT_COLLECTION):
         try:
@@ -53,10 +55,10 @@ class MilvusHelper:
                 #     item += [0] * (dim - len(item))
                 self.client.insert(collection_name=collection_name, data={"id": i, "vector": item, "doc": data[i]})
         except Exception as e:
-            print(f"Error: {e}")
+            loguru.logger.info(f"Vector Databse --- Error: {e}")
         res = self.client.get(collection_name=collection_name, ids=[0, 1, 2])
 
-        print(res)
+        loguru.logger.info(f"Vector Database --- Result: {res}")
 
     def search(self, data, n_results, collection_name=DEFAULT_COLLECTION):
 
@@ -69,7 +71,7 @@ class MilvusHelper:
             search_params=search_params,
             output_fields=["doc"],
         )
-        print(res)
+        loguru.logger.info(f"Vector Database --- Result: {res}")
         sentences = []
         for hits in res:
             for hit in hits:

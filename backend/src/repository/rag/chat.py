@@ -1,4 +1,5 @@
 import csv
+import loguru
 
 from src.models.schemas.train import TrainFileIn
 import sqlalchemy
@@ -21,13 +22,13 @@ class RAGChatModelRepository(BaseRAGRepository):
             ai_model.initialize_model(model_name)
             pass
         except Exception as e:
-            print(e)
+            loguru.logger.info(f"Exception --- {e}")
             return False
         return True
 
     def search_context(self, query, n_results=1):
         query_embeddings = ai_model.encode_string(query)
-        print(query_embeddings.shape)
+        loguru.logger.info(f"Embeddings Shape --- {query_embeddings.shape}")
         return vector_db.search(data=query_embeddings, n_results=n_results)
 
     async def get_response(self, session_id: int, input_msg: str, chat_repo) -> str:
@@ -52,6 +53,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             # Create a CSV reader
             reader = csv.reader(file)
             # Iterate over each row in the CSV
+            print(f"reader Data:{reader}")
             for row in reader:
                 # Add the row to the list
                 data.extend(row)
