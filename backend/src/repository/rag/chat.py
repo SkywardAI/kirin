@@ -1,4 +1,5 @@
 import csv
+import loguru
 
 import sqlalchemy
 from src.models.schemas.chat import MessagesResponse
@@ -19,13 +20,13 @@ class RAGChatModelRepository(BaseRAGRepository):
             ai_model.initialize_model(model_name)
             pass
         except Exception as e:
-            print(e)
+            loguru.logger.info(f"Exception --- {e}")
             return False
         return True
 
     def search_context(self, query, n_results=1):
         query_embeddings = ai_model.encode_string(query)
-        print(query_embeddings.shape)
+        loguru.logger.info(f"Embeddings Shape --- {query_embeddings.shape}")
         return vector_db.search(data=query_embeddings, n_results=n_results)
 
     async def get_response(self, session_id: int, input_msg: str, chat_repo) -> str:
@@ -37,14 +38,14 @@ class RAGChatModelRepository(BaseRAGRepository):
         con.conversation.add_message({"role": "user", "content": input_msg})
         context = self.search_context(input_msg)
         answer = ai_model.generate_answer(con,context)
-        print(f'ai generate_answer value:{answer}')
+        loguru.logger.info(f"AI generate_answer value --- {answer}")
         # TODO stream output
         return answer
 
     async def load_csv_file(self, file_name: str, model_name: str) -> bool:
         # read file named file_name and convert the content into a list of strings @Aisuko
-        print(file_name)
-        print(model_name)
+        loguru.logger.info(f"CSV Loader --- File Name: {file_name}")
+        loguru.logger.info(f"CSV Loader --- Model Name: {model_name}")
         data = []
         with open(UPLOAD_FILE_PATH + file_name, "r") as file:
             # Create a CSV reader
