@@ -56,3 +56,8 @@ class RAGChatModelRepository(BaseRAGRepository):
         vector_db.insert_list(embedding_list, data)
 
         return True
+
+    async def evaluate_response(self, request_msg: str, response_msg: str) -> float:
+        # TODO evluate the response and request message
+
+        return 0

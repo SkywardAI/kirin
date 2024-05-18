@@ -15,6 +15,7 @@ class ChatInMessage(BaseSchemaModel):
 class ChatInResponse(BaseSchemaModel):
     sessionId: int
     message: str
+    accuracy: float
 
 
 class Session(BaseSchemaModel):
