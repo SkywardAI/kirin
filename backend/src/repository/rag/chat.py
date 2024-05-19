@@ -59,5 +59,6 @@ class RAGChatModelRepository(BaseRAGRepository):
 
     async def evaluate_response(self, request_msg: str, response_msg: str) -> float:
         # TODO evluate the response and request message
-
+        request_embeddings = ai_model.encode_string(request_msg)
+        response_embeddings = ai_model.encode_string(response_msg)
         return 0
