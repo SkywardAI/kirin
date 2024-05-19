@@ -65,18 +65,13 @@ async def choose_aimodels(
     response_model=AiModelCreateResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
-<<<<<<< HEAD
 async def create_ai_model(
-=======
-async def choose_aimodels(
->>>>>>> main
     ai_model: AiModelCreate,
     aimodel_repo: AiModelCRUDRepository = fastapi.Depends(get_repository(repo_type=AiModelCRUDRepository)),
 ) -> AiModelCreateResponse:
     req_model= AiModel(name=ai_model.name,des=ai_model.des)
 
     db_model=await aimodel_repo.get_aimodel_by_name(ai_model.name)
-    print(f"db_model db_model db_model{db_model}")
     if db_model is not None:
         raise EntityDoesNotExist(f"AiModel with id `{ai_model.name}`   alread exist!")
        
