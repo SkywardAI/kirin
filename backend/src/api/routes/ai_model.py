@@ -1,8 +1,10 @@
+from src.utilities.exceptions.database import EntityDoesNotExist
+from src.models.db.ai_model import AiModel
 import fastapi
 
 from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.config.settings.const import UPLOAD_FILE_PATH
-from src.models.schemas.ai_model import AiModel, AiModelChooseResponse, AiModelInResponse
+from src.models.schemas.ai_model import AiModelCreate, AiModelChooseResponse, AiModelInResponse,AiModelCreateResponse
 from src.repository.crud.ai_model import AiModelCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
 
@@ -55,3 +57,27 @@ async def choose_aimodels(
             name=ai_model.name,
             msg="Sorry Model init failed! Please try again!",
         )
+
+
+@router.post(
+    path="",
+    name="models:create-model",
+    response_model=AiModelCreateResponse,
+    status_code=fastapi.status.HTTP_200_OK,
+)
+async def create_ai_model(
+    ai_model: AiModelCreate,
+    aimodel_repo: AiModelCRUDRepository = fastapi.Depends(get_repository(repo_type=AiModelCRUDRepository)),
+) -> AiModelCreateResponse:
+    req_model= AiModel(name=ai_model.name,des=ai_model.des)
+
+    db_model=await aimodel_repo.get_aimodel_by_name(ai_model.name)
+    if db_model is not None:
+        raise EntityDoesNotExist(f"AiModel with id `{ai_model.name}`   alread exist!")
+       
+    ai_model = await aimodel_repo.create_aimodel(aimodel_create=req_model)
+    return AiModelCreateResponse(
+        id=ai_model.id,
+        name=ai_model.name,
+        des=ai_model.des
+    )
