@@ -80,7 +80,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         for item_dict in reader_dataset['train']:
             loguru.logger.info(f"load_data_set_all_field item_dict:{item_dict.get('url', '')},{type(item_dict)}")
             for key, value in item_dict.items():
-                if(isinstance(key, str)):
+                if(isinstance(key, value)):
                   embedding_list = ai_model.encode_string(value)
                   vector_db.insert_list(embedding_list, value)  
         return True
