@@ -19,13 +19,14 @@ from kimchima.pkg import (
     TokenizerFactory,
     EmbeddingsFactory,
     PipelinesFactory,
+    CrossEncoderFactory,
     Devices
 )
 from kimchima.utils import (
     Downloader
 )
 
-from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAUTL_SUMMERIZE_MODEL,DEFAULT_MODEL_PATH
+from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAUTL_SUMMERIZE_MODEL,CROSS_ENDOCDER,DEFAULT_MODEL_PATH
 
 class ModelPipeline:
     r"""
@@ -40,6 +41,7 @@ class ModelPipeline:
         self.pipe_sum = self.initialize_pip_sum(model_sum)
         self.encoder_model, self.encoder_tokenizer = self.initialize_encoder(encoder_name)
         self.model_name = model_name
+        self.cross_encoder= CrossEncoderFactory(CROSS_ENDOCDER)
         # self.initialize_encoder(DEFAULT_ENCODER)
 
     def encode_string(self, data):

@@ -5,7 +5,7 @@ from src.models.schemas.chat import MessagesResponse
 from pymilvus import db
 
 from src.models.db.chat import ChatHistory
-from src.config.settings.const import UPLOAD_FILE_PATH
+from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM
 from src.repository.ai_models import ai_model
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.vector_database import vector_db
@@ -22,10 +22,12 @@ class RAGChatModelRepository(BaseRAGRepository):
             return False
         return True
 
-    def search_context(self, query, n_results=1):
+    def search_context(self, query, n_results=RAG_NUM):
         query_embeddings = ai_model.encode_string(query)
         loguru.logger.info(f"Embeddings Shape --- {query_embeddings.shape}")
-        return vector_db.search(data=query_embeddings, n_results=n_results)
+        rag_res = vector_db.search(data=query_embeddings, n_results=n_results)
+        rank = ai_model.cross_encoder.rank(query, rag_res)
+        return rag_res[rank[0]['corpus_id']]
 
     async def get_response(self, session_id: int, input_msg: str, chat_repo) -> str:
 
@@ -58,7 +60,6 @@ class RAGChatModelRepository(BaseRAGRepository):
         return True
 
     async def evaluate_response(self, request_msg: str, response_msg: str) -> float:
-        # TODO evluate the response and request message
-        request_embeddings = ai_model.encode_string(request_msg)
-        response_embeddings = ai_model.encode_string(response_msg)
-        return 0
+        evaluate_conbine=[request_msg, response_msg]
+        score = ai_model.cross_encoder.predict(evaluate_conbine)
+        return score
