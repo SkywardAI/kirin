@@ -56,7 +56,6 @@ class MilvusHelper:
             output_fields=["doc"],
         )
         loguru.logger.info(f"Vector Database --- Result: {res}")
-        # 
         sentences = []
         for hits in res:
             for hit in hits:
