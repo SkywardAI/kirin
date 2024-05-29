@@ -41,6 +41,11 @@ class AiModelCRUDRepository(BaseCRUDRepository):
             raise EntityDoesNotExist(f"AiModel with name `{name}` does not exist!")
 
         return query.scalar()
+    
+    async def get_aimodel_by_name(self, name: str) -> AiModel:
+        stmt = sqlalchemy.select(AiModel).where(AiModel.name == name)
+        query = await self.async_session.execute(statement=stmt)
+        return query.scalar()    
 
     async def update_aimodel_by_id(self, id: int, aimodel_update: AiModelInUpdate) -> AiModel:
         new_aimodel_data = aimodel_update.dict()

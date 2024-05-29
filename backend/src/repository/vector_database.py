@@ -2,7 +2,7 @@ import time
 import loguru
 
 from pymilvus import connections, Milvus, MilvusClient
-
+from src.repository.ai_models import ai_model
 from src.config.manager import settings
 from src.config.settings.const import DEFAULT_COLLECTION, DEFAULT_DIM
 
@@ -22,6 +22,22 @@ class MilvusHelper:
                 time.sleep(10)
         else:
             raise Exception(f"Failed to connect to Milvus after 3 attempts:{err}")
+
+    async def load_dataset(self, *args, **kwargs):
+        return
+    
+    async def load_csv(self, *args, **kwargs):
+        return 
+        
+    async def save(self, *args, **kwargs):
+        r"""
+        Save data into vector database.
+
+        Args:
+        """
+
+        return
+    
 
     def create_collection(self, collection_name=DEFAULT_COLLECTION, dimension=DEFAULT_DIM, recreate=True):
         if recreate and self.client.has_collection(collection_name):

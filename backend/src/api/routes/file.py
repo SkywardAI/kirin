@@ -1,6 +1,8 @@
 import os
 import random
 
+from src.repository.crud.dataset_db import DataSetCRUDRepository
+from src.models.schemas.dataset import DatasetResponse
 import fastapi
 from fastapi import BackgroundTasks
 
@@ -52,15 +54,26 @@ async def upload_and_return_id(
 @router.get(
     path="/dataset",
     name="dataset:get-dataset-list",
-    response_model=list[str],
+    response_model=list[DatasetResponse],
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def get_dataset(
-) -> list[str]:
-    #TODO return the names of recently used dataset order by last used time desc
-    res = ["dataset1","dataset2"]
+    dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_repository(repo_type=DataSetCRUDRepository)),
+) -> list[DatasetResponse]:
+    db_datasets=await dataset_repo.get_dataset_list()
+    datasets_list: list = list()    
 
-    return res
+    for db_dataset in db_datasets:
+        # print(f"db_dataset:{type(db_dataset.id),type(db_dataset.name),type(db_dataset.created_at),type(db_dataset.updated_at)}")    
+        dataset_res=DatasetResponse(
+                id=db_dataset.id,
+                dataset_name=db_dataset.name,
+                created_at=db_dataset.created_at,
+                updated_at=db_dataset.updated_at,
+            ),
+        datasets_list.append(dataset_res)
+        # datasets_list.append(db_dataset.name)
+    return datasets_list
 
 @router.get(
     path="/{id}",
