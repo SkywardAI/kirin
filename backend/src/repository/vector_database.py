@@ -76,8 +76,7 @@ class MilvusHelper:
         for hits in res:
             for hit in hits:
                 sentences.append(hit.get("entity").get("doc"))
-        context = ". ".join(sentences)
-        return context
+        return sentences
 
     def create_index(self, index_name, index_params, collection_name=DEFAULT_COLLECTION):
         self.client.create_index(collection_name, index_name, index_params)
