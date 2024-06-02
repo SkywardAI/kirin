@@ -1,6 +1,6 @@
 import csv
 import loguru
-
+import re
 from src.models.schemas.train import TrainFileIn
 import sqlalchemy
 import loguru
@@ -64,46 +64,73 @@ class RAGChatModelRepository(BaseRAGRepository):
 
         return True
 
-
     async def load_data_set(self, param: TrainFileIn)-> bool:
-
         if param.embedField is None or param.resField is None:
-           loguru.logger.info(f"load_data_set param {param}")           
-           await self.load_data_set_all_field(dataset_name=param.dataSet) 
+            loguru.logger.info(f"load_data_set param {param}")           
+            await self.load_data_set_all_field(dataset_name=param.dataSet) 
         else:
-           await self.load_data_set_by_field(param=param)   
+            await self.load_data_set_by_field(param=param)   
         return True
-
-
 
     async def load_data_set_all_field(self, dataset_name: str)-> bool:
-        loguru.logger.info(f"load_data_set_all_field dataset_name:{dataset_name}")
         reader_dataset=load_dataset(dataset_name)
+        collection_name = self.trim_collection_name(dataset_name)
+        vector_db.create_collection(collection_name = collection_name)
+        loguru.logger.info(f"load_data_set_all_field dataset_name:{dataset_name} into collection_name:{collection_name}")
+        count = 0
+        doc_list = []
         for item_dict in reader_dataset['train']:
-            loguru.logger.info(f"load_data_set_all_field item_dict:{item_dict.get('url', '')},{type(item_dict)}")
+            doc_str =''
             for key, value in item_dict.items():
-                if(isinstance(key, value)):
-                  embedding_list = ai_model.encode_string(value)
-                  vector_db.insert_list(embedding_list, value)  
+                if(isinstance(key, type(value))):
+                    doc_str += f" {key}:{value}"
+            count += 1
+            doc_list.append(doc_str)
+            if count % 100 == 0:
+                embedding_list = ai_model.encode_string(doc_list)
+                vector_db.insert_list(embedding_list, doc_list, self.trim_collection_name(dataset_name),start_idx = count)
+                loguru.logger.info(f"load_data_set_all_field count:{count}")
+                doc_list = []
+        embedding_list = ai_model.encode_string(doc_list)
+        vector_db.insert_list(embedding_list, doc_list, self.trim_collection_name(dataset_name),start_idx = count)
+        loguru.logger.info(f"load_data_set_all_field count:{count}")
+        loguru.logger.info("Dataset loaded successfully")
         return True
-
-
 
     async def load_data_set_by_field(self, param: TrainFileIn)->bool:
         reader_dataset=load_dataset(param.dataSet)
         embedField=param.embedField
-        resField=  param.resField
+        resField= param.resField
+        collection_name = self.trim_collection_name(param.dataSet)
+        vector_db.create_collection(collection_name = collection_name)
+        loguru.logger.info(f"load_data_set_all_field dataset_name:{param.dataSet} into collection_name:{collection_name}")
+        count = 0
+        embed_field_list = []
+        res_field_list = []
         for item in reader_dataset['train']:
          # check contail field
             # if resField not in item or embedField not in item :
-          embedField_val=item.get(embedField, '')
-          resField_val=item.get(resField, '')
-          embedding_list = ai_model.encode_string(embedField_val)         
-          vector_db.insert_list(embedding_list, resField_val)  
-            
+            embedField_val=item.get(embedField, '')
+            resField_val=item.get(resField, '')
+            embed_field_list.append(embedField_val)
+            res_field_list.append(resField_val)
+            count += 1
+            if count % 100 == 0:
+                embedding_list = ai_model.encode_string(embed_field_list)
+                vector_db.insert_list(embedding_list, res_field_list, collection_name,start_idx = count) 
+                embed_field_list = []
+                res_field_list = []
+                loguru.logger.info(f"load_data_set_all_field count:{count}")
+        embedding_list = ai_model.encode_string(embed_field_list)
+        vector_db.insert_list(embedding_list, res_field_list, collection_name,start_idx = count)
+        loguru.logger.info(f"load_data_set_all_field count:{count}")
+        loguru.logger.info("Dataset loaded successfully")
         return True
 
     async def evaluate_response(self, request_msg: str, response_msg: str) -> float:
         evaluate_conbine=[request_msg, response_msg]
         score = ai_model.cross_encoder.predict(evaluate_conbine)
         return score
+
+    def trim_collection_name(self, name: str) -> str:
+        return re.sub(r'\W+', '', name)
