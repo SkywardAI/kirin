@@ -9,7 +9,7 @@ from pymilvus import db
 from datasets import load_dataset
 
 from src.models.db.chat import ChatHistory
-from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM
+from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM, LOAD_BATCH_SIZE
 from src.repository.ai_models import ai_model
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.vector_database import vector_db
@@ -64,15 +64,15 @@ class RAGChatModelRepository(BaseRAGRepository):
 
         return True
 
-    async def load_data_set(self, param: TrainFileIn)-> bool:
+    def load_data_set(self, param: TrainFileIn)-> bool:
         if param.embedField is None or param.resField is None:
             loguru.logger.info(f"load_data_set param {param}")           
-            await self.load_data_set_all_field(dataset_name=param.dataSet) 
+            self.load_data_set_all_field(dataset_name=param.dataSet) 
         else:
-            await self.load_data_set_by_field(param=param)   
+            self.load_data_set_by_field(param=param)   
         return True
 
-    async def load_data_set_all_field(self, dataset_name: str)-> bool:
+    def load_data_set_all_field(self, dataset_name: str)-> bool:
         reader_dataset=load_dataset(dataset_name)
         collection_name = self.trim_collection_name(dataset_name)
         vector_db.create_collection(collection_name = collection_name)
@@ -86,7 +86,7 @@ class RAGChatModelRepository(BaseRAGRepository):
                     doc_str += f" {key}:{value}"
             count += 1
             doc_list.append(doc_str)
-            if count % 100 == 0:
+            if count % LOAD_BATCH_SIZE == 0:
                 embedding_list = ai_model.encode_string(doc_list)
                 vector_db.insert_list(embedding_list, doc_list, self.trim_collection_name(dataset_name),start_idx = count)
                 loguru.logger.info(f"load_data_set_all_field count:{count}")
@@ -97,7 +97,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         loguru.logger.info("Dataset loaded successfully")
         return True
 
-    async def load_data_set_by_field(self, param: TrainFileIn)->bool:
+    def load_data_set_by_field(self, param: TrainFileIn)->bool:
         reader_dataset=load_dataset(param.dataSet)
         embedField=param.embedField
         resField= param.resField
@@ -115,7 +115,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             embed_field_list.append(embedField_val)
             res_field_list.append(resField_val)
             count += 1
-            if count % 100 == 0:
+            if count % LOAD_BATCH_SIZE == 0:
                 embedding_list = ai_model.encode_string(embed_field_list)
                 vector_db.insert_list(embedding_list, res_field_list, collection_name,start_idx = count) 
                 embed_field_list = []

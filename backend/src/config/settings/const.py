@@ -15,6 +15,9 @@ DEFAULT_MODEL_PATH = "/models/"
 CONVERSATION_INACTIVE_SEC= 300
 RAG_NUM = 5
 
+#DATASET LOADBATCH
+LOAD_BATCH_SIZE = 100
+
 # SAMPLE_CONTEXT
 SAMPLE_CONTEXT = [
     "Melbourne is the capital city of the Australian state of Victoria.",
