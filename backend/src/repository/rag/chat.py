@@ -75,6 +75,13 @@ class RAGChatModelRepository(BaseRAGRepository):
         return True
 
     def load_data_set_directly(self, param: TrainFileIn)->bool:
+        r"""
+        We load the the .csv file directly
+        
+        @param param: the instance of TrainFileIn
+        
+        @return: boolean
+        """
         reader_dataset=load_dataset(param.dataSet)
         resField = param.resField if param.resField else '0'
         collection_name = self.trim_collection_name(param.dataSet)
