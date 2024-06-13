@@ -76,7 +76,8 @@ class RAGChatModelRepository(BaseRAGRepository):
 
     def load_data_set_directly(self, param: TrainFileIn)->bool:
         r"""
-        We load the the .csv file directly
+        If the data set is already in the form of embeddings, 
+        this function can be used to load the data set directly into the vector database.
         
         @param param: the instance of TrainFileIn
         
