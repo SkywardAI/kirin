@@ -10,12 +10,12 @@ from src.repository.crud.ai_model import AiModelCRUDRepository
 from src.repository.crud.file import UploadedFileCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
 
-router = fastapi.APIRouter(prefix="/train", tags=["train"])
+router = fastapi.APIRouter(prefix="/train", tags=["Save"])
 
 
 @router.post(
     "",
-    name="train:train-with-file",
+    name="train:Save file or dataset to DB",
     response_model=TrainFileInResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
 )
@@ -31,10 +31,12 @@ async def train(
     # 3, use file and or dataset perform the training logic (csv id done)
 
     if  train_in_msg.modelID is not None and train_in_msg.fileID is not None:
+        # if contains file ID and modelID,  then load file
         ai_model = await aimodel_repo.read_aimodel_by_id(id=train_in_msg.modelID)
         file_csv = await file_repo.read_uploadedfiles_by_id(id=train_in_msg.fileID)
         await rag_chat_repo.load_csv_file(file_name=file_csv.name, model_name=ai_model.name)
     else:
+        # Else, load dataset
         db_dataset=await dataset_repo.get_dataset_by_name(train_in_msg.dataSet)
         if not db_dataset:
         # await rag_chat_repo.load_data_set(train_in_msg) 

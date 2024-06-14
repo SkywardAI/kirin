@@ -6,7 +6,8 @@ class TrainFileIn(BaseSchemaModel):
     dataSet: str | None = None
     modelID: int | None = None
     embedField : str | None = None
-    resField : str | None =None
+    resField : str | None = None
+    directLoad: bool = False
 
 
 class TrainFileInResponse(BaseSchemaModel):
