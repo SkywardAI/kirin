@@ -57,3 +57,10 @@ gpu-logs:
 .PHONY: gpu-remove
 gpu-remove:
 	docker compose -f docker-compose.gpu.yaml down
+
+############################################################################################################
+# Linter
+
+.PHONY: ruff
+ruff:
+	@ruff check --output-format=github backend/src/ --config ruff.toml
