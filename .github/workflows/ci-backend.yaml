@@ -18,9 +18,10 @@ jobs:
           - ubuntu-latest
         python-version:
           - "3.11"
-    defaults:
-      run:
-        working-directory: backend/
+    # No need to set to specific directory
+    # defaults:
+    #   run:
+    #     working-directory: backend/
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -33,13 +34,10 @@ jobs:
           cache: 'pip'
       - name: Install Dependencies for Linting
         run: |
-          pip install flake8
-      - name: Lint with Flake8
+          pip install ruff==0.4.9
+      - name: Lint with ruff
         run: |
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          make ruff
 
  
   # test:
