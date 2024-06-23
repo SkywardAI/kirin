@@ -2,13 +2,8 @@ import csv
 import loguru
 import re
 from src.models.schemas.train import TrainFileIn
-import sqlalchemy
-import loguru
-from src.models.schemas.chat import MessagesResponse
-from pymilvus import db
 from datasets import load_dataset
 
-from src.models.db.chat import ChatHistory
 from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM, LOAD_BATCH_SIZE
 from src.repository.ai_models import ai_model
 from src.repository.rag.base import BaseRAGRepository

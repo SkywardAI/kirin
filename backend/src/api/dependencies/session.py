@@ -1,12 +1,6 @@
-import contextlib
 import typing
 import loguru
-import fastapi
-from sqlalchemy.ext.asyncio import (
-    async_sessionmaker as sqlalchemy_async_sessionmaker,
-    AsyncSession as SQLAlchemyAsyncSession,
-    AsyncSessionTransaction as SQLAlchemyAsyncSessionTransaction,
-)
+from sqlalchemy.ext.asyncio import AsyncSession as SQLAlchemyAsyncSession
 
 from src.repository.database import async_db
 

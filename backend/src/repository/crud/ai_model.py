@@ -1,13 +1,11 @@
 import typing
 
 import sqlalchemy
-from sqlalchemy.sql import functions as sqlalchemy_functions
 
 from src.models.db.ai_model import AiModel
 from src.models.schemas.ai_model import AiModelInUpdate
 from src.repository.crud.base import BaseCRUDRepository
-from src.securities.verifications.credentials import credential_verifier
-from src.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
+from src.utilities.exceptions.database import EntityDoesNotExist
 
 
 class AiModelCRUDRepository(BaseCRUDRepository):

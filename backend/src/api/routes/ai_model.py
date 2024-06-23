@@ -3,7 +3,6 @@ from src.models.db.ai_model import AiModel
 import fastapi
 
 from src.api.dependencies.repository import get_rag_repository, get_repository
-from src.config.settings.const import UPLOAD_FILE_PATH
 from src.models.schemas.ai_model import AiModelCreate, AiModelChooseResponse, AiModelInResponse,AiModelCreateResponse
 from src.repository.crud.ai_model import AiModelCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository

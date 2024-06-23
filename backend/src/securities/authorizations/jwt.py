@@ -33,7 +33,7 @@ class JWTGenerator:
 
     def generate_access_token(self, account: Account) -> str:
         if not account:
-            raise EntityDoesNotExist(f"Cannot generate JWT token for without Account entity!")
+            raise EntityDoesNotExist("Cannot generate JWT token for without Account entity!")
 
         return self._generate_jwt_token(
             jwt_data=JWTAccount(username=account.username, email=account.email).dict(),  # type: ignore

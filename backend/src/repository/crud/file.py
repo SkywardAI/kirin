@@ -1,7 +1,5 @@
 import typing
-
 import sqlalchemy
-from sqlalchemy.sql import functions as sqlalchemy_functions
 
 from src.models.db.file import UploadedFile
 from src.repository.crud.base import BaseCRUDRepository

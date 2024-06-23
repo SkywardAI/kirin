@@ -1,5 +1,3 @@
-import random
-
 from src.models.schemas.dataset import DatasetCreate
 from src.repository.crud.dataset_db import DataSetCRUDRepository
 import fastapi
@@ -60,7 +58,7 @@ async def check_status(
     id: int,
 ) -> TrainStatusInResponse:
 
-    choices = [0, 1, -1]
+    # choices = [0, 1, -1]
     # 0 for in process
     # 1 for complete successfully
     # -1 for error
