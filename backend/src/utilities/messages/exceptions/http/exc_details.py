@@ -36,4 +36,4 @@ def http_404_email_details(email: str) -> str:
 
 
 def http_400_file_name_details()->str:
-    return f"The file_name already exists. Please refrain from uploading it again, or try uploading with a different name!"
+    return "The file_name already exists. Please refrain from uploading it again, or try uploading with a different name!"

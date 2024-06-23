@@ -5,8 +5,6 @@ from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.models.schemas.chat import ChatHistory, ChatInMessage, ChatInResponse, Session
 from src.repository.crud.chat import ChatHistoryCRUDRepository, SessionCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
-from src.securities.authorizations.jwt import jwt_generator
-from src.utilities.exceptions.database import EntityDoesNotExist
 
 router = fastapi.APIRouter(prefix="/chat", tags=["chatbot"])
 

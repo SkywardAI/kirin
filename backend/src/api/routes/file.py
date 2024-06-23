@@ -1,5 +1,4 @@
 import os
-import random
 
 from src.repository.crud.dataset_db import DataSetCRUDRepository
 from src.models.schemas.dataset import DatasetResponse
@@ -86,7 +85,7 @@ async def check_status(
 ) -> FileStatusInResponse:
 
     # TODO check process status of training
-    choices = [0, 1, -1]
+    # choices = [0, 1, -1]
     # 0 for in process
     # 1 for complete successfully
     # -1 for error

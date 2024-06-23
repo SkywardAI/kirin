@@ -2,14 +2,10 @@ import typing
 from typing import Optional
 
 import sqlalchemy
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy.sql import functions as sqlalchemy_functions
 
 from src.models.db.chat import ChatHistory, Session
 from src.repository.crud.base import BaseCRUDRepository
-from src.securities.verifications.credentials import credential_verifier
-from src.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
+from src.utilities.exceptions.database import EntityDoesNotExist
 
 
 class SessionCRUDRepository(BaseCRUDRepository):

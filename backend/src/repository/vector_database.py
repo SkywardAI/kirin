@@ -1,8 +1,7 @@
 import time
 import loguru
 
-from pymilvus import connections, Milvus, MilvusClient
-from src.repository.ai_models import ai_model
+from pymilvus import MilvusClient
 from src.config.manager import settings
 from src.config.settings.const import DEFAULT_COLLECTION, DEFAULT_DIM
 
@@ -13,7 +12,7 @@ class MilvusHelper:
             try:
                 url = f"http://{settings.MILVUS_HOST}:{settings.MILVUS_PORT}"
                 self.client = MilvusClient(url)
-                loguru.logger.info(f"Vector Database --- Connected to Milvus.")
+                loguru.logger.info("Vector Database --- Connected to Milvus.")
                 break
             except Exception as e:
                 err = e
@@ -49,16 +48,10 @@ class MilvusHelper:
 
     def insert_list(self, embedding, data, collection_name=DEFAULT_COLLECTION, start_idx=0):
         try:
-            dim = self._get_collection_dimension_(collection_name)
             for i, item in enumerate(embedding):
-                # if len(item) < dim:
-                #     item += [0] * (dim - len(item))
                 self.client.insert(collection_name=collection_name, data={"id": i+start_idx, "vector": item, "doc": data[i]})
         except Exception as e:
             loguru.logger.info(f"Vector Databse --- Error: {e}")
-        # res = self.client.get(collection_name=collection_name, ids=[0, 1, 2])
-
-        # loguru.logger.info(f"Vector Database --- Result of first 3 result: {res}")
 
     def search(self, data, n_results, collection_name=DEFAULT_COLLECTION):
 

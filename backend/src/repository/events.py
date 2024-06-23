@@ -3,7 +3,7 @@ import loguru
 import threading
 from sqlalchemy import event
 from sqlalchemy.dialects.postgresql.asyncpg import AsyncAdapt_asyncpg_connection
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSessionTransaction
+from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.pool.base import _ConnectionRecord
 
 from src.config.settings.const import SAMPLE_CONTEXT
@@ -12,8 +12,6 @@ from src.repository.database import async_db
 from src.repository.table import Base
 from src.repository.vector_database import vector_db
 from src.repository.ai_models import ai_model
-from datasets import load_dataset
-from src.repository.vector_database import vector_db
 
 @event.listens_for(target=async_db.async_engine.sync_engine, identifier="connect")
 def inspect_db_server_on_connection(
