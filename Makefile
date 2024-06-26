@@ -64,3 +64,10 @@ gpu-remove:
 .PHONY: ruff
 ruff:
 	@ruff check --output-format=github backend/src/ --config ruff.toml
+
+############################################################################################################
+# Load minimal model
+
+.PHONY: minimal
+minimal:
+	@mkdir -p volumes/models && wget -O volumes/models/gpt2-minimal-Q4_K_M-v2.gguf https://huggingface.co/aisuko/gpt2-117M-gguf/resolve/main/ggml-model-Q4_K_M-v2.gguf?download=true
