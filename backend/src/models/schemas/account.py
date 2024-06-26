@@ -19,7 +19,6 @@ class AccountInUpdate(BaseSchemaModel):
 
 class AccountInLogin(BaseSchemaModel):
     username: str
-    email: pydantic.EmailStr
     password: str
 
 
