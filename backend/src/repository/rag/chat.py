@@ -1,5 +1,6 @@
 import csv
 import loguru
+import requests
 import re
 from src.models.schemas.train import TrainFileIn
 from datasets import load_dataset
@@ -9,6 +10,8 @@ from src.repository.ai_models import ai_model
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.vector_database import vector_db
 from src.repository.conversation import ConversationWithSession, conversations
+
+from src.repository.inference_eng import inference_helper
 
 class RAGChatModelRepository(BaseRAGRepository):
     async def load_model(self, session_id: int, model_name: str) -> bool:
@@ -168,3 +171,30 @@ class RAGChatModelRepository(BaseRAGRepository):
 
     def trim_collection_name(self, name: str) -> str:
         return re.sub(r'\W+', '', name)
+    
+
+    async def inference(self, session_id: int, input_msg: str, chat_repo) -> str:
+        """
+        Inference on CPU
+        """
+        if session_id not in conversations:
+            conversations[session_id] = ConversationWithSession(session_id, chat_repo)
+            await conversations[session_id].load()
+        con = conversations[session_id]
+        con.conversation.add_message({"role": "user", "content": input_msg})
+        # context = self.search_context(input_msg)
+        
+
+        url=f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/completion"
+        headers = {
+            'Content-Type': 'application/json',
+        }
+
+        data = {"prompt": input_msg, "n_predict": 128}
+
+
+        response = requests.post(url, headers=headers, json=data)
+        # TODO check if status is 200
+        answer = response.json()
+        loguru.logger.info(f'inference answer value:{answer}')
+        return answer.get('content')

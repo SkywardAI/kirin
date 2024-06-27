@@ -32,9 +32,12 @@ async def chat(
         # TODO need verify if sesson exist
         # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:20])
         session_id = chat_in_msg.sessionId
-    response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
-    score = await rag_chat_repo.evaluate_response(request_msg = chat_in_msg.message, response_msg = response_msg)
-    response_msg = response_msg + "score : {:.3f}".format(score)
+    # response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
+
+    response_msg=await rag_chat_repo.inference(session_id=session_id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
+
+    # score = await rag_chat_repo.evaluate_response(request_msg = chat_in_msg.message, response_msg = response_msg)
+    # response_msg = response_msg + "score : {:.3f}".format(score)
     return ChatInResponse(
         sessionId=session_id,
         message=response_msg

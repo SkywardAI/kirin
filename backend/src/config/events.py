@@ -3,14 +3,21 @@ import typing
 import fastapi
 import loguru
 
-from src.repository.events import dispose_db_connection, initialize_db_connection, initialize_aimodel, initialize_vectordb_connection
+from src.repository.events import (
+    dispose_db_connection, 
+    initialize_db_connection, 
+    # initialize_aimodel, 
+    initialize_vectordb_connection,
+    initialize_inference_client
+    )
 
 
 def execute_backend_server_event_handler(backend_app: fastapi.FastAPI) -> typing.Any:
     async def launch_backend_server_events() -> None:
         await initialize_db_connection(backend_app=backend_app)
-        await initialize_aimodel()
+        # await initialize_aimodel()
         await initialize_vectordb_connection()
+        await initialize_inference_client()
     return launch_backend_server_events
 
 

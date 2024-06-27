@@ -13,11 +13,32 @@
 # limitations under the License.
 
 
-import loguru
+# https://pypi.org/project/openai/1.35.5/
+import openai
 
 from src.config.manager import settings
 
 class InferenceHelper:
-    def __init__(self) -> None:
+    def init(self) -> None:
+        # TODO pydantic settings
         self.infer_eng_url=settings.INFERENCE_ENG
+        self.infer_eng_port=settings.INFERENCE_ENG_PORT
+        # OpenAI-compatible Chat Completions API
+        self.client=self.openai_client()
 
+    
+    def openai_client(self) -> openai.OpenAI:
+        """
+        Initialize OpenAI client
+        
+        Returns:
+        openai.OpenAI: OpenAI client
+        
+        """
+        url=f'http://{self.infer_eng_url}:{self.infer_eng_port}/v1'
+        api_key='sk-no-key-required'
+
+        return openai.OpenAI(base_url=url, api_key=api_key)
+
+
+inference_helper: InferenceHelper = InferenceHelper()
