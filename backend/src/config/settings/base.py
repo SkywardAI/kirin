@@ -10,7 +10,7 @@ ROOT_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent.parent.parent.pare
 
 class BackendBaseSettings(BaseSettings):
     TITLE: str = "Kirin API"
-    VERSION: str = "0.1.1"
+    VERSION: str = "0.1.7"
     TIMEZONE: str = "UTC"
     DESCRIPTION: str | None = None
     DEBUG: bool = False
@@ -72,6 +72,8 @@ class BackendBaseSettings(BaseSettings):
     HASHING_ALGORITHM_LAYER_2: str = decouple.config("HASHING_ALGORITHM_LAYER_2", cast=str)  # type: ignore
     HASHING_SALT: str = decouple.config("HASHING_SALT", cast=str)  # type: ignore
     JWT_ALGORITHM: str = decouple.config("JWT_ALGORITHM", cast=str)  # type: ignore
+
+    INFERENCE_ENG: str = decouple.config("INFERENCE_ENG", cast=str)
 
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True

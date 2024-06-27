@@ -79,6 +79,7 @@ services:
       - HASHING_SALT=${HASHING_SALT}
       - MILVUS_HOST=${MILVUS_HOST}
       - MILVUS_PORT=${MILVUS_PORT}
+      - INFERENCE_ENG=${INFERENCE_ENG}
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
@@ -139,7 +140,7 @@ services:
 
 
   llamacpp:
-    container_name: inference_engine
+    container_name: llamacpp
     image: gclub/llama.cpp:server--b1-7a6db5c
     restart: always
     volumes:
@@ -148,7 +149,8 @@ services:
       - 8080
     ports:
       - 8080:8080
-    command: ["-m", "models/gpt2-minimal-Q4_K_M-v2.gguf", "-c", "512"]
+    command: ["-m", "models/gpt2-minimal-Q4_K_M-v2.gguf", "-c", "512","--host", "0.0.0.0", "--port", "8080"]
+    # command: ["-m", "models/gpt2-minimal-Q4_K_M-v2.gguf", "-c", "512","--port", "8080"]
 
 
   frontend:

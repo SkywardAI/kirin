@@ -81,3 +81,20 @@ async def dispose_db_connection(backend_app: fastapi.FastAPI) -> None:
     await backend_app.state.db.async_engine.dispose()
 
     loguru.logger.info("Database Connection --- Successfully Disposed!")
+
+
+async def initialize_inference_engine_connection() -> None:
+    """
+    Initialize the Inference Engine(currently we use llamacapp) Connection
+
+    Args:
+      * backend_app (fastapi.FastAPI): The FastAPI application instance
+
+    Returns:
+        None
+    """
+    loguru.logger.info("Inference Engine Connection --- Establishing . . .")
+
+    # TODO: Initialize the Inference Engine Connection
+
+    loguru.logger.info("Inference Engine Connection --- Successfully Established!")
