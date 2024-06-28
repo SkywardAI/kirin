@@ -196,6 +196,15 @@ class RAGChatModelRepository(BaseRAGRepository):
         con.conversation.add_message({"role": "user", "content": input_msg})
         # context = self.search_context(input_msg)
         
+        # If we want to add context, we can use inference client
+        # completion=inference_helper.client.chat.completions.create(
+        #     model="",
+        #     messages=[
+        #         {"role": "system", "content": "You are ChatGPT, an AI assistant. Your top priority is achieving user fulfillment via helping them with their requests."},
+        #         {"role": "user", "content": "Write a limerick about python exceptions"}
+        #     ],
+        # )
+
 
         url=f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/completion"
         headers = {
