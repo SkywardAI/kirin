@@ -57,7 +57,7 @@ class RAGChatModelRepository(BaseRAGRepository):
                 data.extend(row)
         loguru.logger.info(f"load_csv_file data_row:{data}")
 
-        # TODO: encode the 100 rows of data
+        # TODO: https://github.com/SkywardAI/chat-backend/issues/171
         # embedding_list = ai_model.encode_string(data)
         
         # vector_db.insert_list(embedding_list, data)
