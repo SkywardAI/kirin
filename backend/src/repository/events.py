@@ -11,7 +11,6 @@ from src.repository.conversation import cleanup_conversations
 from src.repository.database import async_db
 from src.repository.table import Base
 from src.repository.vector_database import vector_db
-from src.repository.ai_models import ai_model
 from src.repository.inference_eng import inference_helper
 
 @event.listens_for(target=async_db.async_engine.sync_engine, identifier="connect")
@@ -49,13 +48,9 @@ async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
 
     loguru.logger.info("Database Connection --- Successfully Established!")
 
-async def initialize_aimodel() -> None:
-    loguru.logger.info("Ai model --- Initializing . . .")
-    await ai_model.init()
 
-    loguru.logger.info("Ai model--- Successfully Initialized!")
-
-async def initialize_vectordb_connection() -> None:
+async def initialize_vectordb_collection() -> None:
+    
     loguru.logger.info("Vector Database Connection --- Establishing . . .")
 
     vector_db.create_collection()

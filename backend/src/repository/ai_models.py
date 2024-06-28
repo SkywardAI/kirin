@@ -111,4 +111,4 @@ class ModelPipeline:
             return model_path
 
 
-ai_model: ModelPipeline = ModelPipeline()
+# ai_model: ModelPipeline = ModelPipeline()
