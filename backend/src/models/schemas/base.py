@@ -8,7 +8,7 @@ from src.utilities.formatters.field_formatter import format_dict_key_to_camel_ca
 
 
 class BaseSchemaModel(pydantic.BaseModel):
-    class Config(pydantic.BaseConfig):
+    class Config(pydantic.ConfigDict):
         from_attributes: bool = True
         validate_assignment: bool = True
         populate_by_name: bool = True

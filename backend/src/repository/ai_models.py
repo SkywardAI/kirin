@@ -26,7 +26,12 @@ from kimchima.utils import (
     Downloader
 )
 
-from src.config.settings.const import DEFAULT_ENCODER, DEFAULT_MODEL, DEFAUTL_SUMMERIZE_MODEL,CROSS_ENDOCDER,DEFAULT_MODEL_PATH
+from src.config.settings.const import (
+    DEFAULT_ENCODER, 
+    DEFAULT_MODEL, 
+    DEFAUTL_SUMMERIZE_MODEL,
+    CROSS_ENDOCDER,DEFAULT_MODEL_PATH
+    )
 
 class ModelPipeline:
     r"""
@@ -106,4 +111,4 @@ class ModelPipeline:
             return model_path
 
 
-ai_model: ModelPipeline = ModelPipeline()
+# ai_model: ModelPipeline = ModelPipeline()

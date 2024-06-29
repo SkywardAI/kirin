@@ -79,6 +79,7 @@ services:
       - HASHING_SALT=${HASHING_SALT}
       - MILVUS_HOST=${MILVUS_HOST}
       - MILVUS_PORT=${MILVUS_PORT}
+      - INFERENCE_ENG=${INFERENCE_ENG}
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
@@ -136,6 +137,20 @@ services:
     depends_on:
       - "etcd"
       - "minio"
+
+
+  llamacpp:
+    container_name: llamacpp
+    image: gclub/llama.cpp:server--b1-a8d49d8
+    restart: always
+    volumes:
+      - "${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models"
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    command: ["-m", "models/gpt2-minimal-Q4_K_M-v2.gguf", "-c", "512"]
+
 
   frontend:
     image: ghcr.io/skywardai/rebel:v0.1.3
