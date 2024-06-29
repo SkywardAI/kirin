@@ -12,6 +12,12 @@ There are two steps to start the development environment:
     ```shell
     make env
     ```
+2. Download the pre-trained model
+
+    ```shell
+    make minimal
+    ```
+
 2. Open the project in VSCode and click on the `Reopen in Container` button.
 
 And VSCode will automatically build the development environment based on our [pre-build images](https://hub.docker.com/r/gclub/skywardai/tags).

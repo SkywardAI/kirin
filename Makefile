@@ -1,11 +1,123 @@
+FILE_NAME:=.env
+
+# The environment file is used to store all the environment variables for the project.
+ENVIRONMENT:=DEV
+DEBUG:=True
+BACKEND_SERVER_HOST:=127.0.0.1
+BACKEND_SERVER_PORT:=8000
+BACKEND_SERVER_WORKERS:=4
+
+# Database - Postgres
+POSTGRES_DB:=my_db
+POSTGRES_PASSWORD:=postgres13240!
+POSTGRES_PORT:=5432
+POSTGRES_SCHEMA:=postgresql
+POSTGRES_USERNAME:=postgres
+IS_ALLOWED_CREDENTIALS:=True
+API_TOKEN:=YOUR-API-TOKEN
+AUTH_TOKEN:=YOUR-AUTHENTICATION-TOKEN
+
+# This is the host for Docker Postgres Image in docker-compose.yaml
+POSTGRES_HOST:=db
+POSTGRES_URI:={POSTGRES_SCHEMA}://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}
+
+# Database - SQLAlchemy
+DB_TIMEOUT:=5
+DB_POOL_SIZE:=100
+DB_MAX_POOL_CON:=80
+DB_POOL_OVERFLOW:=20
+IS_DB_ECHO_LOG:=True
+IS_DB_EXPIRE_ON_COMMIT:=False
+IS_DB_FORCE_ROLLBACK:=True
+
+# JWT Token
+JWT_SECRET_KEY:=YOUR-JWT-SECRET-KEY
+JWT_SUBJECT:=YOUR-JWT-SUBJECT
+JWT_TOKEN_PREFIX:=YOUR-TOKEN-PREFIX
+JWT_ALGORITHM:=HS256
+JWT_MIN:=60
+JWT_HOUR:=23
+JWT_DAY:=6
+
+# Hash Functions
+HASHING_ALGORITHM_LAYER_1:=bcrypt
+HASHING_ALGORITHM_LAYER_2:=argon2
+HASHING_SALT:=YOUR-RANDOM-SALTY-SALT
+
+# Codecov (Login to Codecov and get your TOKEN)
+# CODECOV_TOKEN:=CODECOV_TOKEN=
+
+# Milvus
+ETCD_AUTO_COMPACTION_MODE:=revision
+ETCD_AUTO_COMPACTION_RETENTION:=1000
+ETCD_QUOTA_BACKEND_BYTES:=4294967296
+MILVUS_HOST:=milvus-standalone
+MILVUS_PORT:=19530
+
+
+DOCKER_VOLUME_DIRECTORY:=
+
+# CPU Accelerate Inference Engine
+INFERENCE_ENG:=llamacpp
+INFERENCE_ENG_PORT:=8080
+INFERENCE_ENG_VERSION:=server--b1-a8d49d8
+
+# Language model, default is gpt2-117M
+LANGUAGE_MODEL_NAME:=gpt2-xl-Q4_K_M-v2.gguf
+LANGUAGE_MODEL_URL:=https://huggingface.co/aisuko/gpt2-xl-gguf/resolve/main/gpt2-xl-Q4_K_M-v2.gguf?download=true
+
+
 .PHONY: env
 env:
-	@cp .env.example .env
+	@echo "ENVIRONMENT=$(ENVIRONMENT)"> $(FILE_NAME)
+	@echo "DEBUG=$(DEBUG)">> $(FILE_NAME)
+	@echo "BACKEND_SERVER_HOST=$(BACKEND_SERVER_HOST)">> $(FILE_NAME)
+	@echo "BACKEND_SERVER_PORT=$(BACKEND_SERVER_PORT)">> $(FILE_NAME)
+	@echo "BACKEND_SERVER_WORKERS=$(BACKEND_SERVER_WORKERS)">> $(FILE_NAME)
+	@echo "POSTGRES_DB=$(POSTGRES_DB)">> $(FILE_NAME)
+	@echo "POSTGRES_PASSWORD=$(POSTGRES_PASSWORD)">> $(FILE_NAME)
+	@echo "POSTGRES_PORT=$(POSTGRES_PORT)">> $(FILE_NAME)
+	@echo "POSTGRES_SCHEMA=$(POSTGRES_SCHEMA)">> $(FILE_NAME)
+	@echo "POSTGRES_USERNAME=$(POSTGRES_USERNAME)">> $(FILE_NAME)
+	@echo "IS_ALLOWED_CREDENTIALS=$(IS_ALLOWED_CREDENTIALS)">> $(FILE_NAME)
+	@echo "API_TOKEN=$(API_TOKEN)">> $(FILE_NAME)
+	@echo "AUTH_TOKEN=$(AUTH_TOKEN)">> $(FILE_NAME)
+	@echo "POSTGRES_HOST=$(POSTGRES_HOST)">> $(FILE_NAME)
+	@echo "POSTGRES_URI=$(POSTGRES_URI)">> $(FILE_NAME)
+	@echo "DB_TIMEOUT=$(DB_TIMEOUT)">> $(FILE_NAME)
+	@echo "DB_POOL_SIZE=$(DB_POOL_SIZE)">> $(FILE_NAME)
+	@echo "DB_MAX_POOL_CON=$(DB_MAX_POOL_CON)">> $(FILE_NAME)
+	@echo "DB_POOL_OVERFLOW=$(DB_POOL_OVERFLOW)">> $(FILE_NAME)
+	@echo "IS_DB_ECHO_LOG=$(IS_DB_ECHO_LOG)">> $(FILE_NAME)
+	@echo "IS_DB_EXPIRE_ON_COMMIT=$(IS_DB_EXPIRE_ON_COMMIT)">> $(FILE_NAME)
+	@echo "IS_DB_FORCE_ROLLBACK=$(IS_DB_FORCE_ROLLBACK)">> $(FILE_NAME)
+	@echo "JWT_SECRET_KEY=$(JWT_SECRET_KEY)">> $(FILE_NAME)
+	@echo "JWT_SUBJECT=$(JWT_SUBJECT)">> $(FILE_NAME)
+	@echo "JWT_TOKEN_PREFIX=$(JWT_TOKEN_PREFIX)">> $(FILE_NAME)
+	@echo "JWT_ALGORITHM=$(JWT_ALGORITHM)">> $(FILE_NAME)
+	@echo "JWT_MIN=$(JWT_MIN)">> $(FILE_NAME)
+	@echo "JWT_HOUR=$(JWT_HOUR)">> $(FILE_NAME)
+	@echo "JWT_DAY=$(JWT_DAY)">> $(FILE_NAME)
+	@echo "HASHING_ALGORITHM_LAYER_1=$(HASHING_ALGORITHM_LAYER_1)">> $(FILE_NAME)
+	@echo "HASHING_ALGORITHM_LAYER_2=$(HASHING_ALGORITHM_LAYER_2)">> $(FILE_NAME)
+	@echo "HASHING_SALT=$(HASHING_SALT)">> $(FILE_NAME)
+	@echo "ETCD_AUTO_COMPACTION_MODE=$(ETCD_AUTO_COMPACTION_MODE)">> $(FILE_NAME)
+	@echo "ETCD_AUTO_COMPACTION_RETENTION=$(ETCD_AUTO_COMPACTION_RETENTION)">> $(FILE_NAME)
+	@echo "ETCD_QUOTA_BACKEND_BYTES=$(ETCD_QUOTA_BACKEND_BYTES)">> $(FILE_NAME)
+	@echo "MILVUS_HOST=$(MILVUS_HOST)">> $(FILE_NAME)
+	@echo "MILVUS_PORT=$(MILVUS_PORT)">> $(FILE_NAME)
+	@echo "DOCKER_VOLUME_DIRECTORY=$(DOCKER_VOLUME_DIRECTORY)">> $(FILE_NAME)
+	@echo "INFERENCE_ENG=$(INFERENCE_ENG)">> $(FILE_NAME)
+	@echo "INFERENCE_ENG_PORT=$(INFERENCE_ENG_PORT)">> $(FILE_NAME)
+	@echo "INFERENCE_ENG_VERSION=$(INFERENCE_ENG_VERSION)">> $(FILE_NAME)
+	@echo "LANGUAGE_MODEL_NAME=$(LANGUAGE_MODEL_NAME)">> $(FILE_NAME)
+
+
 
 ############################################################################################################
 # For development, require Nvidia GPU
 .PHONY: build
-build: env
+build: env lm
 	docker-compose -f docker-compose.yaml build
 
 
@@ -66,8 +178,9 @@ ruff:
 	@ruff check --output-format=github backend/src/ --config ruff.toml
 
 ############################################################################################################
-# Load minimal model
+# Download model from Hugging Face
 
-.PHONY: minimal
-minimal:
-	@mkdir -p volumes/models && wget -O volumes/models/gpt2-minimal-Q4_K_M-v2.gguf https://huggingface.co/aisuko/gpt2-117M-gguf/resolve/main/ggml-model-Q4_K_M-v2.gguf?download=true
+.PHONY: lm
+lm:
+	@mkdir -p volumes/models && wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
+
