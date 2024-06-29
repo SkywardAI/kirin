@@ -73,8 +73,8 @@ class BackendBaseSettings(BaseSettings):
     HASHING_SALT: str = decouple.config("HASHING_SALT", cast=str)  # type: ignore
     JWT_ALGORITHM: str = decouple.config("JWT_ALGORITHM", cast=str)  # type: ignore
 
-    INFERENCE_ENG: str = decouple.config("INFERENCE_ENG", cast=str)
-    INFERENCE_ENG_PORT: int=decouple.config("INFERENCE_ENG_PORT", cast=int)
+    INFERENCE_ENG: str = decouple.config("INFERENCE_ENG", cast=str) # type: ignore
+    INFERENCE_ENG_PORT: int=decouple.config("INFERENCE_ENG_PORT", cast=int) # type: ignore
 
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True

@@ -80,6 +80,7 @@ services:
       - MILVUS_HOST=${MILVUS_HOST}
       - MILVUS_PORT=${MILVUS_PORT}
       - INFERENCE_ENG=${INFERENCE_ENG}
+      - INFERENCE_ENG_PORT=${INFERENCE_ENG_PORT}
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
