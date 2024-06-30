@@ -197,6 +197,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         # context = self.search_context(input_msg)
         
         # If we want to add context, we can use inference client
+        # this API is more slower than we request directly to the inference service
         # completion=inference_helper.client.chat.completions.create(
         #     model="",
         #     messages=[
@@ -210,8 +211,17 @@ class RAGChatModelRepository(BaseRAGRepository):
         headers = {
             'Content-Type': 'application/json',
         }
-
-        data = {"prompt": input_msg, "n_predict": 128}
+        
+        data = {
+            "prompt": input_msg, 
+            "n_predict": 128,
+            "system_prompt":{
+                "prompt":"You are ChatGPT, an AI assistant. Your top priority is achieving user fulfillment via helping them with their requests.",
+                "anti_prompt":"User:",
+                "assistant_name": "Assistant:"
+            }
+                
+        }
 
 
         response = requests.post(url, headers=headers, json=data)
