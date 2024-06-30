@@ -70,28 +70,28 @@ async def get_session(
 
     return sessions_list
 
+# remove get all sessions api for security seak
+# @router.get(
+#     path="",
+#     name="chat:get-all-sessions",
+#     response_model=list[Session],
+#     status_code=fastapi.status.HTTP_200_OK,
+# )
+# async def get_all_sessions(
+#     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
+# ) -> list[Session]:
+#     sessions = await session_repo.read_sessions()
+#     sessions_list: list = list()
 
-@router.get(
-    path="",
-    name="chat:get-all-sessions",
-    response_model=list[Session],
-    status_code=fastapi.status.HTTP_200_OK,
-)
-async def get_all_sessions(
-    session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
-) -> list[Session]:
-    sessions = await session_repo.read_sessions()
-    sessions_list: list = list()
+#     for session in sessions:
+#         res_session = Session(
+#             id=session.id,
+#             name=session.name,
+#             created_at=session.created_at,
+#         )
+#         sessions_list.append(res_session)
 
-    for session in sessions:
-        res_session = Session(
-            id=session.id,
-            name=session.name,
-            created_at=session.created_at,
-        )
-        sessions_list.append(res_session)
-
-    return sessions_list
+#     return sessions_list
 
 
 @router.get(

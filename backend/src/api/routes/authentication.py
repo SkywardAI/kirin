@@ -79,3 +79,14 @@ async def signin(
             updated_at=db_account.updated_at,
         ),
     )
+
+@router.get(
+    path="/token",
+    name="authentication: token for anonymous user",
+    response_model=dict,
+    status_code=fastapi.status.HTTP_200_OK,
+)
+async def get_chathistory() -> str:
+    #TODO add logic for generate token
+
+    return {"token": ""}

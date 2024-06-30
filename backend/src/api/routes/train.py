@@ -48,18 +48,18 @@ async def train(
     )
 
 
-@router.get(
-    path="/{id}",
-    name="train:check status",
-    response_model=TrainStatusInResponse,
-    status_code=fastapi.status.HTTP_200_OK,
-)
-async def check_status(
-    id: int,
-) -> TrainStatusInResponse:
+# @router.get(
+#     path="/{id}",
+#     name="train:check status",
+#     response_model=TrainStatusInResponse,
+#     status_code=fastapi.status.HTTP_200_OK,
+# )
+# async def check_status(
+#     id: int,
+# ) -> TrainStatusInResponse:
 
-    # choices = [0, 1, -1]
-    # 0 for in process
-    # 1 for complete successfully
-    # -1 for error
-    return TrainStatusInResponse(status=1)
+#     # choices = [0, 1, -1]
+#     # 0 for in process
+#     # 1 for complete successfully
+#     # -1 for error
+#     return TrainStatusInResponse(status=1)

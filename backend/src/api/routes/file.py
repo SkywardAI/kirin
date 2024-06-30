@@ -74,20 +74,20 @@ async def get_dataset(
         # datasets_list.append(db_dataset.name)
     return datasets_list
 
-@router.get(
-    path="/{id}",
-    name="file:check upload status",
-    response_model=FileStatusInResponse,
-    status_code=fastapi.status.HTTP_200_OK,
-)
-async def check_status(
-    id: int,
-) -> FileStatusInResponse:
+# @router.get(
+#     path="/{id}",
+#     name="file:check upload status",
+#     response_model=FileStatusInResponse,
+#     status_code=fastapi.status.HTTP_200_OK,
+# )
+# async def check_status(
+#     id: int,
+# ) -> FileStatusInResponse:
 
-    # TODO check process status of training
-    # choices = [0, 1, -1]
-    # 0 for in process
-    # 1 for complete successfully
-    # -1 for error
-    return FileStatusInResponse(status=1)
+#     # TODO check process status of training
+#     # choices = [0, 1, -1]
+#     # 0 for in process
+#     # 1 for complete successfully
+#     # -1 for error
+#     return FileStatusInResponse(status=1)
 
