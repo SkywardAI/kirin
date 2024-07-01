@@ -36,9 +36,19 @@ The above-listed technologies are just the main ones. There are other technologi
 * [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) $\rightarrow$ A file for distributing the responsibilities in our project to each team/teammate.
 
 
-## For quick setup
+## Requirements
+
+```shell
+docker-compose version 1.29.2, build unknown
+```
+
+## Quick setup
 
 See [quick start](https://skywardai.github.io/skywardai.io/docs/quick-start.html)
+
+## Deployment
+
+See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build_and_run.html)
 
 
 # License

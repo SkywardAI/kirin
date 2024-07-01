@@ -75,6 +75,11 @@ class BackendBaseSettings(BaseSettings):
 
     INFERENCE_ENG: str = decouple.config("INFERENCE_ENG", cast=str) # type: ignore
     INFERENCE_ENG_PORT: int=decouple.config("INFERENCE_ENG_PORT", cast=int) # type: ignore
+    INFERENCE_ENG_VERSION: str = decouple.config("INFERENCE_ENG_VERSION", cast=str) # type: ignore
+    
+    # Configurations for language model
+    LANGUAGE_MODEL_NAME: str = decouple.config("LANGUAGE_MODEL_NAME", cast=str) # type: ignore
+
 
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True
