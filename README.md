@@ -38,9 +38,7 @@ The above-listed technologies are just the main ones. There are other technologi
 
 ## Requirements
 
-```shell
-docker-compose version 1.29.2, build unknown
-```
+See [Requirements.md](./docs/Requirements.md)
 
 ## Quick setup
 
@@ -48,7 +46,7 @@ See [quick start](https://skywardai.github.io/skywardai.io/docs/quick-start.html
 
 ## Deployment
 
-See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build_and_run.html)
+See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build_and_run.html). And if you are interested in docker-in-docker development, see [Development.md](./docs/Development.md)
 
 
 # License

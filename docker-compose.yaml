@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:latest
+    image: postgres:16.3
     container_name: db
     restart: always
     environment:
@@ -16,7 +16,7 @@ services:
       - 5433:5432
 
   db_editor:
-    image: adminer
+    image: adminer:4.8.1
     container_name: db_editor
     restart: always
     environment:
