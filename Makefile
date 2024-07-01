@@ -182,5 +182,5 @@ ruff:
 
 .PHONY: lm
 lm:
-	@mkdir -p volumes/models && wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
+	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
 
