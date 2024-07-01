@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.pool.base import _ConnectionRecord
 
 # from src.config.settings.const import SAMPLE_CONTEXT
+from src.repository.crud.account import account_repo
 from src.repository.conversation import cleanup_conversations
 from src.repository.database import async_db
 from src.repository.table import Base
@@ -96,3 +97,10 @@ async def initialize_inference_client() -> None:
     inference_helper.init()
 
     loguru.logger.info("Inference Client --- Successfully Initialized!")
+
+async def initialize_anonymous_user() -> None:
+    loguru.logger.info("Anonymous user --- Creating . . .")
+
+    await account_repo.create_anonymous_user()
+
+    loguru.logger.info("Anonymous user --- Successfully Created!")
