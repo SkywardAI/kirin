@@ -205,7 +205,42 @@ class RAGChatModelRepository(BaseRAGRepository):
         #         {"role": "user", "content": "Write a limerick about python exceptions"}
         #     ],
         # )
+        
+        #TODO:
+          # 1. Implement the tokenize function
+          # 2. Implement the inference function
+          # 3. Implement the further context function
+          # 4. Implement the check status of the inference service
 
+        instruction="A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions."
+
+        def format_prompt(prmpt: str) -> str:
+            chat = [
+                {
+                    "human": "Hello, Assistant.",
+                    "assistant": "Hello. How may I help you today?"
+                },
+                {
+                    "human": "Please tell me the largest city in Europe.",
+                    "assistant": "Sure. The largest city in Europe is Moscow, the capital of Russia."
+                },
+            ]
+            return f"{instruction}\n" + "\n".join([f"### Human: {m['human']}\n### Assistant: {m['assistant']}" for m in chat]) + f"\n### Human: {prmpt}\n### Assistant:"
+
+        
+        url=f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/tokenize"
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        data={
+            "content": instruction
+        }
+        response = requests.post(url, headers=headers, json=data)
+        if response.status_code != 200:
+            loguru.logger.error(f"Error in tokenization: {response.text}")
+            return "Error in tokenization"
+        tokenized_instruction = response.json().get('tokens')
+        n_keep=len(tokenized_instruction)
 
         url=f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/completion"
         headers = {
@@ -213,14 +248,16 @@ class RAGChatModelRepository(BaseRAGRepository):
         }
         
         data = {
-            "prompt": input_msg, 
+            "prompt": format_prompt(input_msg),
+            "temperature": 0.2,
+            "top_k": 40,
+            "top_p": 0.9,
+            "n_keep": n_keep,
             "n_predict": 128,
-            "system_prompt":{
-                "prompt":"You are ChatGPT, an AI assistant. Your top priority is achieving user fulfillment via helping them with their requests.",
-                "anti_prompt":"User:",
-                "assistant_name": "Assistant:"
-            }
-                
+            "cache_prompt": "false",
+            "slot_id": -1,
+            "stop": ["\n### Human:"],
+            "stream": "false",
         }
 
 

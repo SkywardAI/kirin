@@ -62,9 +62,10 @@ INFERENCE_ENG:=llamacpp
 INFERENCE_ENG_PORT:=8080
 INFERENCE_ENG_VERSION:=server--b1-a8d49d8
 
-# Language model, default is gpt2-117M
-LANGUAGE_MODEL_NAME:=gpt2-xl-Q4_K_M-v2.gguf
-LANGUAGE_MODEL_URL:=https://huggingface.co/aisuko/gpt2-xl-gguf/resolve/main/gpt2-xl-Q4_K_M-v2.gguf?download=true
+# Language model, default is phi3-mini-4k-instruct-q4.gguf
+# https://github.com/SkywardAI/llama.cpp/blob/9b2f16f8055265c67e074025350736adc1ea0666/tests/test-chat-template.cpp#L91-L92
+LANGUAGE_MODEL_NAME:=Phi-3-mini-4k-instruct-q4.gguf
+LANGUAGE_MODEL_URL:=https://huggingface.co/aisuko/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi3-mini-4k-instruct-Q4.gguf?download=true
 
 
 .PHONY: env
