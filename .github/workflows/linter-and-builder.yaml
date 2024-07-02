@@ -1,0 +1,82 @@
+name: 'Linter and Builder 🚀'
+on:
+  pull_request:
+    branches:
+      - 'main'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref && github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  code-quality:
+    name: 'Code-Quality 💎'
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        python-version:
+          - "3.11"
+    # No need to set to specific directory
+    # defaults:
+    #   run:
+    #     working-directory: backend/
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+      - name: Check repository
+        uses: actions/checkout@v4
+
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install Dependencies for Linting
+        run: |
+          pip install ruff==0.4.9
+
+      - name: Lint with ruff
+        run: |
+          make ruff
+
+  check-build-images:
+    name: 'Docker Build Checker🐳'
+    needs: [code-quality]
+    strategy:
+      matrix:
+        config:
+          - { dockerfile: "backend/Dockerfile", platforms: "linux/amd64,linux/arm64" }
+    # defaults:
+    #   run:
+    #     working-directory: backend/
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check repository
+        uses: actions/checkout@v4
+        
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get Commit Hash
+        id: commit
+        shell: bash
+        run: |
+          echo "SHORT_HASH=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        # if: startsWith(github.ref, 'refs/tags/') != true && success()
+        uses: docker/build-push-action@v4
+        with:
+          context: backend/
+          push: false
+          platforms: ${{ matrix.config.platforms }}
+          tags: "${{ secrets.DOCKER_REGISTRY_KIRIN }}/${{ secrets.IMAGE_NAME_KIRIN }}:${{ env.SHORT_HASH }}"
+          file: ${{ matrix.config.dockerfile }}
