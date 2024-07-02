@@ -7,8 +7,7 @@ from src.repository.events import (
     dispose_db_connection, 
     initialize_db_connection,
     initialize_vectordb_collection,
-    initialize_inference_client,
-    initialize_anonymous_user
+    initialize_inference_client
     )
 
 
