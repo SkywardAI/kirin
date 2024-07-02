@@ -138,7 +138,7 @@ logs:
 ############################################################################################################
 # For demo, without GPU augumentation, but slow for inference. Might include some bugs.
 .PHONY: demo
-demo: env
+demo: env lm
 	docker-compose -f docker-compose.demo.yaml up -d
 
 .PHONY: demo-stop
@@ -183,5 +183,5 @@ ruff:
 
 .PHONY: lm
 lm:
-	@mkdir -p volumes/models && wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
+	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
 
