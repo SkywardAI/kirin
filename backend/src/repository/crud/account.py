@@ -29,23 +29,6 @@ class AccountCRUDRepository(BaseCRUDRepository):
 
         return new_account
 
-    async def create_anonymous_user(self) -> Account:
-        account_create = AccountInCreate(username="anonymous_user", email="anonymous@anonymous.com",password="password")
-        new_account = Account(username=account_create.username, email=account_create.email, is_logged_in=True)
-
-        new_account.set_hash_salt(hash_salt=pwd_generator.generate_salt)
-        new_account.set_hashed_password(
-            hashed_password=pwd_generator.generate_hashed_password(
-                hash_salt=new_account.hash_salt, new_password=account_create.password
-            )
-        )
-
-        self.async_session.add(instance=new_account)
-        await self.async_session.commit()
-        await self.async_session.refresh(instance=new_account)
-
-        return new_account
-
     async def read_accounts(self) -> typing.Sequence[Account]:
         stmt = sqlalchemy.select(Account)
         query = await self.async_session.execute(statement=stmt)
@@ -154,5 +137,3 @@ class AccountCRUDRepository(BaseCRUDRepository):
             raise EntityAlreadyExists(f"The email `{email}` is already registered!")  # type: ignore
 
         return True
-
-account_repo: AccountCRUDRepository=AccountCRUDRepository(BaseCRUDRepository)

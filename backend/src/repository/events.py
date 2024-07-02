@@ -3,11 +3,13 @@ import loguru
 import threading
 from sqlalchemy import event
 from sqlalchemy.dialects.postgresql.asyncpg import AsyncAdapt_asyncpg_connection
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.pool.base import _ConnectionRecord
 
-# from src.config.settings.const import SAMPLE_CONTEXT
-from src.repository.crud.account import account_repo
+from src.config.settings.const import ANONYMOUS_USER, ANONYMOUS_EMAIL,ANONYMOUS_PASS
+from src.models.db.account import Account
+from src.securities.hashing.password import pwd_generator
 from src.repository.conversation import cleanup_conversations
 from src.repository.database import async_db
 from src.repository.table import Base
@@ -38,6 +40,24 @@ async def initialize_db_tables(connection: AsyncConnection) -> None:
 
     loguru.logger.info("Database Table Creation --- Successfully Initialized!")
 
+async def initialize_anonymous_user(async_session: AsyncSession) -> None:
+    loguru.logger.info("Anonymous user --- Creating . . .")
+
+    new_account = Account(username=ANONYMOUS_USER, email=ANONYMOUS_EMAIL, is_logged_in=True)
+
+    new_account.set_hash_salt(hash_salt=pwd_generator.generate_salt)
+    new_account.set_hashed_password(
+        hashed_password=pwd_generator.generate_hashed_password(
+        hash_salt=new_account.hash_salt, new_password=ANONYMOUS_PASS
+        )
+    )
+
+    async_session.add(instance=new_account)
+    await async_session.commit()
+    await async_session.refresh(instance=new_account)
+
+    loguru.logger.info("Anonymous user --- Successfully Created!")
+    
 
 async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
     loguru.logger.info("Database Connection --- Establishing . . .")
@@ -46,6 +66,8 @@ async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
 
     async with backend_app.state.db.async_engine.begin() as connection:
         await initialize_db_tables(connection=connection)
+    async with async_db.async_session as async_session:
+        await initialize_anonymous_user(async_session=async_session)
 
     loguru.logger.info("Database Connection --- Successfully Established!")
 
@@ -97,10 +119,3 @@ async def initialize_inference_client() -> None:
     inference_helper.init()
 
     loguru.logger.info("Inference Client --- Successfully Initialized!")
-
-async def initialize_anonymous_user() -> None:
-    loguru.logger.info("Anonymous user --- Creating . . .")
-
-    await account_repo.create_anonymous_user()
-
-    loguru.logger.info("Anonymous user --- Successfully Created!")
