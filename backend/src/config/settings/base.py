@@ -26,7 +26,7 @@ class BackendBaseSettings(BaseSettings):
 
     MILVUS_HOST: str = decouple.config("MILVUS_HOST", cast=str)  # type: ignore
     MILVUS_PORT: int = decouple.config("MILVUS_PORT", cast=int)  # type: ignore
-    MILVUS_VERSION: int = decouple.config("MILVUS_VERSION", cast=str)  # type: ignore
+    MILVUS_VERSION: str = decouple.config("MILVUS_VERSION", cast=str)  # type: ignore
     DB_POSTGRES_HOST: str = decouple.config("POSTGRES_HOST", cast=str)  # type: ignore
     DB_MAX_POOL_CON: int = decouple.config("DB_MAX_POOL_CON", cast=int)  # type: ignore
     DB_POSTGRES_NAME: str = decouple.config("POSTGRES_DB", cast=str)  # type: ignore
