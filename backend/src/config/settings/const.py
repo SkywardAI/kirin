@@ -20,5 +20,5 @@ LOAD_BATCH_SIZE = 100
 
 #ANONYMOUS USER
 ANONYMOUS_USER = "anonymous"
-ANONYMOUS_EMAIL = "anonymous@abc.com"
+ANONYMOUS_EMAIL = "anonymous@anony.com"
 ANONYMOUS_PASS = "Marlboro@2211"

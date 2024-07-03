@@ -1,5 +1,4 @@
 import fastapi
-from fastapi import Request
 from src.api.dependencies.repository import get_repository
 from src.models.schemas.account import AccountInCreate, AccountInLogin, AccountInResponse, AccountWithToken
 from src.config.settings.const import ANONYMOUS_USER,ANONYMOUS_PASS
@@ -94,7 +93,7 @@ async def signin(
 async def get_chathistory(
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository))
 ) -> dict:
-    anonymous_user = AccountInLogin( username=ANONYMOUS_USER, password=ANONYMOUS_PASS)
+    anonymous_user = AccountInLogin(username=ANONYMOUS_USER, password=ANONYMOUS_PASS)
     db_account = await account_repo.read_user_by_password_authentication(account_login=anonymous_user)
     access_token = jwt_generator.generate_access_token(account=db_account)
 
@@ -107,7 +106,6 @@ async def get_chathistory(
     response_model=dict,
     status_code=fastapi.status.HTTP_200_OK,
 )
-@jwt_required
-async def get_chathistory(request: Request) -> dict:
-    jwt_account = request.state.jwt_account
-    return jwt_account
+async def get_chathistory(jwt_payload: dict = fastapi.Depends(jwt_required)):
+    # jwt_account = request.state.jwt_account
+    return {"result": jwt_payload.username}

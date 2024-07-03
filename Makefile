@@ -66,6 +66,9 @@ INFERENCE_ENG_VERSION:=server--b1-a8d49d8
 LANGUAGE_MODEL_NAME:=gpt2-xl-Q4_K_M-v2.gguf
 LANGUAGE_MODEL_URL:=https://huggingface.co/aisuko/gpt2-xl-gguf/resolve/main/gpt2-xl-Q4_K_M-v2.gguf?download=true
 
+ADMIN_USERNAME:=admin
+ADMIN_EMAIL:=admin@admin.com
+ADMIN_PASS:=admin
 
 .PHONY: env
 env:
@@ -111,6 +114,9 @@ env:
 	@echo "INFERENCE_ENG_PORT=$(INFERENCE_ENG_PORT)">> $(FILE_NAME)
 	@echo "INFERENCE_ENG_VERSION=$(INFERENCE_ENG_VERSION)">> $(FILE_NAME)
 	@echo "LANGUAGE_MODEL_NAME=$(LANGUAGE_MODEL_NAME)">> $(FILE_NAME)
+	@echo "ADMIN_USERNAME=$(ADMIN_USERNAME)">> $(FILE_NAME)
+	@echo "ADMIN_EMAIL=$(ADMIN_EMAIL)">> $(FILE_NAME)
+	@echo "ADMIN_PASS=$(ADMIN_PASS)">> $(FILE_NAME)
 
 
 

@@ -7,7 +7,6 @@ from src.models.schemas.base import BaseSchemaModel
 
 
 class ChatInMessage(BaseSchemaModel):
-    accountID: Optional[int] = Field(None)
     sessionId: Optional[int] = Field(None)
     message: str
 

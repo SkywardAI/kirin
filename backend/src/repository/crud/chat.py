@@ -52,6 +52,11 @@ class SessionCRUDRepository(BaseCRUDRepository):
         query = await self.async_session.execute(statement=stmt)
         return query.scalars().all()
 
+    async def verify_session_by_account_id(self, session_id: int,account_id: int ) -> bool:
+        # stmt = sqlalchemy.select(Session).where(Session.account_id == id)
+        stmt = sqlalchemy.select(Session).where(Session.id == session_id, Session.account_id == account_id)
+        query = await self.async_session.execute(statement=stmt)
+        return bool(query)
 
 class ChatHistoryCRUDRepository(BaseCRUDRepository):
     async def read_chat_history_by_id(self, id: int) -> ChatHistory:

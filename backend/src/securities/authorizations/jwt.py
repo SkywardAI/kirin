@@ -9,8 +9,6 @@ from src.config.manager import settings
 from src.models.db.account import Account
 from src.models.schemas.jwt import JWTAccount, JWToken
 from src.utilities.exceptions.database import EntityDoesNotExist
-from typing import Callable
-from functools import wraps
 
 class JWTGenerator:
     def __init__(self):
@@ -63,28 +61,13 @@ def get_jwt_generator() -> JWTGenerator:
 
 jwt_generator: JWTGenerator = get_jwt_generator()
 
-def jwt_required(func: Callable):
-    @wraps(func)
-    async def decorator(*args, **kwargs):
-        request = None
-        for arg in args:
-            if isinstance(arg, Request):
-                request = arg
-                break
-        if request is None:
-            raise HTTPException(status_code=400, detail="Request object not found")
-
-        # 这里假设你有一个函数来验证JWT并返回解码后的信息
-        auth_scheme = HTTPBearer()
-        credentials: HTTPAuthorizationCredentials = await auth_scheme(request)
-        token = credentials.credentials
-        try:
-            # 假设这个函数验证JWT并返回解码后的令牌信息
-            jwt_account = jwt_generator.retrieve_details_from_token(token)
-        except Exception as e:
-            raise HTTPException(status_code=403, detail="Invalid token")
-
-        # 将解码后的JWT信息添加到请求的状态中，以便在路径操作中使用
-        request.state.jwt_account = jwt_account
-        return await func(*args, **kwargs)
-    return decorator
+async def jwt_required(request: Request):
+    auth_scheme = HTTPBearer()
+    credentials: HTTPAuthorizationCredentials = await auth_scheme(request)
+    token = credentials.credentials
+    try:
+        jwt_account = jwt_generator.retrieve_details_from_token(token)
+    except Exception as e:
+        raise HTTPException(status_code=403, detail="Invalid token")
+    request.state.jwt_account = jwt_account
+    return jwt_account

@@ -1,12 +1,13 @@
 import fastapi
 import pydantic
-
+from src.config.manager import settings
 from src.api.dependencies.repository import get_repository
 from src.models.schemas.account import AccountInResponse, AccountInUpdate, AccountWithToken
 from src.repository.crud.account import AccountCRUDRepository
-from src.securities.authorizations.jwt import jwt_generator
+from src.securities.authorizations.jwt import jwt_generator, jwt_required
 from src.utilities.exceptions.database import EntityDoesNotExist
 from src.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_request
+from src.utilities.exceptions.http.exc_401 import http_exc_401_cunauthorized_request
 
 router = fastapi.APIRouter(prefix="/accounts", tags=["accounts"])
 
@@ -19,9 +20,12 @@ router = fastapi.APIRouter(prefix="/accounts", tags=["accounts"])
 )
 async def get_accounts(
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> list[AccountInResponse]:
     db_accounts = await account_repo.read_accounts()
     db_account_list: list = list()
+    if jwt_payload.username != settings.ADMIN_USERNAME:
+        raise await http_exc_401_cunauthorized_request()
 
     for db_account in db_accounts:
         access_token = jwt_generator.generate_access_token(account=db_account)
@@ -52,6 +56,7 @@ async def get_accounts(
 async def get_account(
     id: int,
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> AccountInResponse:
     try:
         db_account = await account_repo.read_account_by_id(id=id)
@@ -59,7 +64,10 @@ async def get_account(
 
     except EntityDoesNotExist:
         raise await http_404_exc_id_not_found_request(id=id)
-
+    if jwt_payload.username != settings.ADMIN_USERNAME:
+        current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+        if current_user != db_account:
+            raise await http_exc_401_cunauthorized_request()
     return AccountInResponse(
         id=db_account.id,
         authorized_account=AccountWithToken(
@@ -87,6 +95,7 @@ async def update_account(
     update_email: pydantic.EmailStr | None = None,
     update_password: str | None = None,
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> AccountInResponse:
     account_update = AccountInUpdate(username=update_username, email=update_email, password=update_password)
     try:
@@ -94,6 +103,10 @@ async def update_account(
 
     except EntityDoesNotExist:
         raise await http_404_exc_id_not_found_request(id=query_id)
+    if jwt_payload.username != settings.ADMIN_USERNAME:
+        current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+        if current_user != updated_db_account:
+            raise await http_exc_401_cunauthorized_request()
 
     access_token = jwt_generator.generate_access_token(account=updated_db_account)
 
@@ -114,8 +127,11 @@ async def update_account(
 
 @router.delete(path="", name="accountss:delete-account-by-id", status_code=fastapi.status.HTTP_200_OK)
 async def delete_account(
-    id: int, account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository))
+    id: int, account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> dict[str, str]:
+    if jwt_payload.username != settings.ADMIN_USERNAME:
+        raise await http_exc_401_cunauthorized_request()
     try:
         deletion_result = await account_repo.delete_account_by_id(id=id)
 
