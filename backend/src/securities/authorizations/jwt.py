@@ -2,12 +2,13 @@ import datetime
 
 import pydantic
 from jose import jwt as jose_jwt, JWTError as JoseJWTError
+from fastapi import Request, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from src.config.manager import settings
 from src.models.db.account import Account
 from src.models.schemas.jwt import JWTAccount, JWToken
 from src.utilities.exceptions.database import EntityDoesNotExist
-
 
 class JWTGenerator:
     def __init__(self):
@@ -40,9 +41,9 @@ class JWTGenerator:
             expires_delta=datetime.timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRATION_TIME),
         )
 
-    def retrieve_details_from_token(self, token: str, secret_key: str) -> list[str]:
+    def retrieve_details_from_token(self, token: str) -> dict:
         try:
-            payload = jose_jwt.decode(token=token, key=secret_key, algorithms=[settings.JWT_ALGORITHM])
+            payload = jose_jwt.decode(token=token, key=settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
             jwt_account = JWTAccount(username=payload["username"], email=payload["email"])
 
         except JoseJWTError as token_decode_error:
@@ -51,7 +52,7 @@ class JWTGenerator:
         except pydantic.ValidationError as validation_error:
             raise ValueError("Invalid payload in token") from validation_error
 
-        return [jwt_account.username, jwt_account.email]
+        return jwt_account
 
 
 def get_jwt_generator() -> JWTGenerator:
@@ -59,3 +60,14 @@ def get_jwt_generator() -> JWTGenerator:
 
 
 jwt_generator: JWTGenerator = get_jwt_generator()
+
+async def jwt_required(request: Request):
+    auth_scheme = HTTPBearer()
+    credentials: HTTPAuthorizationCredentials = await auth_scheme(request)
+    token = credentials.credentials
+    try:
+        jwt_account = jwt_generator.retrieve_details_from_token(token)
+    except Exception:
+        raise HTTPException(status_code=403, detail="Invalid token")
+    request.state.jwt_account = jwt_account
+    return jwt_account

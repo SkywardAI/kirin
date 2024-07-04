@@ -7,7 +7,7 @@ import fastapi
 from src.utilities.messages.exceptions.http.exc_details import (
     http_404_email_details,
     http_404_id_details,
-    http_404_username_details,
+    http_404_username_details
 )
 
 
