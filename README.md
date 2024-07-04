@@ -1,6 +1,6 @@
-<h1 align=center><strong>Chat machine trainer backend</strong></h1>
+<h1 align=center><strong>Kirin</strong></h1>
 
-[![CI - Backend](https://github.com/SkywardAI/chat-backend/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/ci-backend.yaml) [![Release Drafter 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml/badge.svg?branch=main)](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml)
+[![Linter and Builder 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/linter-and-builder.yaml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/linter-and-builder.yaml) [![Release Drafter 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml) 
 
 
 This is a repository is the backend of the chat machine trainer websit. It's using the following tech stack:

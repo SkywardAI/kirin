@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:latest
+    image: postgres:16.3
     container_name: db
     restart: always
     environment:
@@ -16,7 +16,7 @@ services:
       - 5433:5432
 
   db_editor:
-    image: adminer
+    image: adminer:4.8.1
     container_name: db_editor
     restart: always
     environment:
@@ -33,9 +33,9 @@ services:
       - db
 
   backend_app:
-    image: gclub/kirin:v0.1.4
     container_name: backend_app
     restart: always
+    image: gclub/kirin:v0.1.8
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - DEBUG=${DEBUG}
@@ -70,6 +70,13 @@ services:
       - HASHING_SALT=${HASHING_SALT}
       - MILVUS_HOST=${MILVUS_HOST}
       - MILVUS_PORT=${MILVUS_PORT}
+      - INFERENCE_ENG=${INFERENCE_ENG}
+      - INFERENCE_ENG_PORT=${INFERENCE_ENG_PORT}
+      - INFERENCE_ENG_VERSION=${INFERENCE_ENG_VERSION}
+      - LANGUAGE_MODEL_NAME=${LANGUAGE_MODEL_NAME}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASS=${ADMIN_PASS}
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
@@ -79,7 +86,7 @@ services:
       - 8001:8000
     depends_on:
       - db
-    # command: ["--gpus", "all"]
+
 
   etcd:
     container_name: milvus-etcd
@@ -128,8 +135,22 @@ services:
       - "etcd"
       - "minio"
 
+
+  llamacpp:
+    container_name: llamacpp
+    image: gclub/llama.cpp:${INFERENCE_ENG_VERSION}
+    restart: always
+    volumes:
+      - "${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models"
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-cnv","-i"]
+
+  # Frontend here is only for testing purposes
   frontend:
-    image: ghcr.io/skywardai/rebel:v0.1.3
+    image: ghcr.io/skywardai/rebel:v0.1.4
     container_name: frontend
     restart: always
     expose:
