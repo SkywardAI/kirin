@@ -3,7 +3,7 @@ from src.api.dependencies.repository import get_repository
 from src.models.schemas.account import AccountInCreate, AccountInLogin, AccountInResponse, AccountWithToken
 from src.config.settings.const import ANONYMOUS_USER,ANONYMOUS_PASS
 from src.repository.crud.account import AccountCRUDRepository
-from src.securities.authorizations.jwt import jwt_generator, jwt_required
+from src.securities.authorizations.jwt import jwt_generator
 from src.utilities.exceptions.database import EntityAlreadyExists
 from src.utilities.exceptions.http.exc_400 import (
     http_exc_400_credentials_bad_signin_request,

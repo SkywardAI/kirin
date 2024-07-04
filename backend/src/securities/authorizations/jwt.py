@@ -67,7 +67,7 @@ async def jwt_required(request: Request):
     token = credentials.credentials
     try:
         jwt_account = jwt_generator.retrieve_details_from_token(token)
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=403, detail="Invalid token")
     request.state.jwt_account = jwt_account
     return jwt_account
