@@ -6,6 +6,9 @@ DEBUG:=True
 BACKEND_SERVER_HOST:=127.0.0.1
 BACKEND_SERVER_PORT:=8000
 BACKEND_SERVER_WORKERS:=4
+BACKEND_SERVER_VERSION:=v0.1.8
+TITLE:="Kirin API"
+TIMEZONE:="UTC"
 
 # Database - Postgres
 POSTGRES_DB:=my_db
@@ -120,6 +123,10 @@ env:
 	@echo "ADMIN_PASS=$(ADMIN_PASS)">> $(FILE_NAME)
 
 
+.PHONY: prepare
+prepare: env
+prepare: lm
+
 
 ############################################################################################################
 # For development, require Nvidia GPU
@@ -191,3 +198,29 @@ ruff:
 lm:
 	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
 
+############################################################################################################
+# Poetry
+
+.PHONY: poetry
+poetry:
+	@pipx install poetry==1.8.2
+
+.PHONY: lock
+lock:
+	@poetry -C backend lock
+
+.PHONY: install
+install:
+	@poetry -C backend install --no-root -vvv
+
+.PHONY: install-dev
+install-dev:
+	@poetry -C backend install --only dev --no-root -vvv
+
+.PHONY: plugin
+plugin:
+	@poetry -C backend self add poetry-plugin-export
+
+.PHONY: expo
+expo:
+	@poetry -C backend export -f requirements.txt --output backend/requirements.txt

@@ -1,13 +1,25 @@
 # Our base image
-FROM gclub/skywardai:v0.1.14
+FROM python:3.11.8-slim
 
 # We set the working directory to /app.
 # This is where the application code will be stored.
 WORKDIR /app
 
-EXPOSE 8000
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Install system dependencies
+# netcat for nc command
+# If necessary gcc postgresql
+RUN apt-get update \
+  && apt-get -y install netcat-traditional \
+  && apt-get clean
 
 COPY . .
+
+RUN pip --disable-pip-version-check --no-cache-dir install -r requirements.txt && rm -rf /tmp/pip-tmp
+
+EXPOSE 8000
 
 # Execute entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]

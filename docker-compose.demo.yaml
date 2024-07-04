@@ -32,8 +32,8 @@ services:
     depends_on:
       - db
 
-  backend_app:
-    container_name: backend_app
+  kirin:
+    container_name: kirin
     restart: always
     image: gclub/kirin:v0.1.8
     environment:

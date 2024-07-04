@@ -3,14 +3,8 @@ import loguru
 import requests
 import re
 from src.models.schemas.train import TrainFileIn
-from datasets import load_dataset
-
-from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM, LOAD_BATCH_SIZE
-# from src.repository.ai_models import ai_model
+from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM
 from src.repository.rag.base import BaseRAGRepository
-from src.repository.vector_database import vector_db
-from src.repository.conversation import ConversationWithSession, conversations
-
 from src.repository.inference_eng import inference_helper
 
 class RAGChatModelRepository(BaseRAGRepository):
@@ -33,12 +27,6 @@ class RAGChatModelRepository(BaseRAGRepository):
         pass
 
     async def get_response(self, session_id: int, input_msg: str, chat_repo) -> str:
-
-        if session_id not in conversations:
-            conversations[session_id] = ConversationWithSession(session_id, chat_repo)
-            await conversations[session_id].load()
-        con = conversations[session_id]
-        con.conversation.add_message({"role": "user", "content": input_msg})
         # context = self.search_context(input_msg)
         #TODO: Implement the inference function
         pass
@@ -83,31 +71,32 @@ class RAGChatModelRepository(BaseRAGRepository):
         
         @return: boolean
         """
-        reader_dataset=load_dataset(param.dataSet)
-        resField = param.resField if param.resField else '0'
-        collection_name = self.trim_collection_name(param.dataSet)
-        vector_db.create_collection(collection_name = collection_name)
-        loguru.logger.info(f"load_data_set_all_field dataset_name:{param.dataSet} into collection_name:{collection_name}")
-        count = 0
-        embed_field_list = []
-        res_field_list = []
-        for item in reader_dataset['train']:
-         # check contail field
-            # if resField not in item or embedField not in item :
-            resField_val=item.get(resField, '')
-            res_field_list.append(resField_val)
-            embedField_val = [value for key, value in item.items() if key != resField]
-            embed_field_list.append(embedField_val)
-            count += 1
-            if count % LOAD_BATCH_SIZE == 0:
-                vector_db.insert_list(embed_field_list, res_field_list, collection_name,start_idx = count) 
-                embed_field_list = []
-                res_field_list = []
-                loguru.logger.info(f"load_data_set_all_field count:{count}")
-        vector_db.insert_list(embed_field_list, res_field_list, collection_name,start_idx = count)
-        loguru.logger.info(f"load_data_set_all_field count:{count}")
-        loguru.logger.info("Dataset loaded successfully")
-        return True
+        # reader_dataset=load_dataset(param.dataSet)
+        # resField = param.resField if param.resField else '0'
+        # collection_name = self.trim_collection_name(param.dataSet)
+        # vector_db.create_collection(collection_name = collection_name)
+        # loguru.logger.info(f"load_data_set_all_field dataset_name:{param.dataSet} into collection_name:{collection_name}")
+        # count = 0
+        # embed_field_list = []
+        # res_field_list = []
+        # for item in reader_dataset['train']:
+        #  # check contail field
+        #     # if resField not in item or embedField not in item :
+        #     resField_val=item.get(resField, '')
+        #     res_field_list.append(resField_val)
+        #     embedField_val = [value for key, value in item.items() if key != resField]
+        #     embed_field_list.append(embedField_val)
+        #     count += 1
+        #     if count % LOAD_BATCH_SIZE == 0:
+        #         vector_db.insert_list(embed_field_list, res_field_list, collection_name,start_idx = count) 
+        #         embed_field_list = []
+        #         res_field_list = []
+        #         loguru.logger.info(f"load_data_set_all_field count:{count}")
+        # vector_db.insert_list(embed_field_list, res_field_list, collection_name,start_idx = count)
+        # loguru.logger.info(f"load_data_set_all_field count:{count}")
+        # loguru.logger.info("Dataset loaded successfully")
+        # return True
+        pass
 
 
 
@@ -189,11 +178,11 @@ class RAGChatModelRepository(BaseRAGRepository):
         """
         Inference using seperate service: llamacpp
         """
-        if session_id not in conversations:
-            conversations[session_id] = ConversationWithSession(session_id, chat_repo)
-            await conversations[session_id].load()
-        con = conversations[session_id]
-        con.conversation.add_message({"role": "user", "content": input_msg})
+        # if session_id not in conversations:
+        #     conversations[session_id] = ConversationWithSession(session_id, chat_repo)
+        #     await conversations[session_id].load()
+        # con = conversations[session_id]
+        # con.conversation.add_message({"role": "user", "content": input_msg})
         # context = self.search_context(input_msg)
         
         # If we want to add context, we can use inference client
