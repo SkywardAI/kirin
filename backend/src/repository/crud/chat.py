@@ -23,17 +23,17 @@ class SessionCRUDRepository(BaseCRUDRepository):
         query = await self.async_session.execute(statement=stmt)
         return query.scalars().all()
 
-    async def read_sessions_by_id(self, id: int) -> Session:
-        stmt = sqlalchemy.select(Session).where(Session.id == id).order_by(Session.created_at.desc())
+    async def read_sessions_by_uuid(self, session_uuid: str) -> Session:
+        stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid).order_by(Session.created_at.desc())
         query = await self.async_session.execute(statement=stmt)
 
         if not query:
-            raise EntityDoesNotExist("Session with id `{id}` does not exist!")
+            raise EntityDoesNotExist("Session with uuid `{session_uuid}` does not exist!")
 
         return query.scalar()  # type: ignore
 
-    async def read_create_sessions_by_id(self, id: int, account_id: int, name: str) -> Session:
-        stmt = sqlalchemy.select(Session).where(Session.id == id)
+    async def read_create_sessions_by_uuid(self, session_uuid: str, account_id: int, name: str) -> Session:
+        stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid)
         query = await self.async_session.execute(statement=stmt)
 
         if not query:
@@ -52,6 +52,11 @@ class SessionCRUDRepository(BaseCRUDRepository):
         query = await self.async_session.execute(statement=stmt)
         return query.scalars().all()
 
+    async def verify_session_by_account_id(self, session_uuid: str, account_id: int ) -> bool:
+        # stmt = sqlalchemy.select(Session).where(Session.account_id == id)
+        stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid, Session.account_id == account_id)
+        query = await self.async_session.execute(statement=stmt)
+        return bool(query)
 
 class ChatHistoryCRUDRepository(BaseCRUDRepository):
     async def read_chat_history_by_id(self, id: int) -> ChatHistory:

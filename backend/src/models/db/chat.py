@@ -1,6 +1,7 @@
 import datetime
-
 import sqlalchemy
+import uuid
+
 from sqlalchemy.orm import Mapped as SQLAlchemyMapped, mapped_column as sqlalchemy_mapped_column
 from sqlalchemy.sql import functions as sqlalchemy_functions
 
@@ -11,6 +12,7 @@ class Session(Base):  # type: ignore
     __tablename__ = "session"
 
     id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(primary_key=True, autoincrement="auto")
+    uuid: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=36), nullable=False, default=lambda: str(uuid.uuid4()))
     account_id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(nullable=True)
     name: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=64), nullable=True)
     created_at: SQLAlchemyMapped[datetime.datetime] = sqlalchemy_mapped_column(

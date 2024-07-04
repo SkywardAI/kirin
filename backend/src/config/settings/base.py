@@ -81,6 +81,10 @@ class BackendBaseSettings(BaseSettings):
     # Configurations for language model
     LANGUAGE_MODEL_NAME: str = decouple.config("LANGUAGE_MODEL_NAME", cast=str) # type: ignore
 
+    # Admin setting
+    ADMIN_USERNAME: str = decouple.config("ADMIN_USERNAME", cast=str) # type: ignore
+    ADMIN_EMAIL: str = decouple.config("ADMIN_EMAIL", cast=str) # type: ignore
+    ADMIN_PASS: str = decouple.config("ADMIN_PASS", cast=str) # type: ignore
 
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True

@@ -83,6 +83,9 @@ services:
       - INFERENCE_ENG_PORT=${INFERENCE_ENG_PORT}
       - INFERENCE_ENG_VERSION=${INFERENCE_ENG_VERSION}
       - LANGUAGE_MODEL_NAME=${LANGUAGE_MODEL_NAME}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASS=${ADMIN_PASS}
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models

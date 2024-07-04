@@ -7,24 +7,23 @@ from src.models.schemas.base import BaseSchemaModel
 
 
 class ChatInMessage(BaseSchemaModel):
-    accountID: Optional[int] = Field(None)
-    sessionId: Optional[int] = Field(None)
+    sessionUuid: Optional[str] = Field(None)
     message: str
 
 
 class ChatInResponse(BaseSchemaModel):
-    sessionId: int
+    sessionUuid: str
     message: str
 
 
 class Session(BaseSchemaModel):
-    id: int
+    sessionUuid: str
     name: str | None
     created_at: datetime.datetime
 
 
 class ChatHistory(BaseSchemaModel):
-    id: int
+    sessionUuid: str
     type: str
     message: str
 

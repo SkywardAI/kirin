@@ -67,6 +67,9 @@ INFERENCE_ENG_VERSION:=server--b1-a8d49d8
 LANGUAGE_MODEL_NAME:=Phi-3-mini-4k-instruct-q4.gguf
 LANGUAGE_MODEL_URL:=https://huggingface.co/aisuko/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi3-mini-4k-instruct-Q4.gguf?download=true
 
+ADMIN_USERNAME:=admin
+ADMIN_EMAIL:=admin@admin.com
+ADMIN_PASS:=admin
 
 .PHONY: env
 env:
@@ -112,6 +115,9 @@ env:
 	@echo "INFERENCE_ENG_PORT=$(INFERENCE_ENG_PORT)">> $(FILE_NAME)
 	@echo "INFERENCE_ENG_VERSION=$(INFERENCE_ENG_VERSION)">> $(FILE_NAME)
 	@echo "LANGUAGE_MODEL_NAME=$(LANGUAGE_MODEL_NAME)">> $(FILE_NAME)
+	@echo "ADMIN_USERNAME=$(ADMIN_USERNAME)">> $(FILE_NAME)
+	@echo "ADMIN_EMAIL=$(ADMIN_EMAIL)">> $(FILE_NAME)
+	@echo "ADMIN_PASS=$(ADMIN_PASS)">> $(FILE_NAME)
 
 
 
