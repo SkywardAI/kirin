@@ -9,7 +9,7 @@ ROOT_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent.parent.parent.pare
 
 
 class BackendBaseSettings(BaseSettings):
-    TITLE: str =   decouple.config("TITLE", cast=str)
+    TITLE: str = "Kirin Aggregator"
     VERSION: str = decouple.config("BACKEND_SERVER_VERSION", cast=str)
     TIMEZONE: str = decouple.config("TIMEZONE", cast=str)
     DESCRIPTION: str | None = None
