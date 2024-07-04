@@ -6,6 +6,8 @@ DEBUG:=True
 BACKEND_SERVER_HOST:=127.0.0.1
 BACKEND_SERVER_PORT:=8000
 BACKEND_SERVER_WORKERS:=4
+BACKEND_SERVER_VERSION:=v0.1.8
+TIMEZONE:="UTC"
 
 # Database - Postgres
 POSTGRES_DB:=my_db
@@ -78,6 +80,7 @@ env:
 	@echo "BACKEND_SERVER_HOST=$(BACKEND_SERVER_HOST)">> $(FILE_NAME)
 	@echo "BACKEND_SERVER_PORT=$(BACKEND_SERVER_PORT)">> $(FILE_NAME)
 	@echo "BACKEND_SERVER_WORKERS=$(BACKEND_SERVER_WORKERS)">> $(FILE_NAME)
+	@echo "BACKEND_SERVER_VERSION=$(BACKEND_SERVER_VERSION)">> $(FILE_NAME)
 	@echo "POSTGRES_DB=$(POSTGRES_DB)">> $(FILE_NAME)
 	@echo "POSTGRES_PASSWORD=$(POSTGRES_PASSWORD)">> $(FILE_NAME)
 	@echo "POSTGRES_PORT=$(POSTGRES_PORT)">> $(FILE_NAME)
@@ -118,7 +121,12 @@ env:
 	@echo "ADMIN_USERNAME=$(ADMIN_USERNAME)">> $(FILE_NAME)
 	@echo "ADMIN_EMAIL=$(ADMIN_EMAIL)">> $(FILE_NAME)
 	@echo "ADMIN_PASS=$(ADMIN_PASS)">> $(FILE_NAME)
+	@echo "TIMEZONE=$(TIMEZONE)">> $(FILE_NAME)
 
+
+.PHONY: prepare
+prepare: env
+prepare: lm
 
 
 ############################################################################################################
@@ -191,3 +199,29 @@ ruff:
 lm:
 	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
 
+############################################################################################################
+# Poetry
+
+.PHONY: poetry
+poetry:
+	@pipx install poetry==1.8.2
+
+.PHONY: lock
+lock:
+	@poetry -C backend lock
+
+.PHONY: install
+install:
+	@poetry -C backend install --no-root -vvv
+
+.PHONY: install-dev
+install-dev:
+	@poetry -C backend install --only dev --no-root -vvv
+
+.PHONY: plugin
+plugin:
+	@poetry -C backend self add poetry-plugin-export
+
+.PHONY: expo
+expo:
+	@poetry -C backend export -f requirements.txt --output backend/requirements.txt

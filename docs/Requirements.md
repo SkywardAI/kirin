@@ -46,7 +46,7 @@ OpenSSL version: OpenSSL 3.0.2 15 Mar 2022
 
 
 ```bash
-pip install -r https://github.com/SkywardAI/containers/blob/main/requirements.txt
+pip3 install -r https://raw.githubusercontent.com/SkywardAI/containers/main/requirements.txt
 ```
 
 If you are interested in docker-in-docker devlopment, see [Development.md](./Development.md)
