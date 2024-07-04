@@ -23,10 +23,10 @@ router = fastapi.APIRouter(prefix="/version", tags=["version"])
 @router.get(
     path="",
     name="version:get-version",
-    response_model=dict,
+    response_model=ServiceVersionResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
-async def get_version() -> dict:
+async def get_version() -> ServiceVersionResponse:
     return ServiceVersionResponse(
         backend_version=settings.VERSION,
         milvus_version=settings.MILVUS_VERSION,
