@@ -98,14 +98,3 @@ async def get_chathistory(
     access_token = jwt_generator.generate_access_token(account=db_account)
 
     return {"token": access_token}
-
-
-@router.get(
-    path="/test",
-    name="authentication: test for jwt",
-    response_model=dict,
-    status_code=fastapi.status.HTTP_200_OK,
-)
-async def get_chathistory(jwt_payload: dict = fastapi.Depends(jwt_required)):
-    # jwt_account = request.state.jwt_account
-    return {"result": jwt_payload.username}
