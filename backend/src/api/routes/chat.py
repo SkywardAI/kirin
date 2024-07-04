@@ -53,7 +53,7 @@ async def chat(
 
 @router.get(
     path="/",
-    name="chat:get-session-by-account-id",
+    name="chat:get-session-of-current-user",
     response_model=list[Session],
     status_code=fastapi.status.HTTP_200_OK,
 )
@@ -83,7 +83,7 @@ async def get_session(
 
 @router.get(
     path="/history/{uuid}",
-    name="chat:get-chat-history-by-session-id",
+    name="chat:get-chat-history-by-session-uuid",
     response_model=list[ChatHistory],
     status_code=fastapi.status.HTTP_200_OK,
 )
