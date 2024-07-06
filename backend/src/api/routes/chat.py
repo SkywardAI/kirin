@@ -52,7 +52,7 @@ async def chat(
 
 
 @router.get(
-    path="/",
+    path="",
     name="chat:get-session-of-current-user",
     response_model=list[Session],
     status_code=fastapi.status.HTTP_200_OK,
