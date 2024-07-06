@@ -201,6 +201,10 @@ ruff:
 lm:
 	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
 
+.PHONY: localinfer
+localinfer: lm
+	@docker run -p 8080:8080 -v ./volumes/models:/models gclub/llama.cpp:$(INFERENCE_ENG_VERSION) -m models/$(LANGUAGE_MODEL_NAME) -c 512 -cnv -i --metrics --host 0.0.0.0 --port 8080
+
 ############################################################################################################
 # Poetry
 
