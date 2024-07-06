@@ -2,6 +2,11 @@
 
 The requirements development tools see below:
 
+```bash
+sudo apt install docker.io
+sudo apt install docker-compose-v2
+```
+
 ## Docker series
 
 ```bash
@@ -35,11 +40,8 @@ Server:
   GitCommit:
 
 ####################################################
-ubuntu:~$ docker-compose version
-docker-compose version 1.29.2, build unknown
-docker-py version: 5.0.3
-CPython version: 3.10.12
-OpenSSL version: OpenSSL 3.0.2 15 Mar 2022
+ubuntu:~/workspace/aisuko/kirin$ docker compose version
+Docker Compose version 2.24.6+ds1-0ubuntu1~22.04.1
 ```
 
 ## Python 3.11
