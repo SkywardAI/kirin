@@ -35,7 +35,7 @@ class SessionCRUDRepository(BaseCRUDRepository):
     async def read_create_sessions_by_uuid(self, session_uuid: str, account_id: int, name: str) -> Session:
         stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid)
         query = await self.async_session.execute(statement=stmt)
-
+        print(query)
         if not query:
             new_session = Session(account_id=account_id, name=name)
 

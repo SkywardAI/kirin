@@ -1,6 +1,6 @@
 import fastapi
 import loguru
-
+from fastapi.security import OAuth2PasswordBearer
 from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.securities.authorizations.jwt import jwt_required
 from src.config.settings.const import ANONYMOUS_USER
@@ -10,7 +10,7 @@ from src.repository.crud.account import AccountCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
 
 router = fastapi.APIRouter(prefix="/chat", tags=["chatbot"])
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 
 @router.post(
     "",
@@ -20,6 +20,7 @@ router = fastapi.APIRouter(prefix="/chat", tags=["chatbot"])
 )
 async def chat(
     chat_in_msg: ChatInMessage,
+    token: str = fastapi.Depends(oauth2_scheme),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     chat_repo: ChatHistoryCRUDRepository = fastapi.Depends(get_repository(repo_type=ChatHistoryCRUDRepository)),
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
@@ -37,9 +38,9 @@ async def chat(
     else:
         # TODO need verify if sesson exist
         # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:20])
-        session_uuid = chat_in_msg.session_uuid
+        session_uuid = chat_in_msg.sessionUuid
     # response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
-    session = await session_repo.read_create_sessions_by_uuid(uuid=session_uuid,account_id=current_user.id, name=chat_in_msg.message[:20] )
+    session = await session_repo.read_create_sessions_by_uuid(session_uuid=session_uuid,account_id=current_user.id, name=chat_in_msg.message[:20] )
     session_uuid = session.uuid
     response_msg=await rag_chat_repo.inference(session_id=session.id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
 
@@ -58,6 +59,7 @@ async def chat(
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def get_session(
+    token: str = fastapi.Depends(oauth2_scheme),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
@@ -89,6 +91,7 @@ async def get_session(
 )
 async def get_chathistory(
     uuid: str,
+    token: str = fastapi.Depends(oauth2_scheme),
     chat_repo: ChatHistoryCRUDRepository = fastapi.Depends(get_repository(repo_type=ChatHistoryCRUDRepository)),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),

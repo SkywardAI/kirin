@@ -1,4 +1,5 @@
 import fastapi
+from fastapi.security import OAuth2PasswordBearer
 import pydantic
 from src.config.manager import settings
 from src.api.dependencies.repository import get_repository
@@ -10,7 +11,7 @@ from src.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_requ
 from src.utilities.exceptions.http.exc_401 import http_exc_401_cunauthorized_request
 
 router = fastapi.APIRouter(prefix="/accounts", tags=["accounts"])
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 
 @router.get(
     path="",
@@ -19,6 +20,7 @@ router = fastapi.APIRouter(prefix="/accounts", tags=["accounts"])
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def get_accounts(
+    token: str = fastapi.Depends(oauth2_scheme),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> list[AccountInResponse]:
@@ -55,6 +57,7 @@ async def get_accounts(
 )
 async def get_account(
     id: int,
+    token: str = fastapi.Depends(oauth2_scheme),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> AccountInResponse:
@@ -91,6 +94,7 @@ async def get_account(
 )
 async def update_account(
     query_id: int,
+    token: str = fastapi.Depends(oauth2_scheme),
     update_username: str | None = None,
     update_email: pydantic.EmailStr | None = None,
     update_password: str | None = None,
@@ -128,6 +132,7 @@ async def update_account(
 @router.delete(path="", name="accountss:delete-account-by-id", status_code=fastapi.status.HTTP_200_OK)
 async def delete_account(
     id: int, account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    token: str = fastapi.Depends(oauth2_scheme),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> dict[str, str]:
     if jwt_payload.username != settings.ADMIN_USERNAME:
