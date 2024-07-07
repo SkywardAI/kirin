@@ -34,11 +34,11 @@ class UploadedFileCRUDRepository(BaseCRUDRepository):
     async def read_uploadedfiles_by_id(self, id: int) -> UploadedFile:
         stmt = sqlalchemy.select(UploadedFile).where(UploadedFile.id == id)
         query = await self.async_session.execute(statement=stmt)
-
-        if not query:
+        fileinfo = query.scalar()
+        if fileinfo is None:
             raise EntityDoesNotExist("File with id `{id}` does not exist!")
 
-        return query.scalar()  # type: ignore
+        return fileinfo# type: ignore
 
     async def delete_file_by_id(self, id: int) -> str:
         select_stmt = sqlalchemy.select(UploadedFile).where(UploadedFile.id == id)

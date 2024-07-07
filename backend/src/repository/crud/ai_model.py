@@ -34,11 +34,11 @@ class AiModelCRUDRepository(BaseCRUDRepository):
     async def read_aimodel_by_name(self, name: str) -> AiModel:
         stmt = sqlalchemy.select(AiModel).where(AiModel.name == name)
         query = await self.async_session.execute(statement=stmt)
-
-        if not query.scalar():
+        ai_model = query.scalar()
+        if ai_model is None:
             raise EntityDoesNotExist(f"AiModel with name `{name}` does not exist!")
 
-        return query.scalar()
+        return ai_model
     
     async def get_aimodel_by_name(self, name: str) -> AiModel:
         stmt = sqlalchemy.select(AiModel).where(AiModel.name == name)
