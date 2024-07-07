@@ -142,7 +142,6 @@ services:
       - "etcd"
       - "minio"
 
-
   llamacpp:
     container_name: llamacpp
     image: gclub/llama.cpp:${INFERENCE_ENG_VERSION}
@@ -153,7 +152,16 @@ services:
       - 8080
     ports:
       - 8080:8080
-    command: ["-m", "models/${LANGUAGE_MODEL_NAME}", "-cnv", "-i", "--metrics"]
+    command: ["-m", "models/${LANGUAGE_MODEL_NAME}"]
+
+  rebel:
+    container_name: rebel
+    image: ghcr.io/skywardai/rebel:v0.1.2
+    restart: always
+    expose:
+      - 80
+    ports:
+      - 80:80
 
 volumes:
   postgresql_db_data:
