@@ -31,8 +31,16 @@ async def chat(
     """
     Chat with the AI-powered chatbot.
     
-    Note: You need to sing up and sign in before calling this API. If you are using
+    **Note:**
+    
+    You need to sing up and sign in before calling this API. If you are using
     the Swagger UI. You can get the token automatically by login in through `api/auth/verify` API.
+
+    **Anonymous users**, we will create anonymous usef infor in the database. So, you can login through Authorize button in Swagger UI.
+    - **username**: anonymous
+    - **password**: Marlboro@2211
+
+    **Example of the request body:**
 
     ```bash
     curl -X 'POST' 'http://127.0.0.1:8000/api/chat'
@@ -45,7 +53,7 @@ async def chat(
     }'
     ```
 
-    Return ChatInResponse:
+    **Return ChatInResponse:**
     - **sessionUuid**: "d5fc2eb0-cd8b-41f8-9e67-5859b1553ef2",
     - **message**: " Hello! How can I assist you further?"
     """

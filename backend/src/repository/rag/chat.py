@@ -196,62 +196,46 @@ class RAGChatModelRepository(BaseRAGRepository):
         # )
         
         #TODO:
-          # 1. Implement the tokenize function
-          # 2. Implement the inference function
-          # 3. Implement the further context function
-          # 4. Implement the check status of the inference service
+          # Implement the further context function
 
-        instruction="A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions."
 
         def format_prompt(prmpt: str) -> str:
-            chat = [
-                {
-                    "human": "Hello, Assistant.",
-                    "assistant": "Hello. How may I help you today?"
-                },
-                {
-                    "human": "Please tell me the largest city in Europe.",
-                    "assistant": "Sure. The largest city in Europe is Moscow, the capital of Russia."
-                },
-            ]
-            return f"{instruction}\n" + "\n".join([f"### Human: {m['human']}\n### Assistant: {m['assistant']}" for m in chat]) + f"\n### Human: {prmpt}\n### Assistant:"
+            """
+            Format the input questions, can be used for saving the conversation history
 
-        
-        url=f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/tokenize"
-        headers = {
-            'Content-Type': 'application/json',
-        }
-        data={
-            "content": instruction
-        }
-        response = requests.post(url, headers=headers, json=data)
-        if response.status_code != 200:
-            loguru.logger.error(f"Error in tokenization: {response.text}")
-            return "Error in tokenization"
-        tokenized_instruction = response.json().get('tokens')
-        n_keep=len(tokenized_instruction)
+            Args:
+            prmpt (str): input message
 
-        url=f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/completion"
-        headers = {
-            'Content-Type': 'application/json',
-        }
+            Returns:
+            str: formatted prompt
+            """
+            return f"{inference_helper.instruction}\n" + f"\n### Human: {prmpt}\n### Assistant:"
+
         
         data = {
             "prompt": format_prompt(input_msg),
             "temperature": 0.2,
             "top_k": 40,
             "top_p": 0.9,
-            "n_keep": n_keep,
+            "n_keep": inference_helper.n_keep,
             "n_predict": 128,
             "cache_prompt": "false",
-            "slot_id": -1,
+            "slot_id": -1, # for cached prompt
             "stop": ["\n### Human:"],
             "stream": "false",
         }
 
 
-        response = requests.post(url, headers=headers, json=data)
-        # TODO check if status is 200
+        response = requests.post(
+            inference_helper.completion_url, 
+            headers={'Content-Type': 'application/json'}, 
+            json=data
+            )
+
+        if response.status_code != 200:
+            loguru.logger.error(f"Error in tokenization: {response.text}")
+            return "Sorry, I am not able to understand"
+        
         answer = response.json()
         loguru.logger.info(f'inference answer value:{answer}')
         return answer.get('content')

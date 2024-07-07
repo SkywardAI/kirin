@@ -86,6 +86,10 @@ class BackendBaseSettings(BaseSettings):
     ADMIN_EMAIL: str = decouple.config("ADMIN_EMAIL", cast=str) # type: ignore
     ADMIN_PASS: str = decouple.config("ADMIN_PASS", cast=str) # type: ignore
 
+    # Configurations for language model
+    INSTRUCTION: str = decouple.config("INSTRUCTION", cast=str) # type: ignore
+
+
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True
         env_file: str = f"{str(ROOT_DIR)}/.env"
