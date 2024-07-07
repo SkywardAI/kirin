@@ -98,7 +98,8 @@ services:
       - 8000:8000
     depends_on:
       - db
-    # command: ["--gpus", "all"]
+      - standalone
+      - llamacpp
 
   etcd:
     container_name: milvus-etcd
