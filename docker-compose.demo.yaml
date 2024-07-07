@@ -153,5 +153,14 @@ services:
       - 8080:8080
     command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-cnv","-i"]
 
+  rebel:
+    container_name: rebel
+    image: ghcr.io/skywardai/rebel:v0.1.1
+    restart: always
+    expose:
+      - 80
+    ports:
+      - 80:80
+
 volumes:
   postgresql_db_data:
