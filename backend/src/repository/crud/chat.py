@@ -30,7 +30,7 @@ class SessionCRUDRepository(BaseCRUDRepository):
         if session is None:
             raise EntityDoesNotExist("Session with uuid `{session_uuid}` does not exist!")
 
-        return query.scalar()  # type: ignore
+        return session  # type: ignore
 
     async def read_create_sessions_by_uuid(self, session_uuid: str, account_id: int, name: str) -> Session:
         stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid)
