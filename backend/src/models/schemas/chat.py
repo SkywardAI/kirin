@@ -7,27 +7,27 @@ from src.models.schemas.base import BaseSchemaModel
 
 
 class ChatInMessage(BaseSchemaModel):
-    sessionUuid: Optional[str] = Field(None)
-    message: str
+    sessionUuid: Optional[str] | None = Field(..., title="Session UUID", description="Session UUID")
+    message: str  = Field(..., title="Message", description="Message")
 
 
 class ChatInResponse(BaseSchemaModel):
-    sessionUuid: str
-    message: str
+    sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
+    message: str = Field(..., title="Message", description="Message")
 
 
 class Session(BaseSchemaModel):
-    sessionUuid: str
-    name: str | None
-    created_at: datetime.datetime
+    sessionUuid: str = Field(..., title="Session UUID" ,description="Session UUID") 
+    name: str | None  = Field(..., title="Name", description="Name") 
+    created_at: datetime.datetime = Field(..., title="Creation time", description="Creation time") 
 
 
 class ChatHistory(BaseSchemaModel):
-    sessionUuid: str
-    type: str
-    message: str
+    sessionUuid: str = Field(..., title="Session UUID", description="Session UUID") 
+    type: str  = Field(..., title="Type", description="Type") 
+    message: str = Field(..., title="Message", description="Message")
 
 
 class MessagesResponse(BaseSchemaModel):
-    role: str
-    content: str
+    role: str = Field(..., title="Role", description="Role")
+    content: str = Field(..., title="Content", description="Content")

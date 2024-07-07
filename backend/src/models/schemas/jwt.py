@@ -1,13 +1,13 @@
+from pydantic import BaseModel, EmailStr, Field
 import datetime
 
-import pydantic
 
 
-class JWToken(pydantic.BaseModel):
-    exp: datetime.datetime
-    sub: str
+class JWToken(BaseModel):
+    exp: datetime.datetime  = Field(..., title="exp", description="exp")
+    sub: str = Field(..., title="sub", description="sub")
 
 
-class JWTAccount(pydantic.BaseModel):
-    username: str
-    email: pydantic.EmailStr
+class JWTAccount(BaseModel):
+    username: str = Field(..., title="username", description="username")
+    email: EmailStr  = Field(..., title="email", description="email")
