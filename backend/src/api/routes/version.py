@@ -30,14 +30,11 @@ async def get_version() -> ServiceVersionResponse:
     """
     Get the version of the service
     
-    **Example**
-
-    ```
+    ```bash
     curl http://localhost:8000/api/version -> {"llamacpp":"server--b1-a8d49d8","milvus":"v2.3.12","kirin":"v0.1.8"}
     ```
     
-    Returns ServiceVersionResponse: 
-    
+    Return ServiceVersionResponse: 
     - **kirin**: The version of the API aggregator
     - **milvus**: The version of the vector database
     - **llamacpp**: The version of the inference engine 

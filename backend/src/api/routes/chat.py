@@ -10,6 +10,7 @@ from src.repository.crud.account import AccountCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
 
 router = fastapi.APIRouter(prefix="/chat", tags=["chatbot"])
+# Automatically get the token from the request header for Swagger UI
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 
 @router.post(
@@ -27,6 +28,29 @@ async def chat(
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> ChatInResponse:
+    """
+    Chat with the AI-powered chatbot.
+    
+    Note: You need to sing up and sign in before calling this API. If you are using
+    the Swagger UI. You can get the token automatically by login in through `api/auth/verify` API.
+
+    ```bash
+    curl -X 'POST' 'http://127.0.0.1:8000/api/chat'
+    -H 'accept: application/json'
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3MjA4MTE3MzEsInN1YiI6IllPVVItSldULVNVQkpFQ1QifQ.DIj9EtBDnnI7AIypclS-BiK251e6vMR0Y6oTh-UJXZU'
+    -H 'Content-Type: application/json'
+    -d '{
+    "sessionUuid": "string",
+    "message": "hi"
+    }'
+    ```
+
+    Return ChatInResponse:
+    - **sessionUuid**: "d5fc2eb0-cd8b-41f8-9e67-5859b1553ef2",
+    - **message**: " Hello! How can I assist you further?"
+    """
+
+
     # if not chat_in_msg.accountID:
     #     chat_in_msg.accountID = 0
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
