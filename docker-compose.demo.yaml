@@ -35,7 +35,7 @@ services:
   kirin:
     container_name: kirin
     restart: always
-    image: gclub/kirin:v0.1.8
+    image: gclub/kirin:v0.1.11
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - DEBUG=${DEBUG}
@@ -156,7 +156,7 @@ services:
 
   rebel:
     container_name: rebel
-    image: ghcr.io/skywardai/rebel:v0.1.2
+    image: ghcr.io/skywardai/rebel:v0.1.3
     restart: always
     expose:
       - 80
