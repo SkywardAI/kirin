@@ -2,7 +2,7 @@ from src.models.schemas.base import BaseSchemaModel
 
 
 class ServiceVersionResponse(BaseSchemaModel):
-    llamacpp_version: str | None = None
-    milvus_version : str | None = None
-    backend_version :str | None = None
+    llamacpp: str | None = None
+    milvus : str | None = None
+    kirin :str | None = None
 
