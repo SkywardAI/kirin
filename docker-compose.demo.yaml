@@ -35,7 +35,7 @@ services:
   kirin:
     container_name: kirin
     restart: always
-    image: gclub/kirin:v0.1.8
+    image: gclub/kirin:v0.1.11
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - DEBUG=${DEBUG}
@@ -80,6 +80,7 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASS=${ADMIN_PASS}
       - TIMEZONE=${TIMEZONE}
+      - INSTRUCTION=${INSTRUCTION}
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
@@ -151,11 +152,11 @@ services:
       - 8080
     ports:
       - 8080:8080
-    command: ["-m", "models/${LANGUAGE_MODEL_NAME}"]
+    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","512"]
 
   rebel:
     container_name: rebel
-    image: ghcr.io/skywardai/rebel:v0.1.2
+    image: ghcr.io/skywardai/rebel:v0.1.3
     restart: always
     expose:
       - 80

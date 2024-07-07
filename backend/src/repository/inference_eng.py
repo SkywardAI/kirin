@@ -15,6 +15,8 @@
 
 # https://pypi.org/project/openai/1.35.5/
 import openai
+import requests
+import loguru
 
 from src.config.manager import settings
 
@@ -23,8 +25,11 @@ class InferenceHelper:
         # TODO pydantic settings
         self.infer_eng_url=settings.INFERENCE_ENG
         self.infer_eng_port=settings.INFERENCE_ENG_PORT
+        self.instruction=settings.INSTRUCTION
         # OpenAI-compatible Chat Completions API
         self.client=self.openai_client()
+        self.n_keep=self.get_n_keep()
+        self.completion_url=self.instruct_infer_url()
 
     
     def openai_client(self) -> openai.OpenAI:
@@ -39,6 +44,46 @@ class InferenceHelper:
         api_key='sk-no-key-required'
 
         return openai.OpenAI(base_url=url, api_key=api_key)
+    
+
+    def get_n_keep(self) -> int:
+        """
+        We get n_keep dynamically for the instruction.
+        if the return value is 0, no tokens are kept.
+
+        Returns:
+        int: n_keep
+
+        """
+
+        response = requests.post(
+            f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/tokenize", 
+            headers={'Content-Type': 'application/json',}, 
+            json={"content": self.instruction}
+        )
+
+        if response.status_code != 200:
+            loguru.logger.error(f"Error in tokenization: {response.text}")
+            return 0
+
+        try:
+            tokenized_instruction = response.json().get('tokens')
+            n_keep=len(tokenized_instruction)
+        except Exception as e:
+            loguru.logger.error(f"Error in tokenization: {e}")
+            return 0
+
+        return n_keep
+
+
+    def instruct_infer_url(self)->str:
+        """
+        Get the URL for the inference engine
+
+        Returns:
+        str: URL for the inference engine
+        """
+        return f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/completion"
 
 
 inference_helper: InferenceHelper = InferenceHelper()
