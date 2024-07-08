@@ -7,6 +7,9 @@ from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.inference_eng import inference_helper
 
+from typing import Any
+from collections.abc import AsyncGenerator
+
 class RAGChatModelRepository(BaseRAGRepository):
     async def load_model(self, session_id: int, model_name: str) -> bool:
         """
@@ -174,9 +177,18 @@ class RAGChatModelRepository(BaseRAGRepository):
         return re.sub(r'\W+', '', name)
     
 
-    async def inference(self, session_id: int, input_msg: str, chat_repo) -> str:
+    async def inference(self, session_id: int, input_msg: str, chat_repo)-> AsyncGenerator[Any]:
         """
-        Inference using seperate service: llamacpp
+        **Inference using seperate service:(llamacpp)**
+
+        **Args:**
+        - **session_id (int):** session id
+        - **input_msg (str):** input message
+        - **chat_repo:** chat repository
+
+        **Returns:**
+        AsyncGenerator[Any]: stream of response
+
         """
         # if session_id not in conversations:
         #     conversations[session_id] = ConversationWithSession(session_id, chat_repo)
@@ -222,7 +234,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             "cache_prompt": "false",
             "slot_id": -1, # for cached prompt
             "stop": ["\n### Human:"],
-            "stream": "false",
+            "stream": True,
         }
 
 
@@ -232,10 +244,4 @@ class RAGChatModelRepository(BaseRAGRepository):
             json=data
             )
 
-        if response.status_code != 200:
-            loguru.logger.error(f"Error in tokenization: {response.text}")
-            return "Sorry, I am not able to understand"
-        
-        answer = response.json()
-        loguru.logger.info(f'inference answer value:{answer}')
-        return answer.get('content')
+        yield response.content
