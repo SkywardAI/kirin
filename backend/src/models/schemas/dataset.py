@@ -1,16 +1,18 @@
 
 import datetime
+
+from pydantic import Field
 from src.models.schemas.base import BaseSchemaModel
 
 
 class DatasetCreate(BaseSchemaModel):
-    dataset_name: str
-    des: str | None = None
-
+    dataset_name: str = Field(..., title="DataSet Name", description="DataSet Name")
+    des: str | None  = Field(..., title="Details", description="Details")
+ 
  
 
 class DatasetResponse(BaseSchemaModel):
-    id: int
-    dataset_name: str  
-    created_at: datetime.datetime | None=None       
-    updated_at: datetime.datetime | None=None       
+    id: int  = Field(..., title="id",description="id") 
+    dataset_name: str = Field(..., title="DataSet Name", description="DataSet Name") 
+    created_at: datetime.datetime | None  = Field(..., title="Creation time", description="Creation time")
+    updated_at: datetime.datetime | None = Field(..., title="Update  time", description="Update time")   
