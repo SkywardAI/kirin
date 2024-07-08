@@ -8,7 +8,7 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
-alembic = "1.13.1"
+alembic = "1.13.2"
 argon2-cffi = "23.1.0"
 asgi-lifespan = "2.1.0"
 async-timeout = "4.0.3"
@@ -37,7 +37,7 @@ openai = "1.35.7"
 
 [tool.poetry.dev-dependencies]
 python = "^3.11"
-alembic = "1.13.1"
+alembic = "1.13.2"
 argon2-cffi = "23.1.0"
 asgi-lifespan = "2.1.0"
 async-timeout = "4.0.3"
