@@ -24,7 +24,7 @@ router = fastapi.APIRouter(prefix="/chat", tags=["chatbot"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 
 
-@router.post(
+@router.get(
         "/seesionuuid",
         name="chat:session-uuid",
         response_model=ChatUUIDResponse,
