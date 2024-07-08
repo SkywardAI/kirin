@@ -160,6 +160,7 @@ async def get_session(
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> list[Session]:
     sessions_list: list = list()
+    # Anonymous user won't related to any session
     if jwt_payload.username == ANONYMOUS_USER:
         return sessions_list
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
