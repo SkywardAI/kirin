@@ -15,6 +15,8 @@ class ChatInResponse(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
     message: str = Field(..., title="Message", description="Message")
 
+class ChatUUIDResponse(BaseSchemaModel):
+    sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
 
 class Session(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID" ,description="Session UUID") 

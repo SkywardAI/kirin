@@ -1,17 +1,69 @@
 import fastapi
 import loguru
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.responses import StreamingResponse
 from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.securities.authorizations.jwt import jwt_required
 from src.config.settings.const import ANONYMOUS_USER
-from src.models.schemas.chat import ChatHistory, ChatInMessage, ChatInResponse, Session
-from src.repository.crud.chat import ChatHistoryCRUDRepository, SessionCRUDRepository
+from src.models.schemas.chat import (
+    ChatHistory, 
+    ChatInMessage, 
+    ChatInResponse, 
+    Session,
+    ChatUUIDResponse
+    )
+from src.repository.crud.chat import (
+    ChatHistoryCRUDRepository, 
+    SessionCRUDRepository
+    )
 from src.repository.crud.account import AccountCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
 
 router = fastapi.APIRouter(prefix="/chat", tags=["chatbot"])
 # Automatically get the token from the request header for Swagger UI
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
+
+
+@router.post(
+        "/seesionuuid",
+        name="chat:session-uuid",
+        response_model=ChatUUIDResponse,
+        status_code=fastapi.status.HTTP_201_CREATED,
+)
+async def chat_uuid(
+    token: str = fastapi.Depends(oauth2_scheme),
+    session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required)
+)->ChatUUIDResponse:
+    """
+    Create a new session for the current user.
+    
+    **Example**
+
+    ```bash
+    curl -X 'POST' 'http://127.0.0.1:8000/api/chat/seesionuuid'
+    -H 'accept: application/json' 
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFub255bW91cyIsImVtYWlsIjoiYW5vbnltb3VzQGFub255LmNvbSIsImV4cCI6MTcyMDkxNTQyNywic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.Utz79iCaFC_OVrS5SUEdvlj2iuWNOSNPoNglFh8tdzI' \
+    -d ''
+    ```
+
+    **Returns**
+
+    {"sessionUuid": "3917151c-173b-4a9e-92aa-ac1d633472d2"}
+
+    """
+
+    # multiple await keyword will caused the error
+    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    new_session = await session_repo.create_session(
+            account_id=current_user.id, name='new session'
+        )
+    session_uuid = new_session.uuid
+
+    return ChatUUIDResponse(
+        sessionUuid=session_uuid
+    )
 
 @router.post(
     "",
@@ -43,44 +95,55 @@ async def chat(
     **Example of the request body:**
 
     ```bash
-    curl -X 'POST' 'http://127.0.0.1:8000/api/chat'
+    curl -X 'POST'
+    'http://127.0.0.1:8000/api/chat'
     -H 'accept: application/json'
-    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3MjA4MTE3MzEsInN1YiI6IllPVVItSldULVNVQkpFQ1QifQ.DIj9EtBDnnI7AIypclS-BiK251e6vMR0Y6oTh-UJXZU'
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFub255bW91cyIsImVtYWlsIjoiYW5vbnltb3VzQGFub255LmNvbSIsImV4cCI6MTcyMDkxOTY4Nywic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.29zUJQvD5dkC9XIRvTfZTFJoO5HzZTgj1JjKOKedg2g'
     -H 'Content-Type: application/json'
     -d '{
     "sessionUuid": "string",
-    "message": "hi"
+    "message": "how are you?"
     }'
     ```
 
     **Return ChatInResponse:**
-    - **sessionUuid**: "d5fc2eb0-cd8b-41f8-9e67-5859b1553ef2",
-    - **message**: " Hello! How can I assist you further?"
+    data: {"content":" I","stop":false,"id_slot":0,"multimodal":false}
+
+    data: {"content":"'","stop":false,"id_slot":0,"multimodal":false}
+
+    data: {"content":"m","stop":false,"id_slot":0,"multimodal":false}
+
+    data: {"content":"",
+    "id_slot":0,"stop":true,
+    "model":"models/Phi-3-mini-4k-instruct-q4.gguf",
+    "tokens_predicted":58,"tokens_evaluated":46,
+    "generation_settings":{},
+    }
+
     """
 
+
+    ##############################################################################################################################
+    # Note: await keyword will cause issue. See https://github.com/sqlalchemy/sqlalchemy/discussions/9757
+    # 
 
     # if not chat_in_msg.accountID:
     #     chat_in_msg.accountID = 0
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
-    if not hasattr(chat_in_msg, "sessionUuid") or not chat_in_msg.sessionUuid:
-        new_session = await session_repo.create_session(
-            account_id=current_user.id, name=chat_in_msg.message[:20]
-        )
-        session_uuid = new_session.uuid
-    else:
-        # TODO need verify if sesson exist
-        # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:20])
-        session_uuid = chat_in_msg.sessionUuid
+
+    # TODO need verify if sesson exist
+    # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:20])
     # response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
-    session = await session_repo.read_create_sessions_by_uuid(session_uuid=session_uuid,account_id=current_user.id, name=chat_in_msg.message[:20] )
-    session_uuid = session.uuid
-    response_msg=await rag_chat_repo.inference(session_id=session.id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
+
+    # TODO: name=chat_in_msg.message[:20] can be edited
+    session = await session_repo.read_create_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id, name=chat_in_msg.message[:20] )
+    # response_msg=await rag_chat_repo.inference(session_id=session.id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
 
     # score = await rag_chat_repo.evaluate_response(request_msg = chat_in_msg.message, response_msg = response_msg)
     # response_msg = response_msg + "score : {:.3f}".format(score)
-    return ChatInResponse(
-        sessionUuid=session_uuid,
-        message=response_msg
+    return StreamingResponse(
+        rag_chat_repo.inference(session_id=session.id, input_msg=chat_in_msg.message, chat_repo=chat_repo), 
+        media_type='text/event-stream'
     )
 
 
