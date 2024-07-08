@@ -1,6 +1,6 @@
 import csv
 import loguru
-import requests
+import httpx
 import re
 from src.models.schemas.train import TrainFileIn
 from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM
@@ -177,7 +177,20 @@ class RAGChatModelRepository(BaseRAGRepository):
         return re.sub(r'\W+', '', name)
     
 
-    async def inference(self, session_id: int, input_msg: str, chat_repo)-> AsyncGenerator[Any]:
+    def format_prompt(self, prmpt: str) -> str:
+        """
+        Format the input questions, can be used for saving the conversation history
+
+        Args:
+        prmpt (str): input message
+
+        Returns:
+        str: formatted prompt
+        """
+        return f"{inference_helper.instruction}\n" + f"\n### Human: {prmpt}\n### Assistant:"
+    
+
+    async def inference(self, session_id: int, input_msg: str, chat_repo)-> AsyncGenerator[Any, None]:
         """
         **Inference using seperate service:(llamacpp)**
 
@@ -187,8 +200,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         - **chat_repo:** chat repository
 
         **Returns:**
-        AsyncGenerator[Any]: stream of response
-
+        AsyncGenerator[Any, None]: response message
         """
         # if session_id not in conversations:
         #     conversations[session_id] = ConversationWithSession(session_id, chat_repo)
@@ -208,24 +220,12 @@ class RAGChatModelRepository(BaseRAGRepository):
         # )
         
         #TODO:
-          # Implement the further context function
-
-
-        def format_prompt(prmpt: str) -> str:
-            """
-            Format the input questions, can be used for saving the conversation history
-
-            Args:
-            prmpt (str): input message
-
-            Returns:
-            str: formatted prompt
-            """
-            return f"{inference_helper.instruction}\n" + f"\n### Human: {prmpt}\n### Assistant:"
+          # 1.Implement the further context function
+          # 2.Add the inference prameters.
 
         
         data = {
-            "prompt": format_prompt(input_msg),
+            "prompt": self.format_prompt(input_msg),
             "temperature": 0.2,
             "top_k": 40,
             "top_p": 0.9,
@@ -237,13 +237,19 @@ class RAGChatModelRepository(BaseRAGRepository):
             "stream": True,
         }
 
-
-        response = requests.post(
-            inference_helper.completion_url, 
-            headers={'Content-Type': 'application/json'}, 
-            stream=True,
-            json=data
-        )
-        
-        for line in response.iter_content():
-            yield line.decode('utf-8')
+        async with httpx.AsyncClient() as client:
+            try:
+                async with client.stream(
+                    "POST",
+                    inference_helper.completion_url,
+                    headers={'Content-Type': 'application/json'},
+                    json=data,
+                    timeout=httpx.Timeout(20)
+                ) as response:
+                    response.raise_for_status()
+                    async for chunk in response.aiter_text():
+                        yield chunk
+            except httpx.ReadError as e:
+                loguru.logger.error(f"An error occurred while requesting {e.request.url!r}.")
+            except httpx.HTTPStatusError as e:
+                loguru.logger.error(f"Error response {e.response.status_code} while requesting {e.request.url!r}.")

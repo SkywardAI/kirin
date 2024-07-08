@@ -135,7 +135,7 @@ async def chat(
     # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:20])
     # response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
 
-    # TODO: name=chat_in_msg.message[:20] can be edited
+    # TODO: name=chat_in_msg.message[:20] use to create uuid in here, we use username to create session in /api/seesionuuid. Is that acceptable? @Micost
     session = await session_repo.read_create_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id, name=chat_in_msg.message[:20] )
     # response_msg=await rag_chat_repo.inference(session_id=session.id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
 
@@ -160,6 +160,7 @@ async def get_session(
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> list[Session]:
     sessions_list: list = list()
+    # Anonymous user won't related to any session
     if jwt_payload.username == ANONYMOUS_USER:
         return sessions_list
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
