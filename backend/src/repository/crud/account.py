@@ -37,29 +37,29 @@ class AccountCRUDRepository(BaseCRUDRepository):
     async def read_account_by_id(self, id: int) -> Account:
         stmt = sqlalchemy.select(Account).where(Account.id == id)
         query = await self.async_session.execute(statement=stmt)
-
-        if not query:
+        account = query.scalar()
+        if account is None:
             raise EntityDoesNotExist("Account with id `{id}` does not exist!")
 
-        return query.scalar()  # type: ignore
+        return account  # type: ignore
 
     async def read_account_by_username(self, username: str) -> Account:
         stmt = sqlalchemy.select(Account).where(Account.username == username)
         query = await self.async_session.execute(statement=stmt)
-
-        if not query:
+        account = query.scalar()
+        if account is None:
             raise EntityDoesNotExist("Account with username `{username}` does not exist!")
 
-        return query.scalar()  # type: ignore
+        return account  # type: ignore
 
     async def read_account_by_email(self, email: str) -> Account:
         stmt = sqlalchemy.select(Account).where(Account.email == email)
         query = await self.async_session.execute(statement=stmt)
-
-        if not query:
+        account = query.scalar()
+        if account is None:
             raise EntityDoesNotExist("Account with email `{email}` does not exist!")
 
-        return query.scalar()  # type: ignore
+        return account # type: ignore
 
     async def read_user_by_password_authentication(self, account_login: AccountInLogin) -> Account:
         stmt = sqlalchemy.select(Account).where(

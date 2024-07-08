@@ -26,17 +26,17 @@ class SessionCRUDRepository(BaseCRUDRepository):
     async def read_sessions_by_uuid(self, session_uuid: str) -> Session:
         stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid).order_by(Session.created_at.desc())
         query = await self.async_session.execute(statement=stmt)
-
-        if not query:
+        session = query.scalar()
+        if session is None:
             raise EntityDoesNotExist("Session with uuid `{session_uuid}` does not exist!")
 
-        return query.scalar()  # type: ignore
+        return session  # type: ignore
 
     async def read_create_sessions_by_uuid(self, session_uuid: str, account_id: int, name: str) -> Session:
         stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid)
         query = await self.async_session.execute(statement=stmt)
-
-        if not query:
+        session = query.scalar()
+        if session is None:
             new_session = Session(account_id=account_id, name=name)
 
             self.async_session.add(instance=new_session)
@@ -44,7 +44,7 @@ class SessionCRUDRepository(BaseCRUDRepository):
             await self.async_session.refresh(instance=new_session)
             return new_session
         else:
-            return query.scalar()  # type: ignore
+            return session  # type: ignore
 
     async def read_sessions_by_account_id(self, id: int) -> typing.Sequence[Session]:
         # stmt = sqlalchemy.select(Session).where(Session.account_id == id)
@@ -62,11 +62,11 @@ class ChatHistoryCRUDRepository(BaseCRUDRepository):
     async def read_chat_history_by_id(self, id: int) -> ChatHistory:
         stmt = sqlalchemy.select(ChatHistory).where(ChatHistory.id == id)
         query = await self.async_session.execute(statement=stmt)
-
-        if not query:
+        chat_history =query.scalar()
+        if chat_history is None:
             raise EntityDoesNotExist("ChatHistory with id `{id}` does not exist!")
 
-        return query.scalar()  # type: ignore
+        return chat_history # type: ignore
 
     async def read_chat_history_by_session_id(self, id: int, limit_num=50) -> typing.Sequence[ChatHistory]:
         # TODO limit num = 50 is a temp number

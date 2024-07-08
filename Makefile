@@ -6,7 +6,7 @@ DEBUG:=True
 BACKEND_SERVER_HOST:=127.0.0.1
 BACKEND_SERVER_PORT:=8000
 BACKEND_SERVER_WORKERS:=4
-BACKEND_SERVER_VERSION:=v0.1.8
+BACKEND_SERVER_VERSION:=v0.1.11
 TIMEZONE:="UTC"
 
 # Database - Postgres
@@ -55,6 +55,7 @@ ETCD_AUTO_COMPACTION_RETENTION:=1000
 ETCD_QUOTA_BACKEND_BYTES:=4294967296
 MILVUS_HOST:=milvus-standalone
 MILVUS_PORT:=19530
+MILVUS_VERSION:=v2.3.12
 
 
 DOCKER_VOLUME_DIRECTORY:=
@@ -68,10 +69,12 @@ INFERENCE_ENG_VERSION:=server--b1-a8d49d8
 # https://github.com/SkywardAI/llama.cpp/blob/9b2f16f8055265c67e074025350736adc1ea0666/tests/test-chat-template.cpp#L91-L92
 LANGUAGE_MODEL_NAME:=Phi-3-mini-4k-instruct-q4.gguf
 LANGUAGE_MODEL_URL:=https://huggingface.co/aisuko/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi3-mini-4k-instruct-Q4.gguf?download=true
+INSTRUCTION:="A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the questions from human."
 
 ADMIN_USERNAME:=admin
 ADMIN_EMAIL:=admin@admin.com
 ADMIN_PASS:=admin
+
 
 .PHONY: env
 env:
@@ -113,6 +116,7 @@ env:
 	@echo "ETCD_QUOTA_BACKEND_BYTES=$(ETCD_QUOTA_BACKEND_BYTES)">> $(FILE_NAME)
 	@echo "MILVUS_HOST=$(MILVUS_HOST)">> $(FILE_NAME)
 	@echo "MILVUS_PORT=$(MILVUS_PORT)">> $(FILE_NAME)
+	@echo "MILVUS_VERSION=$(MILVUS_VERSION)">> $(FILE_NAME)
 	@echo "DOCKER_VOLUME_DIRECTORY=$(DOCKER_VOLUME_DIRECTORY)">> $(FILE_NAME)
 	@echo "INFERENCE_ENG=$(INFERENCE_ENG)">> $(FILE_NAME)
 	@echo "INFERENCE_ENG_PORT=$(INFERENCE_ENG_PORT)">> $(FILE_NAME)
@@ -122,6 +126,7 @@ env:
 	@echo "ADMIN_EMAIL=$(ADMIN_EMAIL)">> $(FILE_NAME)
 	@echo "ADMIN_PASS=$(ADMIN_PASS)">> $(FILE_NAME)
 	@echo "TIMEZONE=$(TIMEZONE)">> $(FILE_NAME)
+	@echo "INSTRUCTION"=$(INSTRUCTION)>> $(FILE_NAME)
 
 
 .PHONY: prepare
@@ -133,57 +138,57 @@ prepare: lm
 # For development, require Nvidia GPU
 .PHONY: build
 build: env lm
-	docker-compose -f docker-compose.yaml build
+	docker compose -f docker-compose.yaml build
 
 
 .PHONY: up
 up: env build
-	docker-compose -f docker-compose.yaml up -d
+	docker compose -f docker-compose.yaml up -d
 
 
 .PHONY: stop
 stop:
-	docker-compose -f docker-compose.yaml stop
+	docker compose -f docker-compose.yaml stop
 
 .PHONY: logs
 logs:
-	@docker-compose -f docker-compose.yaml logs -f
+	@docker compose -f docker-compose.yaml logs -f
 
 ############################################################################################################
 # For demo, without GPU augumentation, but slow for inference. Might include some bugs.
 .PHONY: demo
 demo: env lm
-	docker-compose -f docker-compose.demo.yaml up -d
+	docker compose -f docker-compose.demo.yaml up -d
 
 .PHONY: demo-stop
 demo-stop:
-	docker-compose -f docker-compose.demo.yaml stop
+	docker compose -f docker-compose.demo.yaml stop
 
 .PHONY: demo-logs
 demo-logs:
-	docker-compose -f docker-compose.demo.yaml logs -f
+	docker compose -f docker-compose.demo.yaml logs -f
 
 .PHONY: demo-remove
 demo-remove:
-	docker-compose -f docker-compose.demo.yaml down
+	docker compose -f docker-compose.demo.yaml down
 
 ############################################################################################################
 # For gpu host.
 .PHONY: gpu
 gpu: env
-	docker-compose -f docker-compose.gpu.yaml up -d
+	docker compose -f docker-compose.gpu.yaml up -d
 
 .PHONY: gpu-stop
 gpu-stop:
-	docker-compose -f docker-compose.gpu.yaml stop
+	docker compose -f docker-compose.gpu.yaml stop
 
 .PHONY: gpu-logs
 gpu-logs:
-	docker-compose -f docker-compose.gpu.yaml logs -f
+	docker compose -f docker-compose.gpu.yaml logs -f
 
 .PHONY: gpu-remove
 gpu-remove:
-	docker-compose -f docker-compose.gpu.yaml down
+	docker compose -f docker-compose.gpu.yaml down
 
 ############################################################################################################
 # Linter
@@ -198,6 +203,10 @@ ruff:
 .PHONY: lm
 lm:
 	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
+
+.PHONY: localinfer
+localinfer: lm
+	@docker run -p 8080:8080 -v ./volumes/models:/models gclub/llama.cpp:$(INFERENCE_ENG_VERSION) -m models/$(LANGUAGE_MODEL_NAME) -c 512 -cnv -i --metrics --host 0.0.0.0 --port 8080
 
 ############################################################################################################
 # Poetry

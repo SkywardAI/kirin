@@ -35,7 +35,7 @@ services:
   kirin:
     container_name: kirin
     restart: always
-    image: gclub/kirin:v0.1.8
+    image: gclub/kirin:v0.1.11
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - DEBUG=${DEBUG}
@@ -71,6 +71,7 @@ services:
       - HASHING_SALT=${HASHING_SALT}
       - MILVUS_HOST=${MILVUS_HOST}
       - MILVUS_PORT=${MILVUS_PORT}
+      - MILVUS_VERSION=${MILVUS_VERSION}
       - INFERENCE_ENG=${INFERENCE_ENG}
       - INFERENCE_ENG_PORT=${INFERENCE_ENG_PORT}
       - INFERENCE_ENG_VERSION=${INFERENCE_ENG_VERSION}
@@ -79,15 +80,18 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASS=${ADMIN_PASS}
       - TIMEZONE=${TIMEZONE}
+      - INSTRUCTION=${INSTRUCTION}
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
     expose:
       - 8000
     ports:
-      - 8001:8000
+      - 8000:8000
     depends_on:
       - db
+      - standalone
+      - llamacpp
 
 
   etcd:
@@ -148,12 +152,11 @@ services:
       - 8080
     ports:
       - 8080:8080
-    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-cnv","-i"]
+    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","512"]
 
-  # Frontend here is only for testing purposes
-  frontend:
-    image: ghcr.io/skywardai/rebel:v0.1.4
-    container_name: frontend
+  rebel:
+    container_name: rebel
+    image: ghcr.io/skywardai/rebel:v0.1.3
     restart: always
     expose:
       - 80
