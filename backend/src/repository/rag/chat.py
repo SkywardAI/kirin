@@ -241,7 +241,9 @@ class RAGChatModelRepository(BaseRAGRepository):
         response = requests.post(
             inference_helper.completion_url, 
             headers={'Content-Type': 'application/json'}, 
+            stream=True,
             json=data
-            )
-
-        yield response.content
+        )
+        
+        for line in response.iter_content():
+            yield line.decode('utf-8')
