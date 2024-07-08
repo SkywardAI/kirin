@@ -2,8 +2,10 @@
 
 [![Linter and Builder 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/linter-and-builder.yaml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/linter-and-builder.yaml) [![Release Drafter 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml) [![Releasing Image 🚀](https://github.com/SkywardAI/kirin/actions/workflows/release-image.yaml/badge.svg)](https://github.com/SkywardAI/kirin/actions/workflows/release-image.yaml) [![CodeQL](https://github.com/SkywardAI/kirin/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/SkywardAI/kirin/actions/workflows/github-code-scanning/codeql)
 
+![](./imgs/SkywardAI(Mind%20Map)%20-%20APIs%20aggregator.svg)
 
-This is a repository is the backend of the chat machine trainer websit. It's using the following tech stack:
+
+This is a repository is the API aggregator of SkywardAI. It's using the following tech stack:
 
 * 🐳 [Dockerized](https://www.docker.com/)
 * 🐘 [Asynchronous PostgreSQL](https://www.postgresql.org/docs/current/libpq-async.html)
@@ -11,7 +13,7 @@ This is a repository is the backend of the chat machine trainer websit. It's usi
 
 When the `Docker` is started, these are the URL addresses:
 
-* Backend Application (API docs) $\rightarrow$ `http://localhost:8001/docs`
+* Backend Application (API docs) $\rightarrow$ `http://localhost:8000/docs`
 * Database editor (Adminer) $\rightarrow$ `http//localhost:8081`
 
 The backend API without `Docker` can be found in `http://localhost:8000/docs`.
@@ -47,6 +49,14 @@ See [quick start](https://skywardai.github.io/skywardai.io/docs/quick-start.html
 ## Deployment
 
 See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build_and_run.html). And if you are interested in docker-in-docker development, see [Development.md](./docs/Development.md)
+
+
+## Acknowledgements
+
+* [FastAPI](https://fastapi.tiangolo.com/)
+* [SQLAlchemy](https://www.sqlalchemy.org/)
+* [llama.cpp](https://github.com/ggerganov/llama.cpp)
+* [HuggingFace](https://huggingface.co)
 
 
 # License
