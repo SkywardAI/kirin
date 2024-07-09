@@ -35,7 +35,7 @@ services:
   kirin:
     container_name: kirin
     restart: always
-    image: gclub/kirin:v0.1.11
+    image: gclub/kirin:${BACKEND_SERVER_VERSION}
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - DEBUG=${DEBUG}

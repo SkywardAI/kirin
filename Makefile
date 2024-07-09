@@ -6,7 +6,7 @@ DEBUG:=True
 BACKEND_SERVER_HOST:=127.0.0.1
 BACKEND_SERVER_PORT:=8000
 BACKEND_SERVER_WORKERS:=4
-BACKEND_SERVER_VERSION:=v0.1.11
+BACKEND_SERVER_VERSION:=v0.1.12
 TIMEZONE:="UTC"
 
 # Database - Postgres
@@ -168,14 +168,10 @@ demo-stop:
 demo-logs:
 	docker compose -f docker-compose.demo.yaml logs -f
 
-.PHONY: demo-remove
-demo-remove:
-	docker compose -f docker-compose.demo.yaml down
-
 ############################################################################################################
 # For gpu host.
-.PHONY: gpu
-gpu: env
+.PHONY: gpu-up
+gpu: env lm
 	docker compose -f docker-compose.gpu.yaml up -d
 
 .PHONY: gpu-stop
@@ -185,10 +181,6 @@ gpu-stop:
 .PHONY: gpu-logs
 gpu-logs:
 	docker compose -f docker-compose.gpu.yaml logs -f
-
-.PHONY: gpu-remove
-gpu-remove:
-	docker compose -f docker-compose.gpu.yaml down
 
 ############################################################################################################
 # Linter
