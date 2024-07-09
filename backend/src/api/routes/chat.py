@@ -106,7 +106,7 @@ async def chat(
     }'
     ```
 
-    **Return ChatInResponse:**
+    **Return StreamingResponse:**
     data: {"content":" I","stop":false,"id_slot":0,"multimodal":false}
 
     data: {"content":"'","stop":false,"id_slot":0,"multimodal":false}
