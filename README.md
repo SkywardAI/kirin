@@ -65,6 +65,7 @@ See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build
 * [SQLAlchemy](https://www.sqlalchemy.org/)
 * [llama.cpp](https://github.com/ggerganov/llama.cpp)
 * [HuggingFace](https://huggingface.co)
+* [RMIT Race Hub](https://race.rmit.edu.au)
 
 
 # License
