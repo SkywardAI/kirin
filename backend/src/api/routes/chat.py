@@ -79,7 +79,7 @@ async def chat(
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
-) -> ChatInResponse:
+)-> StreamingResponse:
     """
     Chat with the AI-powered chatbot.
     
@@ -106,7 +106,7 @@ async def chat(
     }'
     ```
 
-    **Return ChatInResponse:**
+    **Return StreamingResponse:**
     data: {"content":" I","stop":false,"id_slot":0,"multimodal":false}
 
     data: {"content":"'","stop":false,"id_slot":0,"multimodal":false}
@@ -142,7 +142,9 @@ async def chat(
     # score = await rag_chat_repo.evaluate_response(request_msg = chat_in_msg.message, response_msg = response_msg)
     # response_msg = response_msg + "score : {:.3f}".format(score)
     return StreamingResponse(
-        rag_chat_repo.inference(session_id=session.id, input_msg=chat_in_msg.message, chat_repo=chat_repo), 
+        rag_chat_repo.inference(session_id=session.id, input_msg=chat_in_msg.message, chat_repo=chat_repo),
+        # Buffering (the real problem) https://serverfault.com/questions/801628/for-server-sent-events-sse-what-nginx-proxy-configuration-is-appropriate/801629#
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
         media_type='text/event-stream'
     )
 
