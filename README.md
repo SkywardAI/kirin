@@ -2,8 +2,16 @@
 
 [![Linter and Builder 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/linter-and-builder.yaml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/linter-and-builder.yaml) [![Release Drafter 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml) [![Releasing Image 🚀](https://github.com/SkywardAI/kirin/actions/workflows/release-image.yaml/badge.svg)](https://github.com/SkywardAI/kirin/actions/workflows/release-image.yaml) [![CodeQL](https://github.com/SkywardAI/kirin/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/SkywardAI/kirin/actions/workflows/github-code-scanning/codeql)
 
+# Architecture
+
 ![](./imgs/SkywardAI(Mind%20Map)%20-%20APIs%20aggregator.svg)
 
+
+# Phi3-minimal-4k-gguf on 8 CPUs demo
+
+https://github.com/SkywardAI/kirin/assets/8053949/48b776f1-c41f-4327-a99b-5ac41fbc66f2
+
+# Tech stack
 
 This is a repository is the API aggregator of SkywardAI. It's using the following tech stack:
 
