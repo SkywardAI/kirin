@@ -8,7 +8,7 @@ from src.repository.crud.ai_model import AiModelCRUDRepository
 from src.repository.crud.file import UploadedFileCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
 
-router = fastapi.APIRouter(prefix="/train", tags=["Save"])
+router = fastapi.APIRouter(prefix="/train", tags=["train"])
 
 
 @router.post(
