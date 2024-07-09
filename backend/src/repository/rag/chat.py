@@ -243,8 +243,7 @@ class RAGChatModelRepository(BaseRAGRepository):
                     "POST",
                     inference_helper.completion_url,
                     headers={'Content-Type': 'application/json'},
-                    json=data,
-                    timeout=httpx.Timeout(20)
+                    json=data
                 ) as response:
                     response.raise_for_status()
                     async for chunk in response.aiter_text():
