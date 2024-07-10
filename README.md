@@ -7,9 +7,10 @@
 ![](./imgs/SkywardAI(Mind%20Map)%20-%20APIs%20aggregator.svg)
 
 
-# Phi3-minimal-4k-gguf on 8 CPUs demo
+# Phi3-minimal-4k-gguf on 8 CPUs
 
-https://github.com/SkywardAI/kirin/assets/8053949/48b776f1-c41f-4327-a99b-5ac41fbc66f2
+https://github.com/SkywardAI/kirin/assets/8053949/143b016c-2264-4644-a7ae-304c908fbedf
+
 
 # Tech stack
 
