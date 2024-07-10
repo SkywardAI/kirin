@@ -82,7 +82,6 @@ services:
       - TIMEZONE=${TIMEZONE}
       - INSTRUCTION=${INSTRUCTION}
     volumes:
-      - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
     expose:
       - 8000
