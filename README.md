@@ -72,4 +72,4 @@ See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build
 
 # License
 
-This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file.
+This project is licensed under the terms of the Apache 2.0 license. See the [LICENSE](./LICENSE.md) file.
