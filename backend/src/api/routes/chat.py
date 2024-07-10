@@ -96,29 +96,30 @@ async def chat(
 
     ```bash
     curl -X 'POST'
-    'http://127.0.0.1:8000/api/chat'
+    'http://localhost:8000/api/chat'
     -H 'accept: application/json'
-    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFub255bW91cyIsImVtYWlsIjoiYW5vbnltb3VzQGFub255LmNvbSIsImV4cCI6MTcyMDkxOTY4Nywic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.29zUJQvD5dkC9XIRvTfZTFJoO5HzZTgj1JjKOKedg2g'
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFub255bW91cyIsImVtYWlsIjoiYW5vbnltb3VzQGFub255LmNvbSIsImV4cCI6MTcyMTA3MTI0MCwic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.hip3zPA2yN-MOwKHFOm_KhZuvaC4soY4MgwegyYJu2s'
     -H 'Content-Type: application/json'
     -d '{
     "sessionUuid": "string",
-    "message": "how are you?"
+    "message": "do you know RMIT?",
+    "temperature": 0.2,
+    "topK": 40,
+    "topP": 0.9,
+    "nPredict": 512
     }'
     ```
 
     **Return StreamingResponse:**
-    data: {"content":" I","stop":false,"id_slot":0,"multimodal":false}
+    data: {"content":" Yes","stop":false,"id_slot":0,"multimodal":false}
 
-    data: {"content":"'","stop":false,"id_slot":0,"multimodal":false}
+    data: {"content":",","stop":false,"id_slot":0,"multimodal":false}
 
-    data: {"content":"m","stop":false,"id_slot":0,"multimodal":false}
+    data: {"content":" R","stop":false,"id_slot":0,"multimodal":false}
 
-    data: {"content":"",
-    "id_slot":0,"stop":true,
-    "model":"models/Phi-3-mini-4k-instruct-q4.gguf",
-    "tokens_predicted":58,"tokens_evaluated":46,
-    "generation_settings":{},
-    }
+    data: {"content":"MIT","stop":false,"id_slot":0,"multimodal":false}
+
+    data: {"content":" University","stop":false,"id_slot":0,"multimodal":false}
 
     """
 
@@ -137,12 +138,19 @@ async def chat(
 
     # TODO: name=chat_in_msg.message[:20] use to create uuid in here, we use username to create session in /api/seesionuuid. Is that acceptable? @Micost
     session = await session_repo.read_create_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id, name=chat_in_msg.message[:20] )
-    # response_msg=await rag_chat_repo.inference(session_id=session.id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
 
     # score = await rag_chat_repo.evaluate_response(request_msg = chat_in_msg.message, response_msg = response_msg)
     # response_msg = response_msg + "score : {:.3f}".format(score)
     return StreamingResponse(
-        rag_chat_repo.inference(session_id=session.id, input_msg=chat_in_msg.message, chat_repo=chat_repo),
+        rag_chat_repo.inference(
+            session_id=session.id, 
+            input_msg=chat_in_msg.message, 
+            chat_repo=chat_repo,
+            temperature=chat_in_msg.temperature,
+            top_k=chat_in_msg.top_k,
+            top_p=chat_in_msg.top_p,
+            n_predict=chat_in_msg.n_predict
+        ),
         # Buffering (the real problem) https://serverfault.com/questions/801628/for-server-sent-events-sse-what-nginx-proxy-configuration-is-appropriate/801629#
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
         media_type='text/event-stream'
@@ -204,7 +212,7 @@ async def get_chathistory(
     for chat in chats:
         res_session = ChatHistory(
             id=chat.id,
-            type="out" if chat.is_bot_msg else "in",
+            chat_type="out" if chat.is_bot_msg else "in",
             message=chat.message,
         )
         chats_list.append(res_session)

@@ -82,7 +82,6 @@ services:
       - TIMEZONE=${TIMEZONE}
       - INSTRUCTION=${INSTRUCTION}
     volumes:
-      - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
     expose:
       - 8000
@@ -152,7 +151,7 @@ services:
       - 8080
     ports:
       - 8080:8080
-    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","512"]
+    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","4096"]
 
   rebel:
     container_name: rebel

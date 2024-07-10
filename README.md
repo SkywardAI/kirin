@@ -66,6 +66,7 @@ See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build
 * [llama.cpp](https://github.com/ggerganov/llama.cpp)
 * [HuggingFace](https://huggingface.co)
 * [RMIT Race Hub](https://race.rmit.edu.au)
+* [Microsoft Phi-3 Series](https://huggingface.co/aisuko/Phi-3-mini-4k-instruct-gguf)
 
 
 # License

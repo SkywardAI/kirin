@@ -7,6 +7,7 @@ from src.api.routes.chat import router as chat_router
 from src.api.routes.load import router as load_router
 from src.api.routes.train import router as train_router
 from src.api.routes.version import router as version_router
+from src.api.routes.health import router as health_router
 
 router = fastapi.APIRouter()
 
@@ -17,3 +18,4 @@ router.include_router(router=ai_model_router)
 router.include_router(router=train_router)
 router.include_router(router=load_router)
 router.include_router(router=version_router)
+router.include_router(router=health_router)

@@ -190,7 +190,16 @@ class RAGChatModelRepository(BaseRAGRepository):
         return f"{inference_helper.instruction}\n" + f"\n### Human: {prmpt}\n### Assistant:"
     
 
-    async def inference(self, session_id: int, input_msg: str, chat_repo)-> AsyncGenerator[Any, None]:
+    async def inference(
+        self, 
+        session_id: int, 
+        input_msg: str, 
+        chat_repo,
+        temperature: float = 0.2,
+        top_k: int = 40,
+        top_p: float = 0.9,
+        n_predict: int = 128,
+        )-> AsyncGenerator[Any, None]:
         """
         **Inference using seperate service:(llamacpp)**
 
@@ -198,6 +207,10 @@ class RAGChatModelRepository(BaseRAGRepository):
         - **session_id (int):** session id
         - **input_msg (str):** input message
         - **chat_repo:** chat repository
+        - **temperature (float):** temperature for inference(float)
+        - **top_k (int):** top_k parameter for inference(int)
+        - **top_p (float):** top_p parameter for inference(float)
+        - **n_predict (int):** n_predict parameter for inference(int)
 
         **Returns:**
         AsyncGenerator[Any, None]: response message
@@ -221,16 +234,15 @@ class RAGChatModelRepository(BaseRAGRepository):
         
         #TODO:
           # 1.Implement the further context function
-          # 2.Add the inference prameters.
 
         
         data = {
             "prompt": self.format_prompt(input_msg),
-            "temperature": 0.2,
-            "top_k": 40,
-            "top_p": 0.9,
+            "temperature": temperature,
+            "top_k": top_k,
+            "top_p": top_p,
             "n_keep": inference_helper.n_keep,
-            "n_predict": 128,
+            "n_predict": n_predict,
             "cache_prompt": "false",
             "slot_id": -1, # for cached prompt
             "stop": ["\n### Human:"],
