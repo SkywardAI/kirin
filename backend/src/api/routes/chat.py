@@ -4,6 +4,8 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import StreamingResponse
 from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.securities.authorizations.jwt import jwt_required
+from src.utilities.exceptions.database import EntityDoesNotExist
+from src.utilities.exceptions.http.exc_404 import http_404_exc_uuid_not_found_request
 from src.config.settings.const import ANONYMOUS_USER
 from src.models.schemas.chat import (
     ChatHistory, 
@@ -33,16 +35,43 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 )
 async def update_session(
     token: str = fastapi.Depends(oauth2_scheme),
-    session_info = SessionUpdate,
+    session_info: SessionUpdate = fastapi.Body(...),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> ChatUUIDResponse:
-    if jwt_payload.username == ANONYMOUS_USER:
-        return ChatUUIDResponse( sessionUuid=session_info.sessionUuid )
-    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
-    sessions = await session_repo.update_sessions_by_uuid(session=session_info, account_id=current_user.id)
+    """
+    update session info by session uuid
+
+    **Example**
     
+    ```bash
+    curl -X 'PATCH' \
+    'http://127.0.0.1:8000/api/chat/session' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFiYyIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsImV4cCI6MTcyMTIwOTMwOSwic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.DxotlAw8ZrDlvU8wsDKd2lhuRdwC1-bkcS8kGVZzS04' \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "sessionUuid": "a6348e9d-d5a7-43f8-9ed3-4919f5ba9c0a",
+    "name": "new session name",
+    "type": "rag"
+    }'
+    ```
+    **Note:**
+    name and type are optional. If you don't want to update, just ignore it.
+    only rag and chat are allowed for type
+    
+    **Returns**
+
+    {"sessionUuid": "3917151c-173b-4a9e-92aa-ac1d633472d2"}
+
+    """
+    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    try:
+        sessions = await session_repo.update_sessions_by_uuid(session=session_info, account_id=current_user.id)
+
+    except EntityDoesNotExist:
+        raise await http_404_exc_uuid_not_found_request(uuid=session_info.sessionUuid)
     return ChatUUIDResponse(
         sessionUuid=sessions.uuid
     )

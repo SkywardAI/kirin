@@ -2,7 +2,7 @@ import typing
 from typing import Optional
 
 import sqlalchemy
-
+from sqlalchemy.sql import functions as sqlalchemy_functions
 from src.models.db.chat import ChatHistory, Session
 from src.models.schemas.chat import SessionUpdate
 from src.repository.crud.base import BaseCRUDRepository
@@ -40,11 +40,11 @@ class SessionCRUDRepository(BaseCRUDRepository):
         if update_session is None:
             raise EntityDoesNotExist(f"Session with uuid `{session.sessionUuid}` does not exist!")
         update_stmt = sqlalchemy.update(table=Session).where(Session.uuid == session.sessionUuid).values(updated_at=sqlalchemy_functions.now())  # type: ignore
-        if session["name"]:
-            update_stmt = update_stmt.values(username=session["name"])
+        if session.name:
+            update_stmt = update_stmt.values(name=session.name)
 
-        if session["type"]:
-            update_stmt = update_stmt.values(type=session["type"])
+        if session.type:
+            update_stmt = update_stmt.values(type=session.type)
         await self.async_session.execute(statement=update_stmt)
         await self.async_session.commit()
         await self.async_session.refresh(instance=update_session)

@@ -52,6 +52,18 @@ class ChatUUIDResponse(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
 
 class SessionUpdate(BaseSchemaModel):
+    """
+    Object for the request body of update session.
+
+    Attributes:
+    -----------
+    sessionUuid: str
+        Session UUID
+    name: str
+        session name
+    type: str
+        type of session: rag or chat
+    """
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
     name: Optional[str] = Field(default=None, title="Name", description="Name")
     type: Optional[Literal["rag", "chat"]] = Field(default=None, title="Type", description="Type")
