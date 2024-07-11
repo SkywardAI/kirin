@@ -275,6 +275,7 @@ async def get_chathistory(
     -H 'accept: application/json' \
     -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFub255bW91cyIsImVtYWlsIjoiYW5vbnltb3VzQGFub255LmNvbSIsImV4cCI6MTcyMTIxMjA3NCwic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.WjKiLd5wLDlzV_T2UHx8i8WFwG-rXBWmCvhovb_9lC0'
     ```
+    
     **Returns**
     
     [
@@ -365,7 +366,7 @@ async def save_chats(
         }
     ]
     }'
-    '''
+    ```
     
     **Returns**
 
