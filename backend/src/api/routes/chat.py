@@ -9,6 +9,7 @@ from src.models.schemas.chat import (
     ChatHistory, 
     ChatInMessage, 
     ChatInResponse, 
+    SessionUpdate,
     Session,
     ChatUUIDResponse
     )
@@ -22,6 +23,30 @@ from src.repository.rag.chat import RAGChatModelRepository
 router = fastapi.APIRouter(prefix="/chat", tags=["chatbot"])
 # Automatically get the token from the request header for Swagger UI
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
+
+
+@router.patch(
+    path="/session",
+    name="Session:update-session-by-uuid",
+    response_model=ChatUUIDResponse,
+    status_code=fastapi.status.HTTP_200_OK,
+)
+async def update_session(
+    token: str = fastapi.Depends(oauth2_scheme),
+    session_info = SessionUpdate,
+    session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required)
+) -> ChatUUIDResponse:
+    if jwt_payload.username == ANONYMOUS_USER:
+        return ChatUUIDResponse( sessionUuid=session_info.sessionUuid )
+    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    sessions = await session_repo.update_sessions_by_uuid(session=session_info, account_id=current_user.id)
+    
+    return ChatUUIDResponse(
+        sessionUuid=sessions.uuid
+    )
+
 
 
 @router.get(
@@ -181,6 +206,7 @@ async def get_session(
             res_session = Session(
                 sessionUuid=session.uuid,
                 name=session.name,
+                type=session.type,
                 created_at=session.created_at,
             )
             sessions_list.append(res_session)

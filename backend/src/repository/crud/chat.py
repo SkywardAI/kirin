@@ -4,6 +4,7 @@ from typing import Optional
 import sqlalchemy
 
 from src.models.db.chat import ChatHistory, Session
+from src.models.schemas.chat import SessionUpdate
 from src.repository.crud.base import BaseCRUDRepository
 from src.utilities.exceptions.database import EntityDoesNotExist
 
@@ -31,6 +32,24 @@ class SessionCRUDRepository(BaseCRUDRepository):
             raise EntityDoesNotExist("Session with uuid `{session_uuid}` does not exist!")
 
         return session  # type: ignore
+
+    async def update_sessions_by_uuid(self, session: SessionUpdate, account_id: int) -> Session:
+        stmt = sqlalchemy.select(Session).where(Session.uuid == session.sessionUuid, Session.account_id == account_id)
+        query = await self.async_session.execute(statement=stmt)
+        update_session = query.scalar()
+        if update_session is None:
+            raise EntityDoesNotExist(f"Session with uuid `{session.sessionUuid}` does not exist!")
+        update_stmt = sqlalchemy.update(table=Session).where(Session.uuid == session.sessionUuid).values(updated_at=sqlalchemy_functions.now())  # type: ignore
+        if session["name"]:
+            update_stmt = update_stmt.values(username=session["name"])
+
+        if session["type"]:
+            update_stmt = update_stmt.values(type=session["type"])
+        await self.async_session.execute(statement=update_stmt)
+        await self.async_session.commit()
+        await self.async_session.refresh(instance=update_session)
+
+        return update_session  # type: ignore
 
     async def read_create_sessions_by_uuid(self, session_uuid: str, account_id: int, name: str) -> Session:
         stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid)

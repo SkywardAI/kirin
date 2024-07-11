@@ -1,6 +1,6 @@
 import datetime
 from typing import Optional
-
+from typing import Literal
 from pydantic import Field
 
 from src.models.schemas.base import BaseSchemaModel
@@ -51,10 +51,16 @@ class ChatUUIDResponse(BaseSchemaModel):
 
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
 
+class SessionUpdate(BaseSchemaModel):
+    sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
+    name: Optional[str] = Field(default=None, title="Name", description="Name")
+    type: Optional[Literal["rag", "chat"]] = Field(default=None, title="Type", description="Type")
+
 class Session(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID" ,description="Session UUID") 
     name: str | None  = Field(..., title="Name", description="Name") 
-    created_at: datetime.datetime = Field(..., title="Creation time", description="Creation time") 
+    type: str | None  = Field(..., title="Type", description="Type") 
+    created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time") 
 
 
 class ChatHistory(BaseSchemaModel):
