@@ -157,7 +157,7 @@ services:
 
   rebel:
     container_name: rebel
-    image: ghcr.io/skywardai/rebel:v0.1.4
+    image: ghcr.io/skywardai/rebel:v0.1.5
     restart: always
     expose:
       - 80

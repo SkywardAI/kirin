@@ -6,7 +6,7 @@ DEBUG:=True
 BACKEND_SERVER_HOST:=127.0.0.1
 BACKEND_SERVER_PORT:=8000
 BACKEND_SERVER_WORKERS:=4
-BACKEND_SERVER_VERSION:=v0.1.12
+BACKEND_SERVER_VERSION:=v0.1.13
 TIMEZONE:="UTC"
 
 # Database - Postgres
@@ -63,7 +63,7 @@ DOCKER_VOLUME_DIRECTORY:=
 # CPU Accelerate Inference Engine
 INFERENCE_ENG:=llamacpp
 INFERENCE_ENG_PORT:=8080
-INFERENCE_ENG_VERSION:=server--b1-a8d49d8
+INFERENCE_ENG_VERSION:=server--b1-2321a5e
 
 # Language model, default is phi3-mini-4k-instruct-q4.gguf
 # https://github.com/SkywardAI/llama.cpp/blob/9b2f16f8055265c67e074025350736adc1ea0666/tests/test-chat-template.cpp#L91-L92
