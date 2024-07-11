@@ -8,12 +8,13 @@ from src.utilities.exceptions.database import EntityDoesNotExist
 from src.utilities.exceptions.http.exc_404 import http_404_exc_uuid_not_found_request
 from src.config.settings.const import ANONYMOUS_USER
 from src.models.schemas.chat import (
-    ChatHistory, 
+    Chats, 
     ChatInMessage, 
     ChatInResponse, 
     SessionUpdate,
     Session,
-    ChatUUIDResponse
+    ChatUUIDResponse,
+    SaveChatHistory
     )
 from src.repository.crud.chat import (
     ChatHistoryCRUDRepository, 
@@ -247,7 +248,7 @@ async def get_session(
 @router.get(
     path="/history/{uuid}",
     name="chat:get-chat-history-by-session-uuid",
-    response_model=list[ChatHistory],
+    response_model=list[Chats],
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def get_chathistory(
@@ -257,19 +258,125 @@ async def get_chathistory(
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
-) -> list[ChatHistory]:
+) -> list[Chats]:
+    """
+
+    Get chat history to session by session uuid
+    
+    **Note:**
+    Will verify if the user has access to the session
+    Upper limit of the chat history is 50
+    
+    **Example of the request body:**
+
+    ```bash
+    curl -X 'GET' \
+    'http://127.0.0.1:8000/api/chat/history/6dcf3f30-4521-4d8e-b944-e7e1b80c4861' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFub255bW91cyIsImVtYWlsIjoiYW5vbnltb3VzQGFub255LmNvbSIsImV4cCI6MTcyMTIxMjA3NCwic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.WjKiLd5wLDlzV_T2UHx8i8WFwG-rXBWmCvhovb_9lC0'
+    ```
+    **Returns**
+    
+    [
+    {
+        "role": "user",
+        "message": "hello"
+    },
+    {
+        "role": "assistant",
+        "message": "hi there, how can i help you?"
+    },
+    {
+        "role": "user",
+        "message": "I'm a billionaire but could not find a way to be happy."
+    },
+    {
+        "role": "assistant",
+        "message": "come on, time to wake up."
+    }
+    ]
+    
+    """
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
     if session_repo.verify_session_by_account_id(session_uuid=uuid, account_id=current_user.id) is False:
-        raise fastapi.HTTPException(status_code=404, detail="Session not found")
+        raise http_404_exc_uuid_not_found_request(uuid=uuid)
     session = await session_repo.read_sessions_by_uuid(session_uuid=uuid)
     chats = await chat_repo.read_chat_history_by_session_id(id=session.id)
     chats_list: list = list()
     for chat in chats:
-        res_session = ChatHistory(
-            id=chat.id,
-            chat_type="out" if chat.is_bot_msg else "in",
+        res_session = Chats(
+            role=chat.role,
             message=chat.message,
         )
         chats_list.append(res_session)
 
     return chats_list
+
+
+@router.post(
+    path="/save",
+    name="chat:save-chat-history-to-session",
+    response_model=ChatUUIDResponse,
+    status_code=fastapi.status.HTTP_201_CREATED,
+)
+async def save_chats(
+    chat_in_msg: SaveChatHistory,
+    token: str = fastapi.Depends(oauth2_scheme),
+    session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
+    chat_repo: ChatHistoryCRUDRepository = fastapi.Depends(get_repository(repo_type=ChatHistoryCRUDRepository)),
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required)
+)->ChatUUIDResponse:
+    """
+
+    Save chat history to session by session uuid
+    
+    **Note:**
+    
+    No overlap chat histories
+    Messages longer than 4096 characters will be truncated
+        
+    **Example of the request body:**
+
+    ```bash
+    curl -X 'POST' \
+    'http://127.0.0.1:8000/api/chat/save' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFub255bW91cyIsImVtYWlsIjoiYW5vbnltb3VzQGFub255LmNvbSIsImV4cCI6MTcyMTIxMjA3NCwic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.WjKiLd5wLDlzV_T2UHx8i8WFwG-rXBWmCvhovb_9lC0' \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "sessionUuid": "6dcf3f30-4521-4d8e-b944-e7e1b80c4861",
+    "chats": [
+        {
+        "role": "user",
+        "message": "hello"
+        },
+        {
+        "role": "assistant",
+        "message": "hi there, how can i help you?"
+        },
+        {
+        "role": "user",
+        "message": "I'\''m a billionaire but could not find a way to be happy."
+        },
+        {
+        "role": "assistant",
+        "message": "come on, time to wake up."
+        }
+    ]
+    }'
+    '''
+    
+    **Returns**
+
+    {"sessionUuid": "6dcf3f30-4521-4d8e-b944-e7e1b80c4861"}
+
+    """
+    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    if session_repo.verify_session_by_account_id(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id) is False:
+        raise http_404_exc_uuid_not_found_request(uuid=chat_in_msg.sessionUuid)
+    session = await session_repo.read_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid)
+    await chat_repo.load_create_chat_history(session_id=session.id, chats=chat_in_msg.chats)
+    return ChatUUIDResponse(
+        sessionUuid=chat_in_msg.sessionUuid
+    )

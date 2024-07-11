@@ -32,7 +32,7 @@ class ChatHistory(Base):  # type: ignore
 
     id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(primary_key=True, autoincrement="auto")
     session_id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(nullable=False)
-    is_bot_msg: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(sqlalchemy.Boolean, nullable=False, default=False)
+    role: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.Enum("user", "assistant", name="role"), nullable=False, default="user")
     message: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=4096), nullable=False)
     created_at: SQLAlchemyMapped[datetime.datetime] = sqlalchemy_mapped_column(
         sqlalchemy.DateTime(timezone=True), nullable=False, server_default=sqlalchemy_functions.now()

@@ -75,7 +75,21 @@ class Session(BaseSchemaModel):
     created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time") 
 
 
-class ChatHistory(BaseSchemaModel):
+class Chats(BaseSchemaModel):
+    """
+    Object for the response body of the chat history endpoint.
+
+    Attributes:
+    -----------
+    role: str
+        Role of chat user or assistant
+    message: str
+        Message
+    """
+    role: str  = Field(..., title="Role", description="Role ") 
+    message: str = Field(..., title="Message", description="Message")
+
+class SaveChatHistory(BaseSchemaModel):
     """
     Object for the response body of the chat history endpoint.
 
@@ -83,16 +97,13 @@ class ChatHistory(BaseSchemaModel):
     -----------
     sessionUuid: str
         Session UUID
-    chat_type: str
-        Type of chat
+    role: str
+        Role of chat user or assistant
     message: str
         Message
     """
-
-    sessionUuid: str = Field(..., title="Session UUID", description="Session UUID") 
-    chat_type: str  = Field(..., title="Chat Type", description="Type of chat") 
-    message: str = Field(..., title="Message", description="Message")
-
+    sessionUuid: str = Field(..., title="Session UUID" ,description="Session UUID")
+    chats: list[Chats] = Field(..., title="Chat history" ,description="Chat history")
 
 class MessagesResponse(BaseSchemaModel):
     role: str = Field(..., title="Role", description="Role")

@@ -1,10 +1,10 @@
 import typing
 from typing import Optional
-
+import loguru
 import sqlalchemy
 from sqlalchemy.sql import functions as sqlalchemy_functions
 from src.models.db.chat import ChatHistory, Session
-from src.models.schemas.chat import SessionUpdate
+from src.models.schemas.chat import SessionUpdate, Chats
 from src.repository.crud.base import BaseCRUDRepository
 from src.utilities.exceptions.database import EntityDoesNotExist
 
@@ -97,3 +97,13 @@ class ChatHistoryCRUDRepository(BaseCRUDRepository):
         )
         query = await self.async_session.execute(statement=stmt)
         return query.scalars().all()  # type: ignore
+
+    async def load_create_chat_history(self, session_id: int, chats: list[Chats]):
+        try:
+            for chat in chats:
+                new_chat_history = ChatHistory(session_id=session_id, role=chat.role, message=chat.message[:4096])
+                self.async_session.add(instance=new_chat_history)
+            await self.async_session.commit() 
+        except Exception as e:
+            await self.async_session.rollback() 
+            loguru.logger.error(f"Error: {e}")
