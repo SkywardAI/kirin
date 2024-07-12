@@ -1,5 +1,5 @@
 import datetime
-
+from typing import Optional
 from pydantic import(Field,EmailStr)
 
 from src.models.schemas.base import BaseSchemaModel
@@ -12,9 +12,8 @@ class AccountInCreate(BaseSchemaModel):
 
 
 class AccountInUpdate(BaseSchemaModel):
-    username: str = Field(..., title="username", description="username")
-    email: EmailStr  = Field(..., title="email", description="email")
-    password: str = Field(..., title="user password", description="Password length 6-20 characters")
+    email: Optional[EmailStr] = Field(default=None, title="email", description="email")
+    password: Optional[str] = Field(default=None, title="user password", description="Password length 6-20 characters")
 
 
 class AccountInLogin(BaseSchemaModel):

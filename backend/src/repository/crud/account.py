@@ -87,11 +87,8 @@ class AccountCRUDRepository(BaseCRUDRepository):
 
         update_stmt = sqlalchemy.update(table=Account).where(Account.id == update_account.id).values(updated_at=sqlalchemy_functions.now())  # type: ignore
 
-        if new_account_data["username"]:
-            update_stmt = update_stmt.values(username=new_account_data["username"])
-
         if new_account_data["email"]:
-            update_stmt = update_stmt.values(username=new_account_data["email"])
+            update_stmt = update_stmt.values(email=new_account_data["email"])
 
         if new_account_data["password"]:
             update_account.set_hash_salt(hash_salt=pwd_generator.generate_salt)  # type: ignore
