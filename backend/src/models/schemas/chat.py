@@ -1,6 +1,6 @@
 import datetime
 from typing import Optional
-
+from typing import Literal
 from pydantic import Field
 
 from src.models.schemas.base import BaseSchemaModel
@@ -51,13 +51,45 @@ class ChatUUIDResponse(BaseSchemaModel):
 
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
 
+class SessionUpdate(BaseSchemaModel):
+    """
+    Object for the request body of update session.
+
+    Attributes:
+    -----------
+    sessionUuid: str
+        Session UUID
+    name: str
+        session name
+    type: str
+        type of session: rag or chat
+    """
+    sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
+    name: Optional[str] = Field(default=None, title="Name", description="Name")
+    type: Optional[Literal["rag", "chat"]] = Field(default=None, title="Type", description="Type")
+
 class Session(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID" ,description="Session UUID") 
     name: str | None  = Field(..., title="Name", description="Name") 
-    created_at: datetime.datetime = Field(..., title="Creation time", description="Creation time") 
+    type: str | None  = Field(..., title="Type", description="Type") 
+    created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time") 
 
 
-class ChatHistory(BaseSchemaModel):
+class Chats(BaseSchemaModel):
+    """
+    Object for the response body of the chat history endpoint.
+
+    Attributes:
+    -----------
+    role: str
+        Role of chat user or assistant
+    message: str
+        Message
+    """
+    role: str  = Field(..., title="Role", description="Role ") 
+    message: str = Field(..., title="Message", description="Message")
+
+class SaveChatHistory(BaseSchemaModel):
     """
     Object for the response body of the chat history endpoint.
 
@@ -65,16 +97,13 @@ class ChatHistory(BaseSchemaModel):
     -----------
     sessionUuid: str
         Session UUID
-    chat_type: str
-        Type of chat
+    role: str
+        Role of chat user or assistant
     message: str
         Message
     """
-
-    sessionUuid: str = Field(..., title="Session UUID", description="Session UUID") 
-    chat_type: str  = Field(..., title="Chat Type", description="Type of chat") 
-    message: str = Field(..., title="Message", description="Message")
-
+    sessionUuid: str = Field(..., title="Session UUID" ,description="Session UUID")
+    chats: list[Chats] = Field(..., title="Chat history" ,description="Chat history")
 
 class MessagesResponse(BaseSchemaModel):
     role: str = Field(..., title="Role", description="Role")
