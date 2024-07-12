@@ -89,6 +89,22 @@ class Chats(BaseSchemaModel):
     role: str  = Field(..., title="Role", description="Role ") 
     message: str = Field(..., title="Message", description="Message")
 
+class ChatsWithTime(BaseSchemaModel):
+    """
+    Object for the response body of the chat history endpoint.
+
+    Attributes:
+    -----------
+    role: str
+        Role of chat user or assistant
+    message: str
+        Message
+    create_at: timestamp
+    """
+    role: str  = Field(..., title="Role", description="Role ") 
+    message: str = Field(..., title="Message", description="Message")
+    create_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
+
 class SaveChatHistory(BaseSchemaModel):
     """
     Object for the response body of the chat history endpoint.

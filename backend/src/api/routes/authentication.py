@@ -115,7 +115,7 @@ async def signin(
     response_model=dict,
     status_code=fastapi.status.HTTP_200_OK,
 )
-async def get_chathistory(
+async def get_token(
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository))
 ) -> dict:
     anonymous_user = AccountInLogin(username=ANONYMOUS_USER, password=ANONYMOUS_PASS)
