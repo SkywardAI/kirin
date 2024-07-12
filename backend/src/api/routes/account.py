@@ -1,6 +1,5 @@
 import fastapi
-from fastapi.security import OAuth2PasswordBearer
-import pydantic
+from fastapi.security import OAuth2PasswordBearerg
 from src.config.manager import settings
 from src.api.dependencies.repository import get_repository
 from src.config.settings.const import ANONYMOUS_USER

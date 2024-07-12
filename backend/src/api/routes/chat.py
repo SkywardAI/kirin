@@ -277,6 +277,7 @@ async def get_chathistory(
     ```
     
     **Returns**
+    ```json
     [
     {
         "role": "user",
@@ -299,7 +300,7 @@ async def get_chathistory(
         "createAt": "2024-07-12T14:01:31.639983Z"
     }
     ]
-    
+    ```
     """
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
     if session_repo.verify_session_by_account_id(session_uuid=uuid, account_id=current_user.id) is False:
