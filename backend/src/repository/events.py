@@ -117,7 +117,8 @@ async def dispose_db_connection(backend_app: fastapi.FastAPI) -> None:
 
 async def initialize_inference_client() -> None:
     """
-    Initialize the Inference client(currently we use llamacapp)
+    Initialize the inference helper, which include the OpenAI client 
+    and the URL for the inference engine.
 
     Args:
       * backend_app (fastapi.FastAPI): The FastAPI application instance
@@ -125,9 +126,6 @@ async def initialize_inference_client() -> None:
     Returns:
         None
     """
-    loguru.logger.info("Inference Client --- Waiting for Initialization . . .")
-
-    #TODO Initialize the Inference client
+    loguru.logger.info("Inference helper --- Waiting for Initialization . . .")
     inference_helper.init()
-
-    loguru.logger.info("Inference Client --- Successfully Initialized!")
+    loguru.logger.info("Inference helper --- Successfully Initialized!")
