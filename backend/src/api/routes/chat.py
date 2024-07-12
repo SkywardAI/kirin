@@ -8,7 +8,7 @@ from src.utilities.exceptions.database import EntityDoesNotExist
 from src.utilities.exceptions.http.exc_404 import http_404_exc_uuid_not_found_request
 from src.config.settings.const import ANONYMOUS_USER
 from src.models.schemas.chat import (
-    Chats, 
+    ChatsWithTime,
     ChatInMessage, 
     ChatInResponse, 
     SessionUpdate,
@@ -248,7 +248,7 @@ async def get_session(
 @router.get(
     path="/history/{uuid}",
     name="chat:get-chat-history-by-session-uuid",
-    response_model=list[Chats],
+    response_model=list[ChatsWithTime],
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def get_chathistory(
@@ -258,7 +258,7 @@ async def get_chathistory(
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
-) -> list[Chats]:
+) -> list[ChatsWithTime]:
     """
 
     Get chat history to session by session uuid
@@ -305,9 +305,10 @@ async def get_chathistory(
     chats = await chat_repo.read_chat_history_by_session_id(id=session.id)
     chats_list: list = list()
     for chat in chats:
-        res_session = Chats(
+        res_session = ChatsWithTime(
             role=chat.role,
             message=chat.message,
+            create_at=chat.created_at,
         )
         chats_list.append(res_session)
 
