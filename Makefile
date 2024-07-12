@@ -139,12 +139,12 @@ prepare: lm
 ############################################################################################################
 # For development, require Nvidia GPU
 .PHONY: build
-build: env lm
+build: env
 	docker compose -f docker-compose.yaml build
 
 
 .PHONY: up
-up: env build
+up: build lm
 	docker compose -f docker-compose.yaml up -d
 
 
