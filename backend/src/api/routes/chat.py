@@ -277,23 +277,26 @@ async def get_chathistory(
     ```
     
     **Returns**
-    
     [
     {
         "role": "user",
-        "message": "hello"
+        "message": "hello 1",
+        "createAt": "2024-07-12T14:01:22.368636Z"
     },
     {
         "role": "assistant",
-        "message": "hi there, how can i help you?"
+        "message": "hello 2",
+        "createAt": "2024-07-12T14:01:22.368636Z"
     },
     {
         "role": "user",
-        "message": "I'm a billionaire but could not find a way to be happy."
+        "message": "hello 3",
+        "createAt": "2024-07-12T14:01:31.639983Z"
     },
     {
         "role": "assistant",
-        "message": "come on, time to wake up."
+        "message": "hello 4",
+        "createAt": "2024-07-12T14:01:31.639983Z"
     }
     ]
     
