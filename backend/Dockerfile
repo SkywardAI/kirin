@@ -7,6 +7,11 @@ WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV VIRTUAL_ENV=/opt/venv
+
+# Switch on virtual environment
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install system dependencies
 # netcat for nc command
@@ -17,7 +22,7 @@ RUN apt-get update \
 
 COPY . .
 
-RUN pip --disable-pip-version-check --no-cache-dir install -r requirements.txt && rm -rf /tmp/pip-tmp
+RUN pip3 --disable-pip-version-check --no-cache-dir install -r requirements.txt && rm -rf /tmp/pip-tmp
 
 EXPOSE 8000
 
