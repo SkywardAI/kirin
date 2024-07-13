@@ -92,7 +92,7 @@ class ChatHistoryCRUDRepository(BaseCRUDRepository):
         stmt = (
             sqlalchemy.select(ChatHistory)
             .where(ChatHistory.session_id == id)
-            .order_by(ChatHistory.created_at.desc())
+            .order_by(ChatHistory.created_at.asc())
             .limit(limit_num)
         )
         query = await self.async_session.execute(statement=stmt)

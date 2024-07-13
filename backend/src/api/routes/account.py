@@ -1,13 +1,13 @@
 import fastapi
 from fastapi.security import OAuth2PasswordBearer
-import pydantic
 from src.config.manager import settings
 from src.api.dependencies.repository import get_repository
+from src.config.settings.const import ANONYMOUS_USER
 from src.models.schemas.account import AccountInResponse, AccountInUpdate, AccountWithToken
 from src.repository.crud.account import AccountCRUDRepository
 from src.securities.authorizations.jwt import jwt_generator, jwt_required
 from src.utilities.exceptions.database import EntityDoesNotExist
-from src.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_request
+from src.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_request, http_404_exc_username_not_found_request
 from src.utilities.exceptions.http.exc_401 import http_exc_401_cunauthorized_request
 
 router = fastapi.APIRouter(prefix="/accounts", tags=["accounts"])
@@ -15,7 +15,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 
 @router.get(
     path="",
-    name="accountss:read-accounts",
+    name="accounts:read-accounts",
     response_model=list[AccountInResponse],
     status_code=fastapi.status.HTTP_200_OK,
 )
@@ -51,7 +51,7 @@ async def get_accounts(
 
 @router.get(
     path="/{id}",
-    name="accountss:read-account-by-id",
+    name="accounts:read-account-by-id",
     response_model=AccountInResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
@@ -85,33 +85,137 @@ async def get_account(
         ),
     )
 
-
 @router.patch(
-    path="/{id}",
-    name="accountss:update-account-by-id",
+    path="",
+    name="accounts:update-current-account",
     response_model=AccountInResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def update_account(
-    query_id: int,
     token: str = fastapi.Depends(oauth2_scheme),
-    update_username: str | None = None,
-    update_email: pydantic.EmailStr | None = None,
-    update_password: str | None = None,
+    account_update: AccountInUpdate = fastapi.Body(...),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> AccountInResponse:
-    account_update = AccountInUpdate(username=update_username, email=update_email, password=update_password)
+    """
+    update current account info
+    email and password are optional
+
+    **Example**
+    
+    ```bash
+    curl -X 'PATCH' \
+    'http://127.0.0.1:8000/api/accounts' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFiYyIsImVtYWlsIjoiYWJjQGV4YW1wbGUuY29tIiwiZXhwIjoxNzIxMjg5Mjg5LCJzdWIiOiJZT1VSLUpXVC1TVUJKRUNUIn0.10sOf9REVbh9_7xh6ROffk1J9eEkNiJctjHEr2VMJp0' \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "email": "abc@abc.com",
+    "password": "abc"
+    }'
+    ```
+    **Note:**
+
+    anonymous user could not be updated
+    
+    **Returns**
+
+    {
+    "id": 3,
+    "authorizedAccount": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFiYyIsImVtYWlsIjoiYWJjQGFiYy5jb20iLCJleHAiOjE3MjEyODkzMjMsInN1YiI6IllPVVItSldULVNVQkpFQ1QifQ.JS1COs7ViBriPcy5lqlb7rxfOuX2tOvFP5aR6iU3Fa4",
+        "username": "abc",
+        "email": "abc@abc.com",
+        "isVerified": false,
+        "isActive": false,
+        "isLoggedIn": true,
+        "createdAt": "2024-07-12T13:53:47.429404Z",
+        "updatedAt": "2024-07-12T13:55:22.784769Z"
+    }
+    }
+
+    """
+    if jwt_payload.username == ANONYMOUS_USER:
+        raise await http_exc_401_cunauthorized_request()
+    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+
+    try:
+        updated_db_account = await account_repo.update_account_by_id(id=current_user.id, account_update=account_update)
+
+    except EntityDoesNotExist:
+        raise await http_404_exc_username_not_found_request(username=jwt_payload.username)
+    access_token = jwt_generator.generate_access_token(account=updated_db_account)
+
+    return AccountInResponse(
+        id=updated_db_account.id,
+        authorized_account=AccountWithToken(
+            token=access_token,
+            username=updated_db_account.username,
+            email=updated_db_account.email,  # type: ignore
+            is_verified=updated_db_account.is_verified,
+            is_active=updated_db_account.is_active,
+            is_logged_in=updated_db_account.is_logged_in,
+            created_at=updated_db_account.created_at,
+            updated_at=updated_db_account.updated_at,
+        ),
+    )
+
+@router.patch(
+    path="/{id}",
+    name="accounts:update-account-by-id",
+    response_model=AccountInResponse,
+    status_code=fastapi.status.HTTP_200_OK,
+)
+async def update_account_by_admin(
+    query_id: int,
+    token: str = fastapi.Depends(oauth2_scheme),
+    account_update: AccountInUpdate = fastapi.Body(...),
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required)
+) -> AccountInResponse:
+    """
+    update account info by account id
+    this can be only done by admin
+    email and password are optional
+
+    **Example**
+    
+    ```bash
+    curl -X 'PATCH' \
+    'http://127.0.0.1:8000/api/accounts/{id}?query_id=3' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE3MjEyODk0NTQsInN1YiI6IllPVVItSldULVNVQkpFQ1QifQ.8nz68k6fGS2seP_3ZaDCJmolR103JqH80VraEDinytM' \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "email": "user@example.com",
+    "password": "string"
+    }'
+    ```
+    
+    **Returns**
+
+    {
+    "id": 3,
+    "authorizedAccount": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFiYyIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsImV4cCI6MTcyMTI4OTQ2Nywic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.KqpTpviN2yTnaDZefa_vVXS6_YQJgtl2oXemd2qDTAo",
+        "username": "abc",
+        "email": "user@example.com",
+        "isVerified": false,
+        "isActive": false,
+        "isLoggedIn": true,
+        "createdAt": "2024-07-12T13:57:10.019039Z",
+        "updatedAt": "2024-07-12T13:57:47.261777Z"
+    }
+    }
+
+    """
+    if jwt_payload.username != settings.ADMIN_USERNAME:
+        raise await http_exc_401_cunauthorized_request()
     try:
         updated_db_account = await account_repo.update_account_by_id(id=query_id, account_update=account_update)
 
     except EntityDoesNotExist:
         raise await http_404_exc_id_not_found_request(id=query_id)
-    if jwt_payload.username != settings.ADMIN_USERNAME:
-        current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
-        if current_user != updated_db_account:
-            raise await http_exc_401_cunauthorized_request()
-
     access_token = jwt_generator.generate_access_token(account=updated_db_account)
 
     return AccountInResponse(
@@ -129,7 +233,7 @@ async def update_account(
     )
 
 
-@router.delete(path="", name="accountss:delete-account-by-id", status_code=fastapi.status.HTTP_200_OK)
+@router.delete(path="", name="accounts:delete-account-by-id", status_code=fastapi.status.HTTP_200_OK)
 async def delete_account(
     id: int, account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     token: str = fastapi.Depends(oauth2_scheme),
