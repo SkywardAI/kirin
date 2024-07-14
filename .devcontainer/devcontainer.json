@@ -47,7 +47,7 @@
 	"initializeCommand": "make prepare",
 
 	// Uncomment the next line to run commands after the container is created.
-	"postCreateCommand": "make install"
+	"postCreateCommand": "make install-dev"
 
 	// Configure tool-specific properties.
 	// "customizations": {},

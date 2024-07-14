@@ -228,3 +228,15 @@ plugin:
 .PHONY: expo
 expo:
 	@poetry -C backend export -f requirements.txt --output backend/requirements.txt
+
+############################################################################################################
+# Linter and test
+
+.PHONY: lint
+lint:
+	@ruff check --output-format=github .
+
+
+.PHONY: test
+test:
+	@poetry run -C backend python -m unittest discover -s backend/tests/ -v
