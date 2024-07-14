@@ -21,5 +21,9 @@ class DataSet(Base):  # type: ignore
         nullable=True,
         server_onupdate=sqlalchemy.schema.FetchedValue(for_update=True),
     )
+    is_uploaded: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(
+        sqlalchemy.Boolean, nullable=False, default=False
+    )
+
 
     __mapper_args__ = {"eager_defaults": True}

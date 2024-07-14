@@ -15,13 +15,25 @@ class DataSetCRUDRepository(BaseCRUDRepository):
 
         return new_dataset
 
+    async def mark_loaded(self, name: str)->typing.Sequence[DataSet]:
+        update_stmt = sqlalchemy.update(table=DataSet).where(DataSet.name == name).values(updated_at=sqlalchemy_functions.now())  # type: ignore
+        update_stmt = update_stmt.values(is_uploaded=True)
+        await self.async_session.execute(statement=update_stmt)
+        await self.async_session.commit()
 
-      
     async def get_dataset_by_name(self,dataset_name: str)->typing.Sequence[DataSet]:
-         stmt = sqlalchemy.select(DataSet).where(DataSet.name == dataset_name)
-         query = await self.async_session.execute(statement=stmt) 
-         return query.scalars().all()
+        stmt = sqlalchemy.select(DataSet).where(DataSet.name == dataset_name)
+        query = await self.async_session.execute(statement=stmt) 
+        return query.scalars().all()
     
+    async def get_load_status(self, id: int)->bool:
+        stmt = sqlalchemy.select(DataSet).where(DataSet.id == id)
+        query = await self.async_session.execute(statement=stmt).first()
+        dataset = query.scalar()
+        if dataset is None:
+            return False
+        return dataset.is_uploaded
+
 
 
     async def get_dataset_list(self)->typing.Sequence[DataSet]:

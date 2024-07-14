@@ -2,14 +2,19 @@ import csv
 import loguru
 import httpx
 import re
+import fastapi
+from src.api.dependencies.repository import get_rag_repository
 from src.models.schemas.train import TrainFileIn
 from datasets import load_dataset
 from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM, LOAD_BATCH_SIZE
+from src.repository.crud.dataset_db import DataSetCRUDRepository
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.inference_eng import inference_helper
 from src.repository.vector_database import vector_db
 from typing import Any
 from collections.abc import AsyncGenerator
+
+dataset_repo = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository))
 
 class RAGChatModelRepository(BaseRAGRepository):
     async def load_model(self, session_id: int, model_name: str) -> bool:
@@ -47,11 +52,11 @@ class RAGChatModelRepository(BaseRAGRepository):
                 # Add the row to the list
                 data.extend(row)
         loguru.logger.info(f"load_csv_file data_row:{data}")
-
-        # TODO: https://github.com/SkywardAI/chat-backend/issues/171
         embedding_list = inference_helper.tokenize(data)
-        vector_db.insert_list(embedding_list, data)
-
+        collection_name = self.trim_collection_name(file_name)
+        vector_db.create_collection(collection_name = collection_name)
+        vector_db.insert_list(embedding_list, data, collection_name)
+        dataset_repo.is_uploaded(collection_name)
         return True
 
     def load_data_set(self, data_set_name: str)-> bool:
@@ -129,6 +134,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         embedding_list = inference_helper.tokenize(doc_list)
         vector_db.insert_list(embedding_list, doc_list, self.trim_collection_name(dataset_name),start_idx = count)
         loguru.logger.info(f"load_data_set_all_field count:{count}")
+        dataset_repo.is_uploaded(collection_name)
         loguru.logger.info("Dataset loaded successfully")
         return True
 
