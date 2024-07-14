@@ -2,19 +2,22 @@ import os
 
 from src.repository.crud.dataset_db import DataSetCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
+from src.securities.authorizations.jwt import jwt_required
 from src.models.schemas.train import TrainFileInResponse
 from src.models.schemas.dataset import DatasetCreate
 import fastapi
 import threading
 from fastapi import BackgroundTasks
 from src.repository.inference_eng import inference_helper
-from src.api.dependencies.repository import get_rag_repository
+from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.config.settings.const import UPLOAD_FILE_PATH
 from src.models.schemas.file import FileInResponse
-
+from fastapi.security import OAuth2PasswordBearer
+from src.repository.crud.account import AccountCRUDRepository
 
 router = fastapi.APIRouter(prefix="/upload", tags=["upload"])
-
+# Automatically get the token from the request header for Swagger UI
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 
 async def save_upload_file(contents: bytes, save_file: str, filename: str, rag_chat_repo: RAGChatModelRepository):
     with open(save_file, "wb") as f:
@@ -28,28 +31,38 @@ async def save_upload_file(contents: bytes, save_file: str, filename: str, rag_c
     response_model=FileInResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
 )
-async def upload_and_return_id(
+async def upload_csv_and_return_id(
     background_tasks: BackgroundTasks,
     file: fastapi.UploadFile = fastapi.File(...),
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    token: str = fastapi.Depends(oauth2_scheme),
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ):
-
+    # If file storage path exists
     filename=file.filename
     save_path = UPLOAD_FILE_PATH
     if not os.path.exists(save_path):
         os.mkdir(save_path)
     save_file = os.path.join(save_path, filename)
+    # If the file already exists, delete it
     if os.path.exists(save_file):
         os.remove(save_file)
+    # Save file info
     db_fileinfo = await dataset_repo.get_dataset_by_name(filename)
     if not db_fileinfo:
         db_fileinfo = await dataset_repo.create_dataset(DatasetCreate(dataset_name=filename,des=filename)) 
+    await account_repo.update_dataset(username=jwt_payload.username, dataset_id=db_fileinfo.id)
+
+    # Save file
     save_file = os.path.join(save_path, filename)
     if os.path.exists(save_file):
         os.remove(save_file)
     contents = await file.read()
+    # Use background task to load file data to vector db
     background_tasks.add_task(save_upload_file, contents, save_file, filename, rag_chat_repo)
+
 
     return FileInResponse(ID=db_fileinfo.id)
 
@@ -59,15 +72,19 @@ async def upload_and_return_id(
     response_model=TrainFileInResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
 )
-async def upload_and_return_id(
+async def upload_dataset_and_return_id(
     date_set_name: str,
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    token: str = fastapi.Depends(oauth2_scheme),
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ):
 
     db_dataset=await dataset_repo.get_dataset_by_name(date_set_name)
     if not db_dataset:
         db_dataset = await dataset_repo.create_dataset(DatasetCreate(dataset_name=date_set_name,des=date_set_name)) 
+    await account_repo.update_dataset(username=jwt_payload.username, dataset_id=db_dataset.id)
     dataload_thread = threading.Thread(target=rag_chat_repo.load_data_set,args=(date_set_name,) )
     dataload_thread.daemon = True
     dataload_thread.start()
