@@ -40,9 +40,9 @@ backend_app: fastapi.FastAPI = initialize_backend_application()
 if __name__ == "__main__":
     uvicorn.run(
         app="main:backend_app",
-        host=settings.SERVER_HOST,
-        port=settings.SERVER_PORT,
+        host=settings.BACKEND_SERVER_HOST,
+        port=settings.BACKEND_SERVER_PORT,
         reload=settings.DEBUG,
-        workers=settings.SERVER_WORKERS,
+        workers=settings.BACKEND_SERVER_WORKERS,
         log_level=settings.LOGGING_LEVEL,
     )

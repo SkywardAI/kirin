@@ -1,3 +1,18 @@
+# coding=utf-8
+
+# Copyright [2024] [SkywardAI]
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#        http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
 import pathlib
 
@@ -10,14 +25,14 @@ ROOT_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent.parent.parent.pare
 
 class BackendBaseSettings(BaseSettings):
     TITLE: str = "Kirin Aggregator"
-    VERSION: str = decouple.config("BACKEND_SERVER_VERSION", cast=str)
+    BACKEND_SERVER_VERSION: str = decouple.config("BACKEND_SERVER_VERSION", cast=str)
     TIMEZONE: str = decouple.config("TIMEZONE", cast=str)
     DESCRIPTION: str | None = None
     DEBUG: bool = False
 
-    SERVER_HOST: str = decouple.config("BACKEND_SERVER_HOST", cast=str)  # type: ignore
-    SERVER_PORT: int = decouple.config("BACKEND_SERVER_PORT", cast=int)  # type: ignore
-    SERVER_WORKERS: int = decouple.config("BACKEND_SERVER_WORKERS", cast=int)  # type: ignore
+    BACKEND_SERVER_HOST: str = decouple.config("BACKEND_SERVER_HOST", cast=str)  # type: ignore
+    BACKEND_SERVER_PORT: int = decouple.config("BACKEND_SERVER_PORT", cast=int)  # type: ignore
+    BACKEND_SERVER_WORKERS: int = decouple.config("BACKEND_SERVER_WORKERS", cast=int)  # type: ignore
     API_PREFIX: str = "/api"
     DOCS_URL: str = "/docs"
     OPENAPI_URL: str = "/openapi.json"
@@ -27,16 +42,22 @@ class BackendBaseSettings(BaseSettings):
     MILVUS_HOST: str = decouple.config("MILVUS_HOST", cast=str)  # type: ignore
     MILVUS_PORT: int = decouple.config("MILVUS_PORT", cast=int)  # type: ignore
     MILVUS_VERSION: str = decouple.config("MILVUS_VERSION", cast=str)  # type: ignore
-    DB_POSTGRES_HOST: str = decouple.config("POSTGRES_HOST", cast=str)  # type: ignore
+    ETCD_AUTO_COMPACTION_MODE: str = decouple.config("ETCD_AUTO_COMPACTION_MODE", cast=str)  # type: ignore
+    ETCD_AUTO_COMPACTION_RETENTION: str = decouple.config("ETCD_AUTO_COMPACTION_RETENTION", cast=str)  # type: ignore
+    ETCD_QUOTA_BACKEND_BYTES : str = decouple.config("ETCD_QUOTA_BACKEND_BYTES", cast=str)  # type: ignore
+
+
+    POSTGRES_HOST: str = decouple.config("POSTGRES_HOST", cast=str)  # type: ignore
     DB_MAX_POOL_CON: int = decouple.config("DB_MAX_POOL_CON", cast=int)  # type: ignore
-    DB_POSTGRES_NAME: str = decouple.config("POSTGRES_DB", cast=str)  # type: ignore
-    DB_POSTGRES_PASSWORD: str = decouple.config("POSTGRES_PASSWORD", cast=str)  # type: ignore
+    POSTGRES_DB: str = decouple.config("POSTGRES_DB", cast=str)  # type: ignore
+    POSTGRES_PASSWORD: str = decouple.config("POSTGRES_PASSWORD", cast=str)  # type: ignore
     DB_POOL_SIZE: int = decouple.config("DB_POOL_SIZE", cast=int)  # type: ignore
     DB_POOL_OVERFLOW: int = decouple.config("DB_POOL_OVERFLOW", cast=int)  # type: ignore
-    DB_POSTGRES_PORT: int = decouple.config("POSTGRES_PORT", cast=int)  # type: ignore
-    DB_POSTGRES_SCHEMA: str = decouple.config("POSTGRES_SCHEMA", cast=str)  # type: ignore
+    POSTGRES_PORT: int = decouple.config("POSTGRES_PORT", cast=int)  # type: ignore
+    POSTGRES_SCHEMA: str = decouple.config("POSTGRES_SCHEMA", cast=str)  # type: ignore
     DB_TIMEOUT: int = decouple.config("DB_TIMEOUT", cast=int)  # type: ignore
-    DB_POSTGRES_USERNAME: str = decouple.config("POSTGRES_USERNAME", cast=str)  # type: ignore
+    POSTGRES_USERNAME: str = decouple.config("POSTGRES_USERNAME", cast=str)  # type: ignore
+    POSTGRES_URI: str = decouple.config("POSTGRES_URI", cast=str)  # type: ignore
 
     IS_DB_ECHO_LOG: bool = decouple.config("IS_DB_ECHO_LOG", cast=bool)  # type: ignore
     IS_DB_FORCE_ROLLBACK: bool = decouple.config("IS_DB_FORCE_ROLLBACK", cast=bool)  # type: ignore
@@ -77,6 +98,7 @@ class BackendBaseSettings(BaseSettings):
     INFERENCE_ENG: str = decouple.config("INFERENCE_ENG", cast=str) # type: ignore
     INFERENCE_ENG_PORT: int=decouple.config("INFERENCE_ENG_PORT", cast=int) # type: ignore
     INFERENCE_ENG_VERSION: str = decouple.config("INFERENCE_ENG_VERSION", cast=str) # type: ignore
+    NUM_CPU_CORES : float = decouple.config("NUM_CPU_CORES", cast=float)  # type: ignore
     
     # Configurations for language model
     LANGUAGE_MODEL_NAME: str = decouple.config("LANGUAGE_MODEL_NAME", cast=str) # type: ignore
@@ -96,7 +118,7 @@ class BackendBaseSettings(BaseSettings):
         validate_assignment: bool = True
         # https://docs.pydantic.dev/latest/api/config/#pydantic.config.ConfigDict.extra
         #TODO: We need to make sure pydanic is really useful
-        extra='allow'
+        # extra='allow'
 
     @property
     def set_backend_app_attributes(self) -> dict[str, str | bool | None]:
@@ -105,7 +127,7 @@ class BackendBaseSettings(BaseSettings):
         """
         return {
             "title": self.TITLE,
-            "version": self.VERSION,
+            "version": self.BACKEND_SERVER_VERSION,
             "debug": self.DEBUG,
             "description": self.DESCRIPTION,
             "docs_url": self.DOCS_URL,

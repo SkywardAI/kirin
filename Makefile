@@ -230,13 +230,8 @@ expo:
 	@poetry -C backend export -f requirements.txt --output backend/requirements.txt
 
 ############################################################################################################
-# Linter and test
-
-.PHONY: lint
-lint:
-	@ruff check --output-format=github .
-
+# Testing
 
 .PHONY: test
 test:
-	@poetry run -C backend python -m unittest discover -s backend/tests/ -v
+	@pytest backend/tests
