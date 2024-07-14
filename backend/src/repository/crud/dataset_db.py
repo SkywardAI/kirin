@@ -1,6 +1,7 @@
 from src.repository.crud.base import BaseCRUDRepository
 from src.models.schemas.dataset import DatasetCreate
-from src.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
+from sqlalchemy.sql import functions as sqlalchemy_functions
+from src.utilities.exceptions.database import EntityDoesNotExist
 from src.models.db.dataset import DataSet
 import sqlalchemy
 
@@ -28,7 +29,7 @@ class DataSetCRUDRepository(BaseCRUDRepository):
         return query.scalars().all()
     
     async def get_dataset_by_id(self, id: int) -> DataSet:
-        stmt = sqlalchemy.select(DataSet).where(DataSet.id == id, DataSet.is_uploaded == True)
+        stmt = sqlalchemy.select(DataSet).where(DataSet.id == id, DataSet.is_uploaded)
         query = await self.async_session.execute(statement=stmt)
         dataset = query.scalar()
         if dataset is None:

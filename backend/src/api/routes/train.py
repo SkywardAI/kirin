@@ -1,11 +1,6 @@
-from src.models.schemas.dataset import DatasetCreate
-from src.repository.crud.dataset_db import DataSetCRUDRepository
+
 import fastapi
-import threading
-from src.api.dependencies.repository import get_rag_repository, get_repository
-from src.models.schemas.train import TrainFileIn, TrainFileInResponse
-from src.repository.crud.ai_model import AiModelCRUDRepository
-from src.repository.rag.chat import RAGChatModelRepository
+from src.models.schemas.train import TrainFileInResponse
 
 router = fastapi.APIRouter(prefix="/train", tags=["train"])
 
