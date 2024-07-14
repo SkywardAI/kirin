@@ -3,7 +3,6 @@ import os
 from src.repository.crud.dataset_db import DataSetCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
 from src.securities.authorizations.jwt import jwt_required
-from src.models.schemas.train import TrainFileInResponse
 from src.models.schemas.dataset import DatasetCreate
 import fastapi
 import threading
@@ -36,7 +35,6 @@ async def upload_csv_and_return_id(
     file: fastapi.UploadFile = fastapi.File(...),
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
-    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     token: str = fastapi.Depends(oauth2_scheme),
     jwt_payload: dict = fastapi.Depends(jwt_required),
 ):
@@ -50,10 +48,7 @@ async def upload_csv_and_return_id(
     if os.path.exists(save_file):
         os.remove(save_file)
     # Save file info
-    db_fileinfo = await dataset_repo.get_dataset_by_name(filename)
-    if not db_fileinfo:
-        db_fileinfo = await dataset_repo.create_dataset(DatasetCreate(dataset_name=filename,des=filename)) 
-    await account_repo.update_dataset(username=jwt_payload.username, dataset_id=db_fileinfo.id)
+    db_fileinfo = await dataset_repo.init_dataset(dataset_name=filename, account_username=jwt_payload.username) 
 
     # Save file
     save_file = os.path.join(save_path, filename)
@@ -63,28 +58,24 @@ async def upload_csv_and_return_id(
     # Use background task to load file data to vector db
     background_tasks.add_task(save_upload_file, contents, save_file, filename, rag_chat_repo)
 
-
+    print(db_fileinfo.id)
     return FileInResponse(ID=db_fileinfo.id)
 
 @router.post(
     "/dataset",
     name="upload:load dataset to vectorDB",
-    response_model=TrainFileInResponse,
+    response_model=FileInResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
 )
 async def upload_dataset_and_return_id(
     date_set_name: str,
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
-    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     token: str = fastapi.Depends(oauth2_scheme),
     jwt_payload: dict = fastapi.Depends(jwt_required),
 ):
 
-    db_dataset=await dataset_repo.get_dataset_by_name(date_set_name)
-    if not db_dataset:
-        db_dataset = await dataset_repo.create_dataset(DatasetCreate(dataset_name=date_set_name,des=date_set_name)) 
-    await account_repo.update_dataset(username=jwt_payload.username, dataset_id=db_dataset.id)
+    db_dataset = await dataset_repo.init_dataset(dataset_name=date_set_name, account_username=jwt_payload.username) 
     dataload_thread = threading.Thread(target=rag_chat_repo.load_data_set,args=(date_set_name,) )
     dataload_thread.daemon = True
     dataload_thread.start()

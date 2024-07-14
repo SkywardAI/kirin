@@ -198,7 +198,7 @@ async def chat(
 
     if session.type == "rag":
         try:
-            collection_name = await get_collection_info(jwt_payload.id)
+            collection_name = await get_collection_info(current_user.id)
             result = rag_chat_repo.get_response(collection_name=collection_name, input_msg=chat_in_msg.message)
         except Exception:
             result = "Dataset for RAG is not ready"
