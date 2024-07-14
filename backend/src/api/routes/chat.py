@@ -1,6 +1,8 @@
 import fastapi
 import loguru
 from fastapi.security import OAuth2PasswordBearer
+from src.repository.crud.dataset_db import DataSetCRUDRepository
+import re
 from fastapi.responses import StreamingResponse
 from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.securities.authorizations.jwt import jwt_required
@@ -194,22 +196,35 @@ async def chat(
     # TODO: name=chat_in_msg.message[:20] use to create uuid in here, we use username to create session in /api/seesionuuid. Is that acceptable? @Micost
     session = await session_repo.read_create_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id, name=chat_in_msg.message[:20] )
 
+    if session.type == "rag":
+        try:
+            collection_name = await get_collection_info(jwt_payload.id)
+            result = rag_chat_repo.get_response(collection_name=collection_name, input_msg=chat_in_msg.message)
+        except Exception:
+            result = "Dataset for RAG is not ready"
+        def iterfile():
+            yield result.encode('utf-8') 
+        return StreamingResponse(
+            iterfile(),
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+            media_type="text/plain")
+    else:
     # score = await rag_chat_repo.evaluate_response(request_msg = chat_in_msg.message, response_msg = response_msg)
     # response_msg = response_msg + "score : {:.3f}".format(score)
-    return StreamingResponse(
-        rag_chat_repo.inference(
-            session_id=session.id, 
-            input_msg=chat_in_msg.message, 
-            chat_repo=chat_repo,
-            temperature=chat_in_msg.temperature,
-            top_k=chat_in_msg.top_k,
-            top_p=chat_in_msg.top_p,
-            n_predict=chat_in_msg.n_predict
-        ),
-        # Buffering (the real problem) https://serverfault.com/questions/801628/for-server-sent-events-sse-what-nginx-proxy-configuration-is-appropriate/801629#
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-        media_type='text/event-stream'
-    )
+        return StreamingResponse(
+            rag_chat_repo.inference(
+                session_id=session.id, 
+                input_msg=chat_in_msg.message, 
+                chat_repo=chat_repo,
+                temperature=chat_in_msg.temperature,
+                top_k=chat_in_msg.top_k,
+                top_p=chat_in_msg.top_p,
+                n_predict=chat_in_msg.n_predict
+            ),
+            # Buffering (the real problem) https://serverfault.com/questions/801628/for-server-sent-events-sse-what-nginx-proxy-configuration-is-appropriate/801629#
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+            media_type='text/event-stream'
+        )
 
 
 @router.get(
@@ -386,3 +401,13 @@ async def save_chats(
     return ChatUUIDResponse(
         sessionUuid=chat_in_msg.sessionUuid
     )
+
+
+async def get_collection_info(
+    user_id: int,
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
+) -> str:
+    current_user = await account_repo.read_account_by_id(id=user_id)
+    current_collection = await dataset_repo.get_dataset_by_id(id=current_user.current_dataset_id)
+    return re.sub(r'\W+', '', current_collection.name)

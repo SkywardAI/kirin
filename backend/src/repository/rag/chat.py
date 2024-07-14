@@ -28,17 +28,17 @@ class RAGChatModelRepository(BaseRAGRepository):
             return False
         return True
 
-    def search_context(self, query, n_results=RAG_NUM):
+    def search_context(self, collection_name, query, n_results=RAG_NUM):
         """
         Search the context in the vector database
         """
-        #TODO: Implement the search context function
-        pass
+        query_embeddings = inference_helper.tokenize([query])[0]
+        loguru.logger.info(f"Embeddings Shape --- {query_embeddings.shape}")
+        rag_res = vector_db.search(data=query_embeddings, n_results=n_results)
+        return rag_res[0]
 
-    async def get_response(self, session_id: int, input_msg: str, chat_repo) -> str:
-        # context = self.search_context(input_msg)
-        #TODO: Implement the inference function
-        pass
+    async def get_response(self, collection_name: str, input_msg: str) -> str:
+        return self.search_context(collection_name, input_msg)
 
     async def load_csv_file(self, file_name: str) -> bool:
         # read file named file_name and convert the content into a list of strings @Aisuko

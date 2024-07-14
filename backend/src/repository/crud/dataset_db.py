@@ -1,5 +1,6 @@
 from src.repository.crud.base import BaseCRUDRepository
 from src.models.schemas.dataset import DatasetCreate
+from src.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
 from src.models.db.dataset import DataSet
 import sqlalchemy
 
@@ -25,6 +26,15 @@ class DataSetCRUDRepository(BaseCRUDRepository):
         stmt = sqlalchemy.select(DataSet).where(DataSet.name == dataset_name)
         query = await self.async_session.execute(statement=stmt) 
         return query.scalars().all()
+    
+    async def get_dataset_by_id(self, id: int) -> DataSet:
+        stmt = sqlalchemy.select(DataSet).where(DataSet.id == id, DataSet.is_uploaded == True)
+        query = await self.async_session.execute(statement=stmt)
+        dataset = query.scalar()
+        if dataset is None:
+            raise EntityDoesNotExist("Dataset with id `{id}` does not exist!")
+
+        return dataset
     
     async def get_load_status(self, id: int)->bool:
         stmt = sqlalchemy.select(DataSet).where(DataSet.id == id)
