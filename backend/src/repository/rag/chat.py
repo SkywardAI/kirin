@@ -241,7 +241,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             "temperature": temperature,
             "top_k": top_k,
             "top_p": top_p,
-            "n_keep": inference_helper.n_keep,
+            "n_keep": 0, # If the context window is full, we keep 0 tokens
             "n_predict": n_predict,
             "cache_prompt": "false",
             "slot_id": -1, # for cached prompt
