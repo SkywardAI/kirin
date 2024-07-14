@@ -1,14 +1,28 @@
+# coding=utf-8
+
+# Copyright [2024] [SkywardAI]
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#        http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import datetime
 
 import pydantic
-from jose import jwt as jose_jwt, JWTError as JoseJWTError
+import jwt as pyjwt
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from src.config.manager import settings
 from src.models.db.account import Account
 from src.models.schemas.jwt import JWTAccount, JWToken
-from src.utilities.exceptions.database import EntityDoesNotExist
 
 class JWTGenerator:
     def __init__(self):
@@ -23,30 +37,28 @@ class JWTGenerator:
         to_encode = jwt_data.copy()
 
         if expires_delta:
-            expire = datetime.datetime.utcnow() + expires_delta
+            expire = datetime.datetime.now(datetime.UTC) + expires_delta
 
         else:
-            expire = datetime.datetime.utcnow() + datetime.timedelta(minutes=settings.JWT_MIN)
+            expire = datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=settings.JWT_MIN)
 
-        to_encode.update(JWToken(exp=expire, sub=settings.JWT_SUBJECT).dict())
+        to_encode.update(JWToken(exp=expire, sub=settings.JWT_SUBJECT).model_dump())
 
-        return jose_jwt.encode(to_encode, key=settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+        return pyjwt.encode(to_encode, key=settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
     def generate_access_token(self, account: Account) -> str:
-        if not account:
-            raise EntityDoesNotExist("Cannot generate JWT token for without Account entity!")
 
         return self._generate_jwt_token(
-            jwt_data=JWTAccount(username=account.username, email=account.email).dict(),  # type: ignore
+            jwt_data=JWTAccount(username=account.username, email=account.email).model_dump(),  # type: ignore
             expires_delta=datetime.timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRATION_TIME),
         )
 
     def retrieve_details_from_token(self, token: str) -> dict:
         try:
-            payload = jose_jwt.decode(token=token, key=settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+            payload = pyjwt.decode(token, key=settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
             jwt_account = JWTAccount(username=payload["username"], email=payload["email"])
 
-        except JoseJWTError as token_decode_error:
+        except pyjwt.exceptions.DecodeError as token_decode_error:
             raise ValueError("Unable to decode JWT Token") from token_decode_error
 
         except pydantic.ValidationError as validation_error:
