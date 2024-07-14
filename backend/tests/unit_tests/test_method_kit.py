@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import unittest
-from backend.src.utilities.httpkit.method_kit import MethodKit
+from src.utilities.httpkit.method_kit import MethodKit
 
 @unittest.skip("Skip due to the fact that the server is not running")
 class TestHTTPKits(unittest.TestCase):

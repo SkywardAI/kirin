@@ -28,7 +28,6 @@ jobs:
       - name: Check repository
         uses: actions/checkout@v4
 
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -42,10 +41,54 @@ jobs:
       - name: Lint with ruff
         run: |
           make ruff
+  
+  unittest:
+    name: 'Unit Test 🧪'
+    needs: [code-quality]
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        python-version:
+          - "3.11"
+        poetry-version:
+          - "1.8.2"
+        pytest-version:
+          - "8.1.1"
+    # No need to set to specific directory
+    # defaults:
+    #   run:
+    #     working-directory: backend/
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+      - name: Check repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+
+      - name: Install Dependencies for Unit Test
+        run: |
+          pip install -r backend/requirements.txt
+      
+      - name: Install PyTest
+        run: |
+          pip install pytest==${{ matrix.pytest-version }}
+
+      - name: Run Unit Test
+        run: |
+          make env
+          make test
 
   check-build-images:
     name: 'Docker Build Checker🐳'
-    needs: [code-quality]
+    needs: [code-quality, unittest]
     strategy:
       matrix:
         config:
