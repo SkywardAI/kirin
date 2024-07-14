@@ -157,7 +157,7 @@ services:
       - 8080
     ports:
       - 8080:8080
-    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","8192"]
+    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","8192","--embeddings"]
 
   rebel:
     container_name: rebel
