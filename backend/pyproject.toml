@@ -33,7 +33,7 @@ python-slugify = "8.0.4"
 sqlalchemy = "2.0.29"
 trio = "0.25.0"
 uvicorn = "0.29.0"
-openai = "1.35.7"
+openai = "1.35.13"
 
 
 [tool.poetry.dev-dependencies]
@@ -63,7 +63,7 @@ python-slugify = "8.0.4"
 sqlalchemy = "2.0.29"
 trio = "0.25.0"
 uvicorn = "0.29.0"
-openai = "1.35.7"
+openai = "1.35.13"
 pre-commit="3.7.0"
 pytest="8.1.1"
 
