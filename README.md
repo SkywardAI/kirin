@@ -2,12 +2,13 @@
 
 [![Linter and Builder 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/linter-and-builder.yaml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/linter-and-builder.yaml) [![Release Drafter 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml) [![Releasing Image 🚀](https://github.com/SkywardAI/kirin/actions/workflows/release-image.yaml/badge.svg)](https://github.com/SkywardAI/kirin/actions/workflows/release-image.yaml) [![CodeQL](https://github.com/SkywardAI/kirin/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/SkywardAI/kirin/actions/workflows/github-code-scanning/codeql)
 
+
 # Architecture
 
 ![](./imgs/SkywardAI(Mind%20Map)%20-%20APIs%20aggregator.svg)
 
 
-# Phi3-minimal-4k-gguf on 8 CPUs
+# Doing inference on 8 CPUs
 
 https://github.com/SkywardAI/kirin/assets/8053949/143b016c-2264-4644-a7ae-304c908fbedf
 
@@ -51,11 +52,17 @@ The above-listed technologies are just the main ones. There are other technologi
 
 See [Requirements.md](./docs/Requirements.md)
 
+
 ## Quick setup
 
 See [quick start](https://skywardai.github.io/skywardai.io/docs/quick-start.html)
 
-## Deployment
+
+## Build and Deployment
+
+<!-- https://stackoverflow.com/questions/2068344/how-do-i-get-a-youtube-video-thumbnail-from-the-youtube-api -->
+
+[![Build and Deployment](https://img.youtube.com/vi/63OxSmcBkhI/1.jpg)](https://youtu.be/63OxSmcBkhI?si=G82BOtcwRvQE7dLU)
 
 See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build_and_run.html). And if you are interested in docker-in-docker development, see [Development.md](./docs/Development.md)
 
