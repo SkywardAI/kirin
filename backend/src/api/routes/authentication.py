@@ -83,6 +83,28 @@ async def signin(
     account_login: AccountInLogin,
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
 ) -> AccountInResponse:
+    """
+    Sign in an existing account
+
+    ```bash
+    curl -X 'POST' 'http://127.0.0.1:8000/api/auth/signin'
+    -H 'accept: application/json'
+    -H 'Content-Type: application/json'
+    -d '{"username": "enota", "password": "enota"}'
+    ```
+
+    Returns AccountInResponse:
+    - **id**: The id of the account
+    - **authorized_account**: The account with token
+        - **token**: The access token
+        - **username**: The username
+        - **email**: The email
+        - **is_verified**: The verification status
+        - **is_active**: The activation status
+        - **is_logged_in**: The login status
+        - **created_at**: The creation time
+        - **updated_at**: The update time
+    """
 
     if account_login.username == ANONYMOUS_USER:
         raise await http_exc_400_credentials_bad_signin_request()
@@ -118,6 +140,16 @@ async def signin(
 async def get_token(
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository))
 ) -> dict:
+    """
+    Get chat history for an anonymous user
+
+    ```bash
+    curl -X 'GET' http://127.0.0.1:8000/api/auth/token'
+    -H 'accept: application/json'
+
+    Returns a JSON object with the token for an anonymous user:
+    - **token**: The access token for the anonymous user
+    """
     anonymous_user = AccountInLogin(username=ANONYMOUS_USER, password=ANONYMOUS_PASS)
     db_account = await account_repo.read_user_by_password_authentication(account_login=anonymous_user)
     access_token = jwt_generator.generate_access_token(account=db_account)
@@ -130,7 +162,18 @@ async def login_for_access_token(
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
 ):
     """
-    verify the user and return the access token
+    Verify the user and return the access token
+
+    ```bash
+    curl -X 'POST' 'http://127.0.0.1:8000/api/auth/verify'
+    -H 'Content-Type: application/x-www-form-urlencoded'
+    -H 'accept': application/json
+    -d 'username=enota&password=enota'
+    ```
+
+    Returns a JSON object with the access token and token type:
+    - **access_token**: The access token
+    - **token_type**: The token type
     """
     try:
         db_account= await account_repo.read_user_by_password_authentication(
