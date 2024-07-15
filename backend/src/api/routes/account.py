@@ -24,6 +24,31 @@ async def get_accounts(
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> list[AccountInResponse]:
+    """
+    Get a list of accounts
+
+    This endpoint retrieves all accounts in the database.
+
+    It requires an admin token to access.
+
+    ```bash
+    curl -X 'GET' 'http://127.0.0.1:8000/accounts'
+    -H 'accept: application/json'
+    -H 'Authorization: Bearer {admin_token}'
+    ```
+
+    Returns a list of AccountInResponse objects:
+    - **id**: The id of the account
+    - **authorized_account**: The account with token
+        - **token**: The access token
+        - **username**: The username
+        - **email**: The email
+        - **is_verified**: The verification status
+        - **is_active**: The activation status
+        - **is_logged_in**: The login status
+        - **created_at**: The creation time
+        - **updated_at**: The update time
+    """
     db_accounts = await account_repo.read_accounts()
     db_account_list: list = list()
     if jwt_payload.username != settings.ADMIN_USERNAME:
