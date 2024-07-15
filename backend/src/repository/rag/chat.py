@@ -271,7 +271,8 @@ class RAGChatModelRepository(BaseRAGRepository):
                     inference_helper.completion_url,
                     headers={'Content-Type': 'application/json'},
                     json=data,
-                    timeout=httpx.Timeout(timeout=5.0)
+                    # We disable all timeout and trying to fix streaming randomly cutting off
+                    timeout=httpx.Timeout(timeout=None)
                 ) as response:
                     response.raise_for_status()
                     async for chunk in response.aiter_text():
