@@ -54,7 +54,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         collection_name = self.trim_collection_name(file_name)
         vector_db.create_collection(collection_name = collection_name)
         vector_db.insert_list(embedding_list, data, collection_name)
-        await dataset_repo.mark_loaded(dataset_id)
+        # await dataset_repo.mark_loaded(dataset_id)
         return True
 
     async def load_data_set(self, dataset_name: str, dataset_id: int, dataset_repo: DataSetCRUDRepository, direct_load: bool = True,)-> bool:
@@ -69,7 +69,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         #     self.load_data_set_all_field(dataset_name=param.dataSet) 
         # else:
         #     self.load_data_set_by_field(param=param)
-        await dataset_repo.mark_loaded(dataset_id)
+        # await dataset_repo.mark_loaded(dataset_id)
         return True
 
     def load_data_set_directly(self, dataset_name: str, dataset_id: int, dataset_repo: DataSetCRUDRepository)->bool:
@@ -106,7 +106,6 @@ class RAGChatModelRepository(BaseRAGRepository):
         loguru.logger.info(f"load_data_set_all_field count:{count}")
         loguru.logger.info("Dataset loaded successfully")
         return True
-        pass
 
 
 

@@ -135,6 +135,7 @@ async def chat(
     chat_repo: ChatHistoryCRUDRepository = fastapi.Depends(get_repository(repo_type=ChatHistoryCRUDRepository)),
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 )-> StreamingResponse:
     """
@@ -198,9 +199,12 @@ async def chat(
 
     if session.type == "rag":
         try:
-            collection_name = await get_collection_info(current_user.id)
+            print(current_user.id)
+            collection_name = await get_collection_info(current_user.id, dataset_repo=dataset_repo)
+            print(collection_name)
             result = rag_chat_repo.get_response(collection_name=collection_name, input_msg=chat_in_msg.message)
-        except Exception:
+        except Exception as e:
+            print(f'{e}')
             result = "Dataset for RAG is not ready"
         def iterfile():
             yield result.encode('utf-8') 
@@ -405,9 +409,7 @@ async def save_chats(
 
 async def get_collection_info(
     user_id: int,
-    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
+    dataset_repo: DataSetCRUDRepository,
 ) -> str:
-    current_user = await account_repo.read_account_by_id(id=user_id)
-    current_collection = await dataset_repo.get_dataset_by_id(id=current_user.current_dataset_id)
+    current_collection = await dataset_repo.get_dataset_by_account_id(id=user_id)
     return re.sub(r'\W+', '', current_collection.name)
