@@ -83,6 +83,28 @@ async def signin(
     account_login: AccountInLogin,
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
 ) -> AccountInResponse:
+    """
+    Sign in an existing account
+
+    ```bash
+    curl -X 'POST' 'http://127.0.0.1:8000/api/auth/signin'
+    -H 'accept: application/json'
+    -H 'Content-Type: application/json'
+    -d '{"username": "enota", "password": "enota"}'
+    ```
+
+    Returns AccountInResponse:
+    - **id**: The id of the account
+    - **authorized_account**: The account with token
+        - **token**: The access token
+        - **username**: The username
+        - **email**: The email
+        - **is_verified**: The verification status
+        - **is_active**: The activation status
+        - **is_logged_in**: The login status
+        - **created_at**: The creation time
+        - **updated_at**: The update time
+    """
 
     if account_login.username == ANONYMOUS_USER:
         raise await http_exc_400_credentials_bad_signin_request()
