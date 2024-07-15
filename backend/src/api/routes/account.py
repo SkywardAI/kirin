@@ -218,6 +218,25 @@ async def delete_account(
     token: str = fastapi.Depends(oauth2_scheme),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> dict[str, str]:
+    """
+    Delete an account by id
+
+    This endpoint deletes an existing account by its ID.
+
+    It is IRREVERSIBLE and should be used with caution.
+
+    It requires an admin token to access.
+
+    ```bash
+    curl -X 'DELETE' 'http://127.0.0.1:8000/accounts/{id}'
+    -H 'accept: application/json'
+    -H 'Authorization: Bearer {admin_token}'
+    ```
+
+    Returns a dictionary:
+
+    - **notification**: The deletion result
+    """
     if jwt_payload.username != settings.ADMIN_USERNAME:
         raise await http_exc_401_cunauthorized_request()
     try:
