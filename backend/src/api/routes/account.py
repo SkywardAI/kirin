@@ -97,6 +97,7 @@ async def get_account(
     curl -X 'GET' 'http://127.0.0.1:8000/accounts/{id}'
     -H 'accept: application/json'
     -H 'Authorization: Bearer {valid_token}'
+    ```
 
     Returns an AccountInResponse object:
 
@@ -170,6 +171,7 @@ async def update_account(
         "email": "new_email@domain.com",
         "password": "Expelliarmus"
     }'
+    ```
 
     Returns an AccountInResponse object:
 
@@ -223,7 +225,7 @@ async def delete_account(
 
     This endpoint deletes an existing account by its ID.
 
-    It is IRREVERSIBLE and should be used with caution.
+    It is **IRREVERSIBLE** and should be used with caution.
 
     It requires an admin token to access.
 
