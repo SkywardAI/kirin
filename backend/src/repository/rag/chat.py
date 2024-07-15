@@ -14,8 +14,6 @@ from src.repository.vector_database import vector_db
 from typing import Any
 from collections.abc import AsyncGenerator
 
-dataset_repo = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository))
-
 class RAGChatModelRepository(BaseRAGRepository):
     async def load_model(self, session_id: int, model_name: str) -> bool:
         """
@@ -34,13 +32,13 @@ class RAGChatModelRepository(BaseRAGRepository):
         """
         query_embeddings = inference_helper.tokenize([query])[0]
         loguru.logger.info(f"Embeddings Shape --- {query_embeddings.shape}")
-        rag_res = vector_db.search(data=query_embeddings, n_results=n_results)
+        rag_res = vector_db.search(data=query_embeddings, n_results=n_results, collection_name=collection_name)
         return rag_res[0]
 
     async def get_response(self, collection_name: str, input_msg: str) -> str:
         return self.search_context(collection_name, input_msg)
 
-    async def load_csv_file(self, file_name: str) -> bool:
+    async def load_csv_file(self, file_name: str, dataset_id: int, dataset_repo: DataSetCRUDRepository) -> bool:
         # read file named file_name and convert the content into a list of strings @Aisuko
         loguru.logger.info(file_name)
         data = []
@@ -56,21 +54,25 @@ class RAGChatModelRepository(BaseRAGRepository):
         collection_name = self.trim_collection_name(file_name)
         vector_db.create_collection(collection_name = collection_name)
         vector_db.insert_list(embedding_list, data, collection_name)
-        dataset_repo.is_uploaded(collection_name)
+        await dataset_repo.mark_loaded(dataset_id)
         return True
 
-    def load_data_set(self, data_set_name: str)-> bool:
-        loguru.logger.info(f"load_data_set param {data_set_name}")
-        self.load_data_set_all_field(dataset_name=data_set_name)
+    async def load_data_set(self, dataset_name: str, dataset_id: int, dataset_repo: DataSetCRUDRepository, direct_load: bool = True,)-> bool:
+        loguru.logger.info(f"load_data_set param {dataset_name}")
+        if direct_load:
+            self.load_data_set_directly(dataset_name=dataset_name, dataset_id=dataset_id, dataset_repo=dataset_repo)
+        else:
+            self.load_data_set_all_field(dataset_name=dataset_name, dataset_id=dataset_id, dataset_repo=dataset_repo)
         # if param.directLoad:
         #     self.load_data_set_directly(param=param)
         # elif param.embedField is None or param.resField is None:
         #     self.load_data_set_all_field(dataset_name=param.dataSet) 
         # else:
         #     self.load_data_set_by_field(param=param)
+        await dataset_repo.mark_loaded(dataset_id)
         return True
 
-    def load_data_set_directly(self, param: TrainFileIn)->bool:
+    def load_data_set_directly(self, dataset_name: str, dataset_id: int, dataset_repo: DataSetCRUDRepository)->bool:
         r"""
         If the data set is already in the form of embeddings, 
         this function can be used to load the data set directly into the vector database.
@@ -79,36 +81,36 @@ class RAGChatModelRepository(BaseRAGRepository):
         
         @return: boolean
         """
-        # reader_dataset=load_dataset(param.dataSet)
-        # resField = param.resField if param.resField else '0'
-        # collection_name = self.trim_collection_name(param.dataSet)
-        # vector_db.create_collection(collection_name = collection_name)
-        # loguru.logger.info(f"load_data_set_all_field dataset_name:{param.dataSet} into collection_name:{collection_name}")
-        # count = 0
-        # embed_field_list = []
-        # res_field_list = []
-        # for item in reader_dataset['train']:
-        #  # check contail field
-        #     # if resField not in item or embedField not in item :
-        #     resField_val=item.get(resField, '')
-        #     res_field_list.append(resField_val)
-        #     embedField_val = [value for key, value in item.items() if key != resField]
-        #     embed_field_list.append(embedField_val)
-        #     count += 1
-        #     if count % LOAD_BATCH_SIZE == 0:
-        #         vector_db.insert_list(embed_field_list, res_field_list, collection_name,start_idx = count) 
-        #         embed_field_list = []
-        #         res_field_list = []
-        #         loguru.logger.info(f"load_data_set_all_field count:{count}")
-        # vector_db.insert_list(embed_field_list, res_field_list, collection_name,start_idx = count)
-        # loguru.logger.info(f"load_data_set_all_field count:{count}")
-        # loguru.logger.info("Dataset loaded successfully")
-        # return True
+        reader_dataset=load_dataset(dataset_name)
+        resField = '0'
+        collection_name = self.trim_collection_name(dataset_name)
+        vector_db.create_collection(collection_name = collection_name)
+        loguru.logger.info(f"load_data_set_all_field dataset_name:{dataset_name} into collection_name:{collection_name}")
+        count = 0
+        embed_field_list = []
+        res_field_list = []
+        for item in reader_dataset['train']:
+         # check contail field
+            # if resField not in item or embedField not in item :
+            resField_val=item.get(resField, '')
+            res_field_list.append(resField_val)
+            embedField_val = [value for key, value in item.items() if key != resField]
+            embed_field_list.append(embedField_val)
+            count += 1
+            if count % LOAD_BATCH_SIZE == 0:
+                vector_db.insert_list(embed_field_list, res_field_list, collection_name,start_idx = count) 
+                embed_field_list = []
+                res_field_list = []
+                loguru.logger.info(f"load_data_set_all_field count:{count}")
+        vector_db.insert_list(embed_field_list, res_field_list, collection_name,start_idx = count)
+        loguru.logger.info(f"load_data_set_all_field count:{count}")
+        loguru.logger.info("Dataset loaded successfully")
+        return True
         pass
 
 
 
-    def load_data_set_all_field(self, dataset_name: str)-> bool:
+    def load_data_set_all_field(self, dataset_name: str, dataset_name_id: int, dataset_repo: DataSetCRUDRepository)-> bool:
         """
         Load the data set into the vector database
         """
@@ -134,7 +136,6 @@ class RAGChatModelRepository(BaseRAGRepository):
         embedding_list = inference_helper.tokenize(doc_list)
         vector_db.insert_list(embedding_list, doc_list, self.trim_collection_name(dataset_name),start_idx = count)
         loguru.logger.info(f"load_data_set_all_field count:{count}")
-        dataset_repo.is_uploaded(collection_name)
         loguru.logger.info("Dataset loaded successfully")
         return True
 

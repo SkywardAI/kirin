@@ -3,7 +3,7 @@ UPLOAD_FILE_PATH = "./uploaded_files/"
 MAX_SQL_LENGTH = 200
 
 DEFAULT_COLLECTION = "default_collection"
-DEFAULT_DIM = 3090
+DEFAULT_DIM = 3072
 
 # DEFAULT MODELS
 DEFAULT_ENCODER = "sentence-transformers/all-MiniLM-L6-v2"
