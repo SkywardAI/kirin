@@ -151,6 +151,39 @@ async def update_account(
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> AccountInResponse:
+    """
+    Update an account by id
+
+    This endpoint updates the details of an existing account by its ID.
+
+    It allows updating the username, email, and password.
+
+    It requires an admin token or the token of the account to access.
+
+    ```bash
+    curl -X 'PATCH' 'http://127.0.0.1:8000/accounts/{id}'
+    -H 'accept: application/json'
+    -H 'Authorization: Bearer {valid_token}'
+    -H 'Content-Type: application/json'
+    -d '{
+        "username": "new_username",
+        "email": "new_email@domain.com",
+        "password": "Expelliarmus"
+    }'
+
+    Returns an AccountInResponse object:
+
+    - **id**: The id of the account
+    - **authorized_account**: The account with token
+        - **token**: The access token
+        - **username**: The username
+        - **email**: The email
+        - **is_verified**: The verification status
+        - **is_active**: The activation status
+        - **is_logged_in**: The login status
+        - **created_at**: The creation time
+        - **updated_at**: The update time
+    """
     account_update = AccountInUpdate(username=update_username, email=update_email, password=update_password)
     try:
         updated_db_account = await account_repo.update_account_by_id(id=query_id, account_update=account_update)
