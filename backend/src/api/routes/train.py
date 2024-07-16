@@ -24,23 +24,6 @@ async def save(
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
 ) -> TrainFileInResponse:
-    """
-    Save file or dataset to DB for training
-
-    ```bash
-    curl -X 'POST' 'http://127.0.0.1:8000/train'
-    -H 'accept: application/json'
-    -H 'Content-Type: application/json'
-    -d '{
-        "modelID": "model_id",
-        "fileID": "file_id",
-        "dataSet": "dataset_name"
-    }'
-    ```
-
-    Returns TrainFileInResponse:
-    - **msg**: The status of the training
-    """
     # 1, either fileID or dataset should be shown in input
     # 2, validate fileID or dataset
     # 3, use file and or dataset perform the training logic (csv id done)

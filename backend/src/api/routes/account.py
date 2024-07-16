@@ -24,31 +24,6 @@ async def get_accounts(
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> list[AccountInResponse]:
-    """
-    Get a list of accounts
-
-    This endpoint retrieves all accounts in the database.
-
-    It requires an admin token to access.
-
-    ```bash
-    curl -X 'GET' 'http://127.0.0.1:8000/accounts'
-    -H 'accept: application/json'
-    -H 'Authorization: Bearer {admin_token}'
-    ```
-
-    Returns a list of AccountInResponse objects:
-    - **id**: The id of the account
-    - **authorized_account**: The account with token
-        - **token**: The access token
-        - **username**: The username
-        - **email**: The email
-        - **is_verified**: The verification status
-        - **is_active**: The activation status
-        - **is_logged_in**: The login status
-        - **created_at**: The creation time
-        - **updated_at**: The update time
-    """
     db_accounts = await account_repo.read_accounts()
     db_account_list: list = list()
     if jwt_payload.username != settings.ADMIN_USERNAME:
@@ -86,32 +61,6 @@ async def get_account(
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> AccountInResponse:
-    """
-    Get an account by id
-
-    This endpoint retrieves an account by id.
-
-    It requires an admin token or the token of the account to access.
-
-    ```bash
-    curl -X 'GET' 'http://127.0.0.1:8000/accounts/{id}'
-    -H 'accept: application/json'
-    -H 'Authorization: Bearer {valid_token}'
-    ```
-
-    Returns an AccountInResponse object:
-
-    - **id**: The id of the account
-    - **authorized_account**: The account with token
-        - **token**: The access token
-        - **username**: The username
-        - **email**: The email
-        - **is_verified**: The verification status
-        - **is_active**: The activation status
-        - **is_logged_in**: The login status
-        - **created_at**: The creation time
-        - **updated_at**: The update time
-    """
     try:
         db_account = await account_repo.read_account_by_id(id=id)
         access_token = jwt_generator.generate_access_token(account=db_account)
@@ -153,7 +102,7 @@ async def update_account(
     email and password are optional
 
     **Example**
-
+    
     ```bash
     curl -X 'PATCH' \
     'http://127.0.0.1:8000/api/accounts' \
@@ -168,7 +117,7 @@ async def update_account(
     **Note:**
 
     anonymous user could not be updated
-
+    
     **Returns**
 
     {
@@ -230,7 +179,7 @@ async def update_account_by_admin(
     email and password are optional
 
     **Example**
-
+    
     ```bash
     curl -X 'PATCH' \
     'http://127.0.0.1:8000/api/accounts/{id}?query_id=3' \
@@ -242,7 +191,7 @@ async def update_account_by_admin(
     "password": "string"
     }'
     ```
-
+    
     **Returns**
 
     {
@@ -290,25 +239,6 @@ async def delete_account(
     token: str = fastapi.Depends(oauth2_scheme),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 ) -> dict[str, str]:
-    """
-    Delete an account by id
-
-    This endpoint deletes an existing account by its ID.
-
-    It is **IRREVERSIBLE** and should be used with caution.
-
-    It requires an admin token to access.
-
-    ```bash
-    curl -X 'DELETE' 'http://127.0.0.1:8000/accounts/{id}'
-    -H 'accept: application/json'
-    -H 'Authorization: Bearer {admin_token}'
-    ```
-
-    Returns a dictionary:
-
-    - **notification**: The deletion result
-    """
     if jwt_payload.username != settings.ADMIN_USERNAME:
         raise await http_exc_401_cunauthorized_request()
     try:
