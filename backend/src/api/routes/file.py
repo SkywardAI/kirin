@@ -34,8 +34,20 @@ async def upload_and_return_id(
     file: fastapi.UploadFile = fastapi.File(...),
     file_repo: UploadedFileCRUDRepository = fastapi.Depends(get_repository(repo_type=UploadedFileCRUDRepository)),
 ):
+    """
+    Uploads a file and returns the file ID
 
-    filename=file.filename 
+    ```bash
+    curl -X 'POST' 'http://127.0.0.1:8000/file'
+    -H 'accept: application/json'
+    -H 'Content-Type: multipart/form-data'
+    -F 'file=@/path/to/file'
+    ```
+
+    Returns a FileInResponse object:
+    - **fileID**: The ID of the file
+    """
+    filename = file.filename
     try:
         new_file = await file_repo.create_uploadfile(file_name=filename)
         save_path = UPLOAD_FILE_PATH
@@ -59,12 +71,26 @@ async def upload_and_return_id(
 async def get_dataset(
     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_repository(repo_type=DataSetCRUDRepository)),
 ) -> list[DatasetResponse]:
-    db_datasets=await dataset_repo.get_dataset_list()
+    """
+    Get the list of datasets
+
+    ```bash
+    curl -X 'GET' 'http://127.0.0.1:8000/file/dataset'
+    -H 'accept: application/json'
+    ```
+
+    Returns a list of DatasetResponse objects:
+    - **id**: The ID of the dataset
+    - **dataset_name**: The name of the dataset
+    - **created_at**: The creation date of the dataset
+    - **updated_at**: The update date of the dataset
+    """
+    db_datasets = await dataset_repo.get_dataset_list()
     datasets_list: list = list()    
 
     for db_dataset in db_datasets:
         # print(f"db_dataset:{type(db_dataset.id),type(db_dataset.name),type(db_dataset.created_at),type(db_dataset.updated_at)}")    
-        dataset_res=DatasetResponse(
+        dataset_res = DatasetResponse(
                 id=db_dataset.id,
                 dataset_name=db_dataset.name,
                 created_at=db_dataset.created_at,
