@@ -106,6 +106,10 @@ class BackendBaseSettings(BaseSettings):
     # Configurations for language model
     INSTRUCTION: str = decouple.config("INSTRUCTION", cast=str) # type: ignore
 
+    ETCD_AUTO_COMPACTION_MODE: str = decouple.config("ETCD_AUTO_COMPACTION_MODE", cast=str) # type: ignore
+    ETCD_AUTO_COMPACTION_RETENTION: int = decouple.config("ETCD_AUTO_COMPACTION_RETENTION", cast=int) # type: ignore
+    ETCD_QUOTA_BACKEND_BYTES: int = decouple.config("ETCD_QUOTA_BACKEND_BYTES", cast=int) # type: ignore
+    NUM_CPU_CORES: float = decouple.config("NUM_CPU_CORES", cast=float) # type: ignore
 
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True

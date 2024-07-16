@@ -30,16 +30,13 @@ class AsyncDatabase:
     @property
     def set_async_db_uri(self) -> str | pydantic.PostgresDsn:
         """
-        Set the synchronous database driver into asynchronous version by utilizing AsyncPG:
+        Return the PostgreSQL database URI.
 
-            `postgresql://` => `postgresql+asyncpg://`
+        Returns:
+        --------
+        str: The PostgreSQL database URI
         """
-        return (
-            # self.postgres_uri.replace("postgresql://", "postgresql+asyncpg://")
-            # if self.postgres_uri
-            # else self.postgres_uri
-            self.postgres_uri
-        )
+        return self.postgres_uri
 
 
 async_db: AsyncDatabase = AsyncDatabase()
