@@ -54,25 +54,25 @@ class RAGChatModelRepository(BaseRAGRepository):
         collection_name = self.trim_collection_name(file_name)
         vector_db.create_collection(collection_name = collection_name)
         vector_db.insert_list(embedding_list, data, collection_name)
-        # await dataset_repo.mark_loaded(dataset_id)
+        await dataset_repo.mark_loaded(dataset_id)
         return True
 
-    async def load_data_set(self, dataset_name: str, dataset_id: int, dataset_repo: DataSetCRUDRepository, direct_load: bool = True,)-> bool:
+    async def load_data_set(self, dataset_name: str, dataset_id: int, dataset_repo: DataSetCRUDRepository, direct_load: bool = True)-> bool:
         loguru.logger.info(f"load_data_set param {dataset_name}")
         if direct_load:
-            self.load_data_set_directly(dataset_name=dataset_name, dataset_id=dataset_id, dataset_repo=dataset_repo)
+            self.load_data_set_directly(dataset_name=dataset_name)
         else:
-            self.load_data_set_all_field(dataset_name=dataset_name, dataset_id=dataset_id, dataset_repo=dataset_repo)
+            self.load_data_set_all_field(dataset_name=dataset_name)
         # if param.directLoad:
         #     self.load_data_set_directly(param=param)
         # elif param.embedField is None or param.resField is None:
         #     self.load_data_set_all_field(dataset_name=param.dataSet) 
         # else:
         #     self.load_data_set_by_field(param=param)
-        # await dataset_repo.mark_loaded(dataset_id)
+        await dataset_repo.mark_loaded(dataset_id)
         return True
 
-    def load_data_set_directly(self, dataset_name: str, dataset_id: int, dataset_repo: DataSetCRUDRepository)->bool:
+    def load_data_set_directly(self, dataset_name: str)->bool:
         r"""
         If the data set is already in the form of embeddings, 
         this function can be used to load the data set directly into the vector database.
@@ -109,7 +109,7 @@ class RAGChatModelRepository(BaseRAGRepository):
 
 
 
-    def load_data_set_all_field(self, dataset_name: str, dataset_name_id: int, dataset_repo: DataSetCRUDRepository)-> bool:
+    def load_data_set_all_field(self, dataset_name: str)-> bool:
         """
         Load the data set into the vector database
         """

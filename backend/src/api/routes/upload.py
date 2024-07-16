@@ -86,7 +86,6 @@ async def upload_csv_and_return_id(
     # Use background task to load file data to vector db
     background_tasks.add_task(save_upload_file, contents, save_file, filename,db_fileinfo.id, rag_chat_repo, dataset_repo)
 
-    print(db_fileinfo.id)
     return FileInResponse(ID=db_fileinfo.id)
 
 @router.post(
@@ -138,44 +137,36 @@ async def upload_dataset_and_return_id(
     background_tasks.add_task(rag_chat_repo.load_data_set, date_set_name,db_dataset.id,dataset_repo)
     return FileInResponse(ID=db_dataset.id )
 
-# TODO get status use the same session with get status. So, it is not working now
-# @router.get(
-#     "/status/{id}",
-#     name="upload:get load status by id",
-#     response_model=bool,
-#     status_code=fastapi.status.HTTP_200_OK,
-# )
-# async def get_status(
-#     id :int,
-#     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
-# ):
-#     """
-    
-#     Check status for dataset / csv upload ,  return True for loaded successfully , False for not loaded yet or dataset not exists
-    
-#     **Note:**
-    
-#     Dataset will be downloaded from huggingface. 
-    
-#     We assume the dataset contains embeddings , example is aisuko/RMIT-2024-pd-study-areas. If the dimision of dataset is not 3072, we will pad it with zeros
-    
-#     If the dataset have different structure or no embeddings included , then we cannot save it to vectorDB
-    
-#     ```bash
 
-#     curl -X 'GET' \
-#     'http://127.0.0.1:8000/api/upload/status/1' \
-#     -H 'accept: application/json'
-
-#     ```
+@router.get(
+    "/status/{id}",
+    name="upload:get load status by id",
+    response_model=bool,
+    status_code=fastapi.status.HTTP_200_OK,
+)
+async def get_status(
+    id :int,
+    dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
+):
+    """
     
-#     **Returns**
-
-#     True
+    Check status for dataset / csv upload ,  return True for loaded successfully , False for not loaded yet or dataset not exists
     
-#     """
-#     result = await dataset_repo.get_load_status(id)
-#     return result
+    ```bash
+
+    curl -X 'GET' \
+    'http://127.0.0.1:8000/api/upload/status/1' \
+    -H 'accept: application/json'
+
+    ```
+    
+    **Returns**
+
+    True
+    
+    """
+    result = await dataset_repo.get_load_status(id)
+    return result
 
 
 
