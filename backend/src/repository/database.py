@@ -8,7 +8,7 @@ from sqlalchemy.pool import Pool as SQLAlchemyPool
 from sqlalchemy import create_engine
 from src.config.manager import settings
 
-
+#TODO async session need to support background task
 class AsyncDatabase:
     def __init__(self):
         self.postgres_uri: pydantic.PostgresDsn = pydantic.PostgresDsn(
