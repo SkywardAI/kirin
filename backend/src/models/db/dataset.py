@@ -23,7 +23,7 @@ class DataSet(Base):  # type: ignore
         server_onupdate=sqlalchemy.schema.FetchedValue(for_update=True),
     )
     is_uploaded: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(
-        sqlalchemy.Boolean, nullable=False, default=False
+        sqlalchemy.Boolean, nullable=False, default=True
     )
 
 

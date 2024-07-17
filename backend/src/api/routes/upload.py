@@ -3,11 +3,7 @@ import os
 from src.repository.crud.dataset_db import DataSetCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
 from src.securities.authorizations.jwt import jwt_required
-from src.models.schemas.dataset import DatasetCreate
 import fastapi
-import threading
-from fastapi import BackgroundTasks
-from src.repository.inference_eng import inference_helper
 from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.config.settings.const import UPLOAD_FILE_PATH
 from src.models.schemas.file import FileInResponse
@@ -18,10 +14,10 @@ router = fastapi.APIRouter(prefix="/upload", tags=["upload"])
 # Automatically get the token from the request header for Swagger UI
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 
-async def save_upload_file(contents: bytes, save_file: str, filename: str, dataset_id: int, rag_chat_repo: RAGChatModelRepository, dataset_repo: DataSetCRUDRepository):
+async def save_upload_file(contents: bytes, save_file: str, filename: str, rag_chat_repo: RAGChatModelRepository):
     with open(save_file, "wb") as f:
         f.write(contents)
-    await rag_chat_repo.load_csv_file(file_name=filename, dataset_id=dataset_id, dataset_repo=dataset_repo)
+    await rag_chat_repo.load_csv_file(file_name=filename)
     
 
 @router.post(
@@ -31,7 +27,6 @@ async def save_upload_file(contents: bytes, save_file: str, filename: str, datas
     status_code=fastapi.status.HTTP_201_CREATED,
 )
 async def upload_csv_and_return_id(
-    background_tasks: BackgroundTasks,
     file: fastapi.UploadFile = fastapi.File(...),
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
@@ -84,8 +79,8 @@ async def upload_csv_and_return_id(
         os.remove(save_file)
     contents = await file.read()
     # Use background task to load file data to vector db
-    background_tasks.add_task(save_upload_file, contents, save_file, filename,db_fileinfo.id, rag_chat_repo, dataset_repo)
-
+    # background_tasks.add_task(save_upload_file, contents, save_file, filename,db_fileinfo.id, rag_chat_repo, dataset_repo)
+    await save_upload_file(contents, save_file, filename,rag_chat_repo)
     return FileInResponse(ID=db_fileinfo.id)
 
 @router.post(
@@ -96,7 +91,6 @@ async def upload_csv_and_return_id(
 )
 async def upload_dataset_and_return_id(
     date_set_name: str,
-    background_tasks: BackgroundTasks,
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
@@ -134,39 +128,40 @@ async def upload_dataset_and_return_id(
     """
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
     db_dataset = await dataset_repo.init_dataset(dataset_name=date_set_name, account_id=current_user.id) 
-    background_tasks.add_task(rag_chat_repo.load_data_set, date_set_name,db_dataset.id,dataset_repo)
+    # background_tasks.add_task(rag_chat_repo.load_data_set, date_set_name,db_dataset.id,dataset_repo)
+    await rag_chat_repo.load_data_set(date_set_name)
     return FileInResponse(ID=db_dataset.id )
 
 
-@router.get(
-    "/status/{id}",
-    name="upload:get load status by id",
-    response_model=bool,
-    status_code=fastapi.status.HTTP_200_OK,
-)
-async def get_status(
-    id :int,
-    dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
-):
-    """
+# @router.get(
+#     "/status/{id}",
+#     name="upload:get load status by id",
+#     response_model=bool,
+#     status_code=fastapi.status.HTTP_200_OK,
+# )
+# async def get_status(
+#     id :int,
+#     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
+# ):
+#     """
     
-    Check status for dataset / csv upload ,  return True for loaded successfully , False for not loaded yet or dataset not exists
+#     Check status for dataset / csv upload ,  return True for loaded successfully , False for not loaded yet or dataset not exists
     
-    ```bash
+#     ```bash
 
-    curl -X 'GET' \
-    'http://127.0.0.1:8000/api/upload/status/1' \
-    -H 'accept: application/json'
+#     curl -X 'GET' \
+#     'http://127.0.0.1:8000/api/upload/status/1' \
+#     -H 'accept: application/json'
 
-    ```
+#     ```
     
-    **Returns**
+#     **Returns**
 
-    True
+#     True
     
-    """
-    result = await dataset_repo.get_load_status(id)
-    return result
+#     """
+#     result = await dataset_repo.get_load_status(id)
+#     return result
 
 
 

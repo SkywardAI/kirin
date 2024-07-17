@@ -30,10 +30,9 @@ class DataSetCRUDRepository(BaseCRUDRepository):
         await self.async_session.commit()
         
     async def get_dataset_by_account_id(self, account_id: int) -> DataSet:
-        stmt = sqlalchemy.select(DataSet).where(DataSet.account_id == account_id, DataSet.is_uploaded).order_by(DataSet.updated_at.desc())
+        stmt = sqlalchemy.select(DataSet).where(DataSet.account_id == account_id, DataSet.is_uploaded).order_by(DataSet.created_at.desc())
         result = await self.async_session.execute(statement=stmt)
-        query = result.first()
-        dataset = query.scalar()
+        dataset = result.scalars().first()
         if dataset is None:
             raise EntityDoesNotExist("Dataset for account id `{id}` does not exist!")
 

@@ -82,7 +82,6 @@ class InferenceHelper:
         """
         embedding_list = []
         for text in text_list:
-            print(text)
             response = requests.post(self.embedding_url, json={"content": text})
             embedding = response.json()['embedding']
             embedding_list.append(embedding)

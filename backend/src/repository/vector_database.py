@@ -65,13 +65,12 @@ class MilvusHelper:
             loguru.logger.info(f"Vector Databse --- Error: {e}")
         loguru.logger.info("Complete insert!")
 
-    def search(self, data, n_results, collection_name=DEFAULT_COLLECTION):
+    def search(self, data: np, n_results, collection_name=DEFAULT_COLLECTION):
 
         search_params = {"metric_type": "COSINE", "params": {}}
-        data_list = data.tolist()
         res = self.client.search(
             collection_name=collection_name,
-            data=data_list,
+            data=[data],
             limit=n_results,
             search_params=search_params,
             output_fields=["doc"],

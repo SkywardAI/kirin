@@ -2,12 +2,10 @@ import csv
 import loguru
 import httpx
 import re
-import fastapi
-from src.api.dependencies.repository import get_rag_repository
+import numpy as np
 from src.models.schemas.train import TrainFileIn
 from datasets import load_dataset
 from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM, LOAD_BATCH_SIZE
-from src.repository.crud.dataset_db import DataSetCRUDRepository
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.inference_eng import inference_helper
 from src.repository.vector_database import vector_db
@@ -31,14 +29,15 @@ class RAGChatModelRepository(BaseRAGRepository):
         Search the context in the vector database
         """
         query_embeddings = inference_helper.tokenize([query])[0]
-        loguru.logger.info(f"Embeddings Shape --- {query_embeddings.shape}")
+        query_embeddings_np = np.array(query_embeddings)
+        loguru.logger.info(f"Embeddings Shape --- {query_embeddings_np.shape}")
         rag_res = vector_db.search(data=query_embeddings, n_results=n_results, collection_name=collection_name)
         return rag_res[0]
 
     async def get_response(self, collection_name: str, input_msg: str) -> str:
         return self.search_context(collection_name, input_msg)
 
-    async def load_csv_file(self, file_name: str, dataset_id: int, dataset_repo: DataSetCRUDRepository) -> bool:
+    async def load_csv_file(self, file_name: str) -> bool:
         # read file named file_name and convert the content into a list of strings @Aisuko
         loguru.logger.info(file_name)
         data = []
@@ -54,10 +53,10 @@ class RAGChatModelRepository(BaseRAGRepository):
         collection_name = self.trim_collection_name(file_name)
         vector_db.create_collection(collection_name = collection_name)
         vector_db.insert_list(embedding_list, data, collection_name)
-        await dataset_repo.mark_loaded(dataset_id)
+        # await dataset_repo.mark_loaded(dataset_id)
         return True
 
-    async def load_data_set(self, dataset_name: str, dataset_id: int, dataset_repo: DataSetCRUDRepository, direct_load: bool = True)-> bool:
+    async def load_data_set(self, dataset_name: str, direct_load: bool = True)-> bool:
         loguru.logger.info(f"load_data_set param {dataset_name}")
         if direct_load:
             self.load_data_set_directly(dataset_name=dataset_name)
@@ -69,7 +68,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         #     self.load_data_set_all_field(dataset_name=param.dataSet) 
         # else:
         #     self.load_data_set_by_field(param=param)
-        await dataset_repo.mark_loaded(dataset_id)
+        # await dataset_repo.mark_loaded(dataset_id)
         return True
 
     def load_data_set_directly(self, dataset_name: str)->bool:
@@ -84,6 +83,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         reader_dataset=load_dataset(dataset_name)
         resField = '0'
         collection_name = self.trim_collection_name(dataset_name)
+        print(collection_name)
         vector_db.create_collection(collection_name = collection_name)
         loguru.logger.info(f"load_data_set_all_field dataset_name:{dataset_name} into collection_name:{collection_name}")
         count = 0
