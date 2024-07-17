@@ -63,7 +63,7 @@ DOCKER_VOLUME_DIRECTORY:=
 INFERENCE_ENG:=llamacpp
 INFERENCE_ENG_PORT:=8080
 INFERENCE_ENG_VERSION:=server--b1-2321a5e
-NUM_CPU_CORES:=4.00
+NUM_CPU_CORES:=8.00
 
 # Language model, default is phi3-mini-4k-instruct-q4.gguf
 # https://github.com/SkywardAI/llama.cpp/blob/9b2f16f8055265c67e074025350736adc1ea0666/tests/test-chat-template.cpp#L91-L92
