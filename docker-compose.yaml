@@ -83,6 +83,10 @@ services:
       - ADMIN_PASS=${ADMIN_PASS}
       - TIMEZONE=${TIMEZONE}
       - INSTRUCTION=${INSTRUCTION}
+      - ETCD_AUTO_COMPACTION_MODE=${ETCD_AUTO_COMPACTION_MODE}
+      - ETCD_AUTO_COMPACTION_RETENTION=${ETCD_AUTO_COMPACTION_RETENTION}
+      - ETCD_QUOTA_BACKEND_BYTES=${ETCD_QUOTA_BACKEND_BYTES}
+      - NUM_CPU_CORES=${NUM_CPU_CORES}
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
@@ -161,7 +165,7 @@ services:
 
   rebel:
     container_name: rebel
-    image: ghcr.io/skywardai/rebel:v0.1.5
+    image: ghcr.io/skywardai/rebel:v0.1.6
     restart: always
     expose:
       - 80

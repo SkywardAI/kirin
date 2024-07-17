@@ -1,3 +1,18 @@
+# coding=utf-8
+
+# Copyright [2024] [SkywardAI]
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#        http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import csv
 import loguru
 import httpx
@@ -262,7 +277,8 @@ class RAGChatModelRepository(BaseRAGRepository):
                     inference_helper.completion_url,
                     headers={'Content-Type': 'application/json'},
                     json=data,
-                    timeout=httpx.Timeout(timeout=5.0)
+                    # We disable all timeout and trying to fix streaming randomly cutting off
+                    timeout=httpx.Timeout(timeout=None)
                 ) as response:
                     response.raise_for_status()
                     async for chunk in response.aiter_text():

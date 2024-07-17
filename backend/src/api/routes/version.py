@@ -37,11 +37,11 @@ async def get_version() -> ServiceVersionResponse:
     Return ServiceVersionResponse: 
     - **kirin**: The version of the API aggregator
     - **milvus**: The version of the vector database
-    - **llamacpp**: The version of the inference engine 
+    - **inference_engine**: The version of the inference engine 
     """
 
     return ServiceVersionResponse(
-        kirin=settings.VERSION,
+        kirin=settings.BACKEND_SERVER_VERSION,
         milvus=settings.MILVUS_VERSION,
-        llamacpp=settings.INFERENCE_ENG_VERSION
+        inference_engine=settings.INFERENCE_ENG_VERSION
   )

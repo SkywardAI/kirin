@@ -6,7 +6,7 @@ DEBUG:=True
 BACKEND_SERVER_HOST:=127.0.0.1
 BACKEND_SERVER_PORT:=8000
 BACKEND_SERVER_WORKERS:=4
-BACKEND_SERVER_VERSION:=v0.1.13
+BACKEND_SERVER_VERSION:=v0.1.15
 TIMEZONE:="UTC"
 
 # Database - Postgres
@@ -21,7 +21,6 @@ AUTH_TOKEN:=YOUR-AUTHENTICATION-TOKEN
 
 # This is the host for Docker Postgres Image in docker-compose.yaml
 POSTGRES_HOST:=db
-POSTGRES_URI:={POSTGRES_SCHEMA}://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}
 
 # Database - SQLAlchemy
 DB_TIMEOUT:=5
@@ -94,7 +93,6 @@ env:
 	@echo "API_TOKEN=$(API_TOKEN)">> $(FILE_NAME)
 	@echo "AUTH_TOKEN=$(AUTH_TOKEN)">> $(FILE_NAME)
 	@echo "POSTGRES_HOST=$(POSTGRES_HOST)">> $(FILE_NAME)
-	@echo "POSTGRES_URI=$(POSTGRES_URI)">> $(FILE_NAME)
 	@echo "DB_TIMEOUT=$(DB_TIMEOUT)">> $(FILE_NAME)
 	@echo "DB_POOL_SIZE=$(DB_POOL_SIZE)">> $(FILE_NAME)
 	@echo "DB_MAX_POOL_CON=$(DB_MAX_POOL_CON)">> $(FILE_NAME)
@@ -228,3 +226,10 @@ plugin:
 .PHONY: expo
 expo:
 	@poetry -C backend export -f requirements.txt --output backend/requirements.txt
+
+############################################################################################################
+# Testing
+
+.PHONY: test
+test:
+	@pytest backend/tests
