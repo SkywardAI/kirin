@@ -19,8 +19,7 @@ import fastapi
 from fastapi.testclient import TestClient
 from src.models.db.account import Account
 from src.repository.crud.base import BaseCRUDRepository
-from src.api.dependencies.repository import get_repository
-
+from src.repository.crud.account import AccountCRUDRepository
 from src.api.routes import authentication
 
 class OverAccountInCreate:
@@ -29,9 +28,6 @@ class OverAccountInCreate:
     password: "123"
 
 class OverAccountCRUDRepository(BaseCRUDRepository):
-    def __init__(self):
-        pass
-
     def create_account(self, account_create: OverAccountInCreate):
         return Account(
             id=1,
@@ -53,10 +49,11 @@ class OverAccountCRUDRepository(BaseCRUDRepository):
     def generate_access_token(self, username: str)-> str:
         return "access_token"
 
-def over_get_repository():
-    return OverAccountCRUDRepository()
+def over_get_repository(repo_type=AccountCRUDRepository):
+    return OverAccountCRUDRepository
 
-@unittest.skip("Skip the test, because the issue https://github.com/tiangolo/fastapi/discussions/8127#discussioncomment-5147586")
+
+@unittest.skip("Skip the test, because the we cannot find dependencies of signup, see https://github.com/tiangolo/fastapi/discussions/8127#discussioncomment-5147586")
 class TestAPIAuthentication(unittest.TestCase):
     """
     Test the FastAPI application attributes
@@ -77,7 +74,7 @@ class TestAPIAuthentication(unittest.TestCase):
         Test the authentication API
 
         """
-        self.app.dependency_overrides[get_repository] = over_get_repository()
+        self.app.dependency_overrides[AccountCRUDRepository] = over_get_repository
 
         response = self.client.post("/auth/signup", json={"username": "aisuko", "email": "aisuko@rmit.edu.au", "password": "aisuko"})
         assert response.status_code == 400
