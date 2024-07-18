@@ -100,12 +100,6 @@ class AccountCRUDRepository(BaseCRUDRepository):
 
         return update_account  # type: ignore
 
-    async def update_dataset(self, username: str, dataset_id: int):
-        update_stmt = sqlalchemy.update(table=Account).where(Account.username == username).values(updated_at=sqlalchemy_functions.now())
-        update_stmt = update_stmt.values(current_dataset_id=dataset_id)
-        await self.async_session.execute(statement=update_stmt)
-        await self.async_session.commit()
-
     async def delete_account_by_id(self, id: int) -> str:
         select_stmt = sqlalchemy.select(Account).where(Account.id == id)
         query = await self.async_session.execute(statement=select_stmt)

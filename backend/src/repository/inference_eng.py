@@ -16,7 +16,7 @@
 
 # https://pypi.org/project/openai/1.35.5/
 import openai
-import requests
+
 from src.config.manager import settings
 
 class InferenceHelper:
@@ -28,7 +28,6 @@ class InferenceHelper:
         self.client=self.openai_client() # OpenAI-compatible Chat Completions API
         self.completion_url=self.instruct_infer_url()
         self.tokenization_url=self.instruct_tokenize_url()
-        self.embedding_url=self.instruct_embedding_url()
 
     
     def openai_client(self) -> openai.OpenAI:
@@ -53,14 +52,6 @@ class InferenceHelper:
         """
         return f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/tokenize"
 
-    def instruct_embedding_url(self)->str:
-        """
-        Get the URL for the embedding engine
-
-        Returns:
-        str: URL for the embedding
-        """
-        return f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/embedding"
 
     def instruct_infer_url(self)->str:
         """
@@ -70,24 +61,6 @@ class InferenceHelper:
         str: URL for the inference engine
         """
         return f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/completion"
-    
-    def tokenize(self, text_list:list[str])->list:
-        """
-        Tokenize the text
-
-        Args:
-        text (list[str]): Text to tokenize
-
-        Returns:
-        list: Tokenized text list
-        """
-        embedding_list = []
-        for text in text_list:
-            response = requests.post(self.embedding_url, json={"content": text})
-            embedding = response.json()['embedding']
-            embedding_list.append(embedding)
-        return embedding_list
-
 
 
 inference_helper: InferenceHelper = InferenceHelper()

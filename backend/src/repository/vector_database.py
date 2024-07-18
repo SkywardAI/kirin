@@ -1,6 +1,6 @@
 import time
 import loguru
-import numpy as np
+
 from pymilvus import MilvusClient
 from src.config.manager import settings
 from src.config.settings.const import DEFAULT_COLLECTION, DEFAULT_DIM
@@ -47,30 +47,19 @@ class MilvusHelper:
         loguru.logger.info(f"Vector Database --- Milvus: collection {collection_name} created")
 
     def insert_list(self, embedding, data, collection_name=DEFAULT_COLLECTION, start_idx=0):
-        loguru.logger.info(f"Start insert data to {collection_name}")
         try:
             for i, item in enumerate(embedding):
-                original_vector = np.array(item)
-                padding_value = 0 
-                if len(original_vector) > DEFAULT_DIM:
-                    loguru.logger.info(f"Vector Databse --- Error: Vector dimension is larger than {DEFAULT_DIM}")
-                    continue
-                if len(original_vector) < DEFAULT_DIM:
-                    padding_vector = np.ones(DEFAULT_DIM - len(original_vector)) * padding_value
-                    padded_vector = np.concatenate((original_vector, padding_vector))
-                else:
-                    padded_vector = original_vector
-                self.client.insert(collection_name=collection_name, data={"id": i+start_idx, "vector": padded_vector, "doc": data[i]})
+                self.client.insert(collection_name=collection_name, data={"id": i+start_idx, "vector": item, "doc": data[i]})
         except Exception as e:
             loguru.logger.info(f"Vector Databse --- Error: {e}")
-        loguru.logger.info("Complete insert!")
 
-    def search(self, data: np, n_results, collection_name=DEFAULT_COLLECTION):
+    def search(self, data, n_results, collection_name=DEFAULT_COLLECTION):
 
         search_params = {"metric_type": "COSINE", "params": {}}
+        data_list = data.tolist()
         res = self.client.search(
             collection_name=collection_name,
-            data=[data],
+            data=data_list,
             limit=n_results,
             search_params=search_params,
             output_fields=["doc"],

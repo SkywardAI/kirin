@@ -1,8 +1,6 @@
 import fastapi
 import loguru
 from fastapi.security import OAuth2PasswordBearer
-from src.repository.crud.dataset_db import DataSetCRUDRepository
-import re
 from fastapi.responses import StreamingResponse
 from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.securities.authorizations.jwt import jwt_required
@@ -135,7 +133,6 @@ async def chat(
     chat_repo: ChatHistoryCRUDRepository = fastapi.Depends(get_repository(repo_type=ChatHistoryCRUDRepository)),
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_rag_repository(repo_type=DataSetCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required)
 )-> StreamingResponse:
     """
@@ -194,37 +191,25 @@ async def chat(
     # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:20])
     # response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
 
+    # TODO: name=chat_in_msg.message[:20] use to create uuid in here, we use username to create session in /api/seesionuuid. Is that acceptable? @Micost
     session = await session_repo.read_create_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id, name=chat_in_msg.message[:20] )
-    if session.type == "rag":
-        try:
-            collection_name = await get_collection_info(current_user.id, dataset_repo=dataset_repo)
-            result = rag_chat_repo.get_response(collection_name=collection_name, input_msg=chat_in_msg.message)
-        except Exception as e:
-            loguru.logger.info(f"Exception --- {e}")
-            result = "Dataset for RAG is not ready"
-        def iterfile():
-            yield result.encode('utf-8') 
-        return StreamingResponse(
-            iterfile(),
-            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-            media_type="text/plain")
-    else:
+
     # score = await rag_chat_repo.evaluate_response(request_msg = chat_in_msg.message, response_msg = response_msg)
     # response_msg = response_msg + "score : {:.3f}".format(score)
-        return StreamingResponse(
-            rag_chat_repo.inference(
-                session_id=session.id, 
-                input_msg=chat_in_msg.message, 
-                chat_repo=chat_repo,
-                temperature=chat_in_msg.temperature,
-                top_k=chat_in_msg.top_k,
-                top_p=chat_in_msg.top_p,
-                n_predict=chat_in_msg.n_predict
-            ),
-            # Buffering (the real problem) https://serverfault.com/questions/801628/for-server-sent-events-sse-what-nginx-proxy-configuration-is-appropriate/801629#
-            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-            media_type='text/event-stream'
-        )
+    return StreamingResponse(
+        rag_chat_repo.inference(
+            session_id=session.id, 
+            input_msg=chat_in_msg.message, 
+            chat_repo=chat_repo,
+            temperature=chat_in_msg.temperature,
+            top_k=chat_in_msg.top_k,
+            top_p=chat_in_msg.top_p,
+            n_predict=chat_in_msg.n_predict
+        ),
+        # Buffering (the real problem) https://serverfault.com/questions/801628/for-server-sent-events-sse-what-nginx-proxy-configuration-is-appropriate/801629#
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        media_type='text/event-stream'
+    )
 
 
 @router.get(
@@ -401,11 +386,3 @@ async def save_chats(
     return ChatUUIDResponse(
         sessionUuid=chat_in_msg.sessionUuid
     )
-
-
-async def get_collection_info(
-    account_id: int,
-    dataset_repo: DataSetCRUDRepository,
-) -> str:
-    current_collection = await dataset_repo.get_dataset_by_account_id(account_id=account_id)
-    return re.sub(r'\W+', '', current_collection.name)
