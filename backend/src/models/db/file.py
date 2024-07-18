@@ -9,5 +9,8 @@ class UploadedFile(Base):  # type: ignore
 
     id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(primary_key=True, autoincrement="auto")
     name: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=64), nullable=False, unique=True)
+    is_uploaded: SQLAlchemyMapped[bool] = sqlalchemy_mapped_column(
+        sqlalchemy.Boolean, nullable=False, default=False
+    )
 
     __mapper_args__ = {"eager_defaults": True}
