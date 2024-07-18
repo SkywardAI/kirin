@@ -7,4 +7,4 @@ class UploadedFile(BaseSchemaModel):
 
 
 class FileInResponse(BaseSchemaModel):
-    fileID: int = Field(..., title="file Id", description="file Id")
+    ID: int = Field(..., title="file Id", description="file Id")

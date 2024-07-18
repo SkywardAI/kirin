@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession as SQLAlchemyAsyncSession
 
 from src.repository.database import async_db
 
-
+#TODO async session need to support background task
 async def get_async_session() -> typing.AsyncGenerator[SQLAlchemyAsyncSession, None]:
     try:
         yield async_db.async_session
