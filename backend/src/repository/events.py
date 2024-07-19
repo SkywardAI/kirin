@@ -13,7 +13,6 @@ from src.securities.hashing.password import pwd_generator
 from src.repository.database import async_db
 from src.repository.table import Base
 from src.repository.vector_database import vector_db
-from src.utilities.httpkit.method_kit import InferKit
 
 
 @event.listens_for(target=async_db.async_engine.sync_engine, identifier="connect")
