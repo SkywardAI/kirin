@@ -39,7 +39,11 @@ class SessionCRUDRepository(BaseCRUDRepository):
         update_session = query.scalar()
         if update_session is None:
             raise EntityDoesNotExist(f"Session with uuid `{session.sessionUuid}` does not exist!")
-        update_stmt = sqlalchemy.update(table=Session).where(Session.uuid == session.sessionUuid).values(updated_at=sqlalchemy_functions.now())  # type: ignore
+        update_stmt = (
+            sqlalchemy.update(table=Session)
+            .where(Session.uuid == session.sessionUuid)
+            .values(updated_at=sqlalchemy_functions.now())
+        )  # type: ignore
         if session.name:
             update_stmt = update_stmt.values(name=session.name)
 
@@ -71,21 +75,22 @@ class SessionCRUDRepository(BaseCRUDRepository):
         query = await self.async_session.execute(statement=stmt)
         return query.scalars().all()
 
-    async def verify_session_by_account_id(self, session_uuid: str, account_id: int ) -> bool:
+    async def verify_session_by_account_id(self, session_uuid: str, account_id: int) -> bool:
         # stmt = sqlalchemy.select(Session).where(Session.account_id == id)
         stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid, Session.account_id == account_id)
         query = await self.async_session.execute(statement=stmt)
         return bool(query)
 
+
 class ChatHistoryCRUDRepository(BaseCRUDRepository):
     async def read_chat_history_by_id(self, id: int) -> ChatHistory:
         stmt = sqlalchemy.select(ChatHistory).where(ChatHistory.id == id)
         query = await self.async_session.execute(statement=stmt)
-        chat_history =query.scalar()
+        chat_history = query.scalar()
         if chat_history is None:
             raise EntityDoesNotExist("ChatHistory with id `{id}` does not exist!")
 
-        return chat_history # type: ignore
+        return chat_history  # type: ignore
 
     async def read_chat_history_by_session_id(self, id: int, limit_num=50) -> typing.Sequence[ChatHistory]:
         # TODO limit num = 50 is a temp number
@@ -103,7 +108,7 @@ class ChatHistoryCRUDRepository(BaseCRUDRepository):
             for chat in chats:
                 new_chat_history = ChatHistory(session_id=session_id, role=chat.role, message=chat.message[:4096])
                 self.async_session.add(instance=new_chat_history)
-            await self.async_session.commit() 
+            await self.async_session.commit()
         except Exception as e:
-            await self.async_session.rollback() 
+            await self.async_session.rollback()
             loguru.logger.error(f"Error: {e}")

@@ -24,11 +24,11 @@ class ChatInMessage(BaseSchemaModel):
         Top_p parameter for inference(float)
     n_predict: int
         n_predict parameter for inference(int)
-    
+
     """
 
     sessionUuid: Optional[str] | None = Field(..., title="Session UUID", description="Session UUID")
-    message: str  = Field(..., title="Message", description="Message")
+    message: str = Field(..., title="Message", description="Message")
     temperature: float = Field(..., title="Temperature", description="Temperature for inference(float)")
     top_k: int = Field(..., title="Top_k", description="Top_k parameter for inference(int)")
     top_p: float = Field(..., title="Top_p", description="Top_p parameter for inference(float)")
@@ -38,6 +38,7 @@ class ChatInMessage(BaseSchemaModel):
 class ChatInResponse(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
     message: str = Field(..., title="Message", description="Message")
+
 
 class ChatUUIDResponse(BaseSchemaModel):
     """
@@ -50,6 +51,7 @@ class ChatUUIDResponse(BaseSchemaModel):
     """
 
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
+
 
 class SessionUpdate(BaseSchemaModel):
     """
@@ -64,15 +66,17 @@ class SessionUpdate(BaseSchemaModel):
     type: str
         type of session: rag or chat
     """
+
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
     name: Optional[str] = Field(default=None, title="Name", description="Name")
     type: Optional[Literal["rag", "chat"]] = Field(default=None, title="Type", description="Type")
 
+
 class Session(BaseSchemaModel):
-    sessionUuid: str = Field(..., title="Session UUID" ,description="Session UUID") 
-    name: str | None  = Field(..., title="Name", description="Name") 
-    type: str | None  = Field(..., title="Type", description="Type") 
-    created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time") 
+    sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
+    name: str | None = Field(..., title="Name", description="Name")
+    type: str | None = Field(..., title="Type", description="Type")
+    created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
 
 
 class Chats(BaseSchemaModel):
@@ -86,8 +90,10 @@ class Chats(BaseSchemaModel):
     message: str
         Message
     """
-    role: str  = Field(..., title="Role", description="Role ") 
+
+    role: str = Field(..., title="Role", description="Role ")
     message: str = Field(..., title="Message", description="Message")
+
 
 class ChatsWithTime(BaseSchemaModel):
     """
@@ -101,9 +107,11 @@ class ChatsWithTime(BaseSchemaModel):
         Message
     create_at: timestamp
     """
-    role: str  = Field(..., title="Role", description="Role ") 
+
+    role: str = Field(..., title="Role", description="Role ")
     message: str = Field(..., title="Message", description="Message")
     create_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
+
 
 class SaveChatHistory(BaseSchemaModel):
     """
@@ -118,8 +126,10 @@ class SaveChatHistory(BaseSchemaModel):
     message: str
         Message
     """
-    sessionUuid: str = Field(..., title="Session UUID" ,description="Session UUID")
-    chats: list[Chats] = Field(..., title="Chat history" ,description="Chat history")
+
+    sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
+    chats: list[Chats] = Field(..., title="Chat history", description="Chat history")
+
 
 class MessagesResponse(BaseSchemaModel):
     role: str = Field(..., title="Role", description="Role")

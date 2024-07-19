@@ -16,44 +16,57 @@
 
 import httpx
 
-class MethodKit:
+
+class InferKit:
     """
-    A class that contains http methods for the HTTPKit class.
+    A class to initialize an async and sync client using httpx
+
+    We only create one client every time is efficient and easy to manage
+
+    Note: We don't close client because we want to keep the connection alive, I don't know if it will cause any problem in more bigger scale
     """
 
     def __init__(self):
-        raise EnvironmentError(
-            "This MethodKit is not meant to be instantiated. Use the methods directly."
-        )
+        self.async_client = self.init_async_client()
+        self.sync_client = self.init_sync_client()
 
-    @classmethod
-    def http_post(cls, *args, **kwargs)-> httpx.Response:
+    def init_async_client(self) -> httpx.AsyncClient:
         """
-        Post request with httpx client.
+        Create async client by using Singleletton pattern
 
-        Args:
-        *args: Variable length argument list.
-        **kwargs: Arbitrary keyword arguments.
-            * url: URL to post to.
-            * json: JSON data to post.
-            * headers: Headers to send.
-            * timeout: Timeout for the request.
+        Replace the code below:
+
+        async with httpx.AsyncClient() as client:
+            try:
+                async with client.stream(
+                    "POST",
+                    InferenceHelper.instruct_infer_url(),
+                    headers={"Content-Type": "application/json"},
+                    json=data_with_context,
+                    # We disable all timeout and trying to fix streaming randomly cutting off
+                    timeout=httpx.Timeout(timeout=None),
+                ) as response:
+                    response.raise_for_status()
+                    async for chunk in response.aiter_text():
+                        yield chunk
+            except httpx.ReadError as e:
+                loguru.logger.error(f"An error occurred while requesting {e.request.url!r}.")
+            except httpx.HTTPStatusError as e:
+                loguru.logger.error(f"Error response {e.response.status_code} while requesting {e.request.url!r}.")
 
         Returns:
-        httpx.Response: Response from the server.
+        httpx.AsyncClient: An async client
         """
-        url = kwargs.get("url")
-        jason_content = kwargs.get("json")
-        headers = kwargs.get("headers")
-        timeout = kwargs.get("timeout")
+        return httpx.AsyncClient()
 
-        with httpx.Client() as client:
-            res = client.post(
-                url,
-                headers=headers,
-                json=jason_content,
-                timeout=timeout
-            )
+    def init_sync_client(self):
+        """
+        Create sync client client by using Singleletton pattern
 
-            res.raise_for_status()
-            return res
+        Returns:
+        httpx.Client: A sync client
+        """
+        return httpx.Client()
+
+
+infer_kit = InferKit()

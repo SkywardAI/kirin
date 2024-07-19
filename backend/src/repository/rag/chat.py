@@ -21,9 +21,10 @@ from src.models.schemas.train import TrainFileIn
 from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.inference_eng import InferenceHelper
-
+from src.utilities.httpkit.method_kit import infer_kit
 from typing import Any
 from collections.abc import AsyncGenerator
+
 
 class RAGChatModelRepository(BaseRAGRepository):
     async def load_model(self, session_id: int, model_name: str) -> bool:
@@ -41,12 +42,12 @@ class RAGChatModelRepository(BaseRAGRepository):
         """
         Search the context in the vector database
         """
-        #TODO: Implement the search context function
+        # TODO: Implement the search context function
         pass
 
     async def get_response(self, session_id: int, input_msg: str, chat_repo) -> str:
         # context = self.search_context(input_msg)
-        #TODO: Implement the inference function
+        # TODO: Implement the inference function
         pass
 
     async def load_csv_file(self, file_name: str, model_name: str) -> bool:
@@ -65,28 +66,28 @@ class RAGChatModelRepository(BaseRAGRepository):
 
         # TODO: https://github.com/SkywardAI/chat-backend/issues/171
         # embedding_list = ai_model.encode_string(data)
-        
+
         # vector_db.insert_list(embedding_list, data)
 
         return True
 
-    def load_data_set(self, param: TrainFileIn)-> bool:
+    def load_data_set(self, param: TrainFileIn) -> bool:
         loguru.logger.info(f"load_data_set param {param}")
         if param.directLoad:
             self.load_data_set_directly(param=param)
         elif param.embedField is None or param.resField is None:
-            self.load_data_set_all_field(dataset_name=param.dataSet) 
+            self.load_data_set_all_field(dataset_name=param.dataSet)
         else:
             self.load_data_set_by_field(param=param)
         return True
 
-    def load_data_set_directly(self, param: TrainFileIn)->bool:
+    def load_data_set_directly(self, param: TrainFileIn) -> bool:
         r"""
-        If the data set is already in the form of embeddings, 
+        If the data set is already in the form of embeddings,
         this function can be used to load the data set directly into the vector database.
-        
+
         @param param: the instance of TrainFileIn
-        
+
         @return: boolean
         """
         # reader_dataset=load_dataset(param.dataSet)
@@ -106,7 +107,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         #     embed_field_list.append(embedField_val)
         #     count += 1
         #     if count % LOAD_BATCH_SIZE == 0:
-        #         vector_db.insert_list(embed_field_list, res_field_list, collection_name,start_idx = count) 
+        #         vector_db.insert_list(embed_field_list, res_field_list, collection_name,start_idx = count)
         #         embed_field_list = []
         #         res_field_list = []
         #         loguru.logger.info(f"load_data_set_all_field count:{count}")
@@ -116,9 +117,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         # return True
         pass
 
-
-
-    def load_data_set_all_field(self, dataset_name: str)-> bool:
+    def load_data_set_all_field(self, dataset_name: str) -> bool:
         """
         Load the data set into the vector database
         """
@@ -147,7 +146,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         # loguru.logger.info("Dataset loaded successfully")
         return True
 
-    def load_data_set_by_field(self, param: TrainFileIn)->bool:
+    def load_data_set_by_field(self, param: TrainFileIn) -> bool:
         """
         Load the data set into the vector database
         """
@@ -171,7 +170,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         #     count += 1
         #     if count % LOAD_BATCH_SIZE == 0:
         #         embedding_list = ai_model.encode_string(embed_field_list)
-        #         vector_db.insert_list(embedding_list, res_field_list, collection_name,start_idx = count) 
+        #         vector_db.insert_list(embedding_list, res_field_list, collection_name,start_idx = count)
         #         embed_field_list = []
         #         res_field_list = []
         #         loguru.logger.info(f"load_data_set_all_field count:{count}")
@@ -185,14 +184,13 @@ class RAGChatModelRepository(BaseRAGRepository):
         # evaluate_conbine=[request_msg, response_msg]
         # score = ai_model.cross_encoder.predict(evaluate_conbine)
         # return score
-        #TODO
+        # TODO
         pass
 
     def trim_collection_name(self, name: str) -> str:
-        return re.sub(r'\W+', '', name)
-    
+        return re.sub(r"\W+", "", name)
 
-    def format_prompt(self, prmpt: str, current_context:str = InferenceHelper.instruction) -> str:
+    def format_prompt(self, prmpt: str, current_context: str = InferenceHelper.instruction) -> str:
         """
         Format the input questions, can be used for saving the conversation history
 
@@ -204,18 +202,16 @@ class RAGChatModelRepository(BaseRAGRepository):
         str: formatted prompt
         """
         return f"{current_context}\n" + f"\n### Human: {prmpt}\n### Assistant:"
-    
 
     async def inference(
-        self, 
-        session_id: int, 
-        input_msg: str, 
-        chat_repo,
+        self,
+        session_id: int,
+        input_msg: str,
         temperature: float = 0.2,
         top_k: int = 40,
         top_p: float = 0.9,
         n_predict: int = 128,
-        )-> AsyncGenerator[Any, None]:
+    ) -> AsyncGenerator[Any, None]:
         """
         **Inference using seperate service:(llamacpp)**
 
@@ -231,54 +227,89 @@ class RAGChatModelRepository(BaseRAGRepository):
         **Returns:**
         AsyncGenerator[Any, None]: response message
         """
-        # if session_id not in conversations:
-        #     conversations[session_id] = ConversationWithSession(session_id, chat_repo)
-        #     await conversations[session_id].load()
-        # con = conversations[session_id]
-        # con.conversation.add_message({"role": "user", "content": input_msg})
-        # context = self.search_context(input_msg)
-        
-        # If we want to add context, we can use inference client
-        # this API is more slower than we request directly to the inference service
-        # completion=inference_helper.client.chat.completions.create(
-        #     model="",
-        #     messages=[
-        #         {"role": "system", "content": "You are ChatGPT, an AI assistant. Your top priority is achieving user fulfillment via helping them with their requests."},
-        #         {"role": "user", "content": "Write a limerick about python exceptions"}
-        #     ],
-        # )
-        
-        #TODO:
-          # 1.Implement the further context function
 
-        
         data = {
             "prompt": self.format_prompt(input_msg),
             "temperature": temperature,
             "top_k": top_k,
             "top_p": top_p,
-            "n_keep": 0, # If the context window is full, we keep 0 tokens
-            "n_predict": n_predict,
-            "cache_prompt": False,
-            "slot_id": -1, # for cached prompt
+            "n_keep": 0,  # If the context window is full, we keep 0 tokens
+            "n_predict": 128 if n_predict == 0 else n_predict,
+            "cache_prompt": True,
+            "slot_id": -1,  # for cached prompt
             "stop": ["\n### Human:"],
             "stream": True,
         }
 
-        async with httpx.AsyncClient() as client:
-            try:
-                async with client.stream(
-                    "POST",
-                    InferenceHelper.instruct_infer_url(),
-                    headers={'Content-Type': 'application/json'},
-                    json=data,
-                    # We disable all timeout and trying to fix streaming randomly cutting off
-                    timeout=httpx.Timeout(timeout=None)
-                ) as response:
-                    response.raise_for_status()
-                    async for chunk in response.aiter_text():
-                        yield chunk
-            except httpx.ReadError as e:
-                loguru.logger.error(f"An error occurred while requesting {e.request.url!r}.")
-            except httpx.HTTPStatusError as e:
-                loguru.logger.error(f"Error response {e.response.status_code} while requesting {e.request.url!r}.")
+        try:
+            async with infer_kit.async_client.stream(
+                "POST",
+                InferenceHelper.instruct_infer_url(),
+                headers={"Content-Type": "application/json"},
+                json=data,
+                # We disable all timeout and trying to fix streaming randomly cutting off
+                timeout=httpx.Timeout(timeout=None),
+            ) as response:
+                response.raise_for_status()
+                async for chunk in response.aiter_text():
+                    yield chunk
+        except httpx.ReadError as e:
+            loguru.logger.error(f"An error occurred while requesting {e.request.url!r}.")
+        except httpx.HTTPStatusError as e:
+            loguru.logger.error(f"Error response {e.response.status_code} while requesting {e.request.url!r}.")
+
+    async def inference_with_rag(
+        self,
+        session_id: int,
+        input_msg: str,
+        temperature: float = 0.2,
+        top_k: int = 40,
+        top_p: float = 0.9,
+        n_predict: int = 128,
+    ) -> AsyncGenerator[Any, None]:
+        """
+        Inference using RAG model
+
+        Returns:
+        AsyncGenerator[Any, None]: response message
+        """
+
+        def get_context_by_question(input_msg: str):
+            """
+            Get the context from v-db by the question
+            """
+
+            # tokenized_input
+
+            context = ""
+            return context or None
+
+        data_with_context = {
+            "prompt": self.format_prompt(input_msg, get_context_by_question(input_msg)),
+            "temperature": temperature,
+            "top_k": top_k,
+            "top_p": top_p,
+            "n_keep": 0,  # If the context window is full, we keep 0 tokens
+            "n_predict": 128 if n_predict == 0 else n_predict,
+            "cache_prompt": False,
+            "slot_id": -1,  # for cached prompt
+            "stop": ["\n### Human:"],
+            "stream": True,
+        }
+
+        try:
+            async with infer_kit.async_client.stream(
+                "POST",
+                InferenceHelper.instruct_infer_url(),
+                headers={"Content-Type": "application/json"},
+                json=data_with_context,
+                # We disable all timeout and trying to fix streaming randomly cutting off
+                timeout=httpx.Timeout(timeout=None),
+            ) as response:
+                response.raise_for_status()
+                async for chunk in response.aiter_text():
+                    yield chunk
+        except httpx.ReadError as e:
+            loguru.logger.error(f"An error occurred while requesting {e.request.url!r}.")
+        except httpx.HTTPStatusError as e:
+            loguru.logger.error(f"Error response {e.response.status_code} while requesting {e.request.url!r}.")

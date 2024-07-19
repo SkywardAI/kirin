@@ -7,7 +7,6 @@ from sqlalchemy.sql import functions as sqlalchemy_functions
 from src.repository.table import Base
 
 
-
 class DataSet(Base):  # type: ignore
     __tablename__ = "data_set"
 

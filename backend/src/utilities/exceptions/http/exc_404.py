@@ -32,9 +32,9 @@ async def http_404_exc_username_not_found_request(username: str) -> Exception:
         detail=http_404_username_details(username=username),
     )
 
+
 async def http_404_exc_uuid_not_found_request(uuid: str) -> Exception:
     return fastapi.HTTPException(
         status_code=fastapi.status.HTTP_404_NOT_FOUND,
         detail=http_404_uuid_details(uuid=uuid),
     )
-

@@ -16,38 +16,18 @@
 import unittest
 from src.utilities.httpkit.method_kit import MethodKit
 
+
 @unittest.skip("Skip due to the fact that the server is not running")
 class TestHTTPKits(unittest.TestCase):
     url = "http://llamacpp:8080/tokenize"
     jason_content = {"content": "Hello, World!"}
-    headers={'Content-Type': 'application/json'}
+    headers = {"Content-Type": "application/json"}
     timeout = 10
-
 
     @classmethod
     def setUpClass(cls) -> None:
         return super().setUpClass()
-    
+
     @classmethod
     def tearDownClass(cls) -> None:
         return super().tearDownClass()
-
-
-    def test_http_post(self)-> None:
-        """
-        Test the http_post method.
-
-        In this test case we calculate the the length of tokens of the content "Hello, World!".
-
-        """
-
-        res = MethodKit.http_post(
-            url=self.url,
-            jason_content=self.jason_content,
-            headers=self.headers,
-            timeout=self.timeout
-        )
-
-        assert res.status_code == 200
-        # length of token is a integer
-        assert isinstance(res.json().get('tokens'), int)

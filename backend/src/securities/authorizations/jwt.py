@@ -24,6 +24,7 @@ from src.config.manager import settings
 from src.models.db.account import Account
 from src.models.schemas.jwt import JWTAccount, JWToken
 
+
 class JWTGenerator:
     def __init__(self):
         pass
@@ -47,7 +48,6 @@ class JWTGenerator:
         return pyjwt.encode(to_encode, key=settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
     def generate_access_token(self, account: Account) -> str:
-
         return self._generate_jwt_token(
             jwt_data=JWTAccount(username=account.username, email=account.email).model_dump(),  # type: ignore
             expires_delta=datetime.timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRATION_TIME),
@@ -72,6 +72,7 @@ def get_jwt_generator() -> JWTGenerator:
 
 
 jwt_generator: JWTGenerator = get_jwt_generator()
+
 
 async def jwt_required(request: Request):
     auth_scheme = HTTPBearer()

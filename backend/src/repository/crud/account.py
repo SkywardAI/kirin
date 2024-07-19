@@ -59,18 +59,19 @@ class AccountCRUDRepository(BaseCRUDRepository):
         if account is None:
             raise EntityDoesNotExist("Account with email `{email}` does not exist!")
 
-        return account # type: ignore
+        return account  # type: ignore
 
     async def read_user_by_password_authentication(self, account_login: AccountInLogin) -> Account:
-        stmt = sqlalchemy.select(Account).where(
-            Account.username == account_login.username)
+        stmt = sqlalchemy.select(Account).where(Account.username == account_login.username)
         query = await self.async_session.execute(statement=stmt)
         db_account = query.scalar()
 
         if not db_account:
             raise EntityDoesNotExist("Wrong username!")
 
-        if not pwd_generator.is_password_authenticated(hash_salt=db_account.hash_salt, password=account_login.password, hashed_password=db_account.hashed_password):  # type: ignore
+        if not pwd_generator.is_password_authenticated(
+            hash_salt=db_account.hash_salt, password=account_login.password, hashed_password=db_account.hashed_password
+        ):  # type: ignore
             raise PasswordDoesNotMatch("Password does not match!")
 
         return db_account  # type: ignore
@@ -85,14 +86,22 @@ class AccountCRUDRepository(BaseCRUDRepository):
         if not update_account:
             raise EntityDoesNotExist(f"Account with id `{id}` does not exist!")  # type: ignore
 
-        update_stmt = sqlalchemy.update(table=Account).where(Account.id == update_account.id).values(updated_at=sqlalchemy_functions.now())  # type: ignore
+        update_stmt = (
+            sqlalchemy.update(table=Account)
+            .where(Account.id == update_account.id)
+            .values(updated_at=sqlalchemy_functions.now())
+        )  # type: ignore
 
         if new_account_data["email"]:
             update_stmt = update_stmt.values(email=new_account_data["email"])
 
         if new_account_data["password"]:
             update_account.set_hash_salt(hash_salt=pwd_generator.generate_salt)  # type: ignore
-            update_account.set_hashed_password(hashed_password=pwd_generator.generate_hashed_password(hash_salt=update_account.hash_salt, new_password=new_account_data["password"]))  # type: ignore
+            update_account.set_hashed_password(
+                hashed_password=pwd_generator.generate_hashed_password(
+                    hash_salt=update_account.hash_salt, new_password=new_account_data["password"]
+                )
+            )  # type: ignore
 
         await self.async_session.execute(statement=update_stmt)
         await self.async_session.commit()

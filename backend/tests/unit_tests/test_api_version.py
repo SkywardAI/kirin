@@ -23,13 +23,13 @@ class TestAPIVersion(unittest.TestCase):
     """
     Test the FastAPI application attributes
     """
-    
+
     @classmethod
     def setUpClass(cls):
         cls.app = fastapi.FastAPI()
         cls.app.include_router(version.router)
         cls.client = TestClient(cls.app)
-    
+
     @classmethod
     def tearDownClass(cls):
         pass
@@ -45,10 +45,3 @@ class TestAPIVersion(unittest.TestCase):
             "milvus": "v2.3.12",
             "kirin": "v0.1.15",
         }
-
-
-
-
-
-
-

@@ -1,7 +1,23 @@
+# coding=utf-8
+
+# Copyright [2024] [SkywardAI]
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#        http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import fastapi
 import loguru
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import StreamingResponse
+from starlette.responses import ContentStream
 from src.api.dependencies.repository import get_rag_repository, get_repository
 from src.securities.authorizations.jwt import jwt_required
 from src.utilities.exceptions.database import EntityDoesNotExist
@@ -9,17 +25,14 @@ from src.utilities.exceptions.http.exc_404 import http_404_exc_uuid_not_found_re
 from src.config.settings.const import ANONYMOUS_USER
 from src.models.schemas.chat import (
     ChatsWithTime,
-    ChatInMessage, 
-    ChatInResponse, 
+    ChatInMessage,
+    ChatInResponse,
     SessionUpdate,
     Session,
     ChatUUIDResponse,
-    SaveChatHistory
-    )
-from src.repository.crud.chat import (
-    ChatHistoryCRUDRepository, 
-    SessionCRUDRepository
-    )
+    SaveChatHistory,
+)
+from src.repository.crud.chat import ChatHistoryCRUDRepository, SessionCRUDRepository
 from src.repository.crud.account import AccountCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
 
@@ -39,7 +52,7 @@ async def update_session(
     session_info: SessionUpdate = fastapi.Body(...),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> ChatUUIDResponse:
     """
     update session info by session uuid
@@ -73,24 +86,21 @@ async def update_session(
 
     except EntityDoesNotExist:
         raise await http_404_exc_uuid_not_found_request(uuid=session_info.sessionUuid)
-    return ChatUUIDResponse(
-        sessionUuid=sessions.uuid
-    )
-
+    return ChatUUIDResponse(sessionUuid=sessions.uuid)
 
 
 @router.get(
-        "/seesionuuid",
-        name="chat:session-uuid",
-        response_model=ChatUUIDResponse,
-        status_code=fastapi.status.HTTP_201_CREATED,
+    "/seesionuuid",
+    name="chat:session-uuid",
+    response_model=ChatUUIDResponse,
+    status_code=fastapi.status.HTTP_201_CREATED,
 )
 async def chat_uuid(
     token: str = fastapi.Depends(oauth2_scheme),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
-)->ChatUUIDResponse:
+    jwt_payload: dict = fastapi.Depends(jwt_required),
+) -> ChatUUIDResponse:
     """
     Create a new session for the current user.
     
@@ -111,14 +121,11 @@ async def chat_uuid(
 
     # multiple await keyword will caused the error
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
-    new_session = await session_repo.create_session(
-            account_id=current_user.id, name='new session'
-        )
+    new_session = await session_repo.create_session(account_id=current_user.id, name="new session")
     session_uuid = new_session.uuid
 
-    return ChatUUIDResponse(
-        sessionUuid=session_uuid
-    )
+    return ChatUUIDResponse(sessionUuid=session_uuid)
+
 
 @router.post(
     "",
@@ -130,16 +137,15 @@ async def chat(
     chat_in_msg: ChatInMessage,
     token: str = fastapi.Depends(oauth2_scheme),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
-    chat_repo: ChatHistoryCRUDRepository = fastapi.Depends(get_repository(repo_type=ChatHistoryCRUDRepository)),
     rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
-)-> StreamingResponse:
+    jwt_payload: dict = fastapi.Depends(jwt_required),
+) -> StreamingResponse:
     """
     Chat with the AI-powered chatbot.
-    
+
     **Note:**
-    
+
     You need to sing up and sign in before calling this API. If you are using
     the Swagger UI. You can get the token automatically by login in through `api/auth/verify` API.
 
@@ -178,37 +184,34 @@ async def chat(
 
     """
 
-
     ##############################################################################################################################
     # Note: await keyword will cause issue. See https://github.com/sqlalchemy/sqlalchemy/discussions/9757
-    # 
+    #
 
-    # if not chat_in_msg.accountID:
-    #     chat_in_msg.accountID = 0
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
 
-    # TODO need verify if sesson exist
-    # create_session = await session_repo.read_create_sessions_by_id(id=chat_in_msg.sessionId, account_id=chat_in_msg.accountID, name=chat_in_msg.message[:20])
-    # response_msg = await rag_chat_repo.get_response(session_id=session_id, input_msg=chat_in_msg.message, chat_repo=chat_repo)
+    # TODO: Only read session here @Micost
+    session = await session_repo.read_create_sessions_by_uuid(
+        session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id, name=chat_in_msg.message[:20]
+    )
 
-    # TODO: name=chat_in_msg.message[:20] use to create uuid in here, we use username to create session in /api/seesionuuid. Is that acceptable? @Micost
-    session = await session_repo.read_create_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id, name=chat_in_msg.message[:20] )
+    match session.type:
+        case "rag":
+            # TODO: Implement RAG
+            pass
+        case _:
+            stream_func: ContentStream = rag_chat_repo.inference(
+                session_id=session.id,
+                input_msg=chat_in_msg.message,
+                temperature=chat_in_msg.temperature,
+                top_k=chat_in_msg.top_k,
+                top_p=chat_in_msg.top_p,
+                n_predict=chat_in_msg.n_predict,
+            )
 
-    # score = await rag_chat_repo.evaluate_response(request_msg = chat_in_msg.message, response_msg = response_msg)
-    # response_msg = response_msg + "score : {:.3f}".format(score)
+    # Buffering (the real problem) https://serverfault.com/questions/801628/for-server-sent-events-sse-what-nginx-proxy-configuration-is-appropriate/801629#
     return StreamingResponse(
-        rag_chat_repo.inference(
-            session_id=session.id, 
-            input_msg=chat_in_msg.message, 
-            chat_repo=chat_repo,
-            temperature=chat_in_msg.temperature,
-            top_k=chat_in_msg.top_k,
-            top_p=chat_in_msg.top_p,
-            n_predict=chat_in_msg.n_predict
-        ),
-        # Buffering (the real problem) https://serverfault.com/questions/801628/for-server-sent-events-sse-what-nginx-proxy-configuration-is-appropriate/801629#
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-        media_type='text/event-stream'
+        stream_func, headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}, media_type="text/event-stream"
     )
 
 
@@ -222,7 +225,7 @@ async def get_session(
     token: str = fastapi.Depends(oauth2_scheme),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> list[Session]:
     sessions_list: list = list()
     # Anonymous user won't related to any session
@@ -245,6 +248,7 @@ async def get_session(
 
     return sessions_list
 
+
 @router.get(
     path="/history/{uuid}",
     name="chat:get-chat-history-by-session-uuid",
@@ -257,7 +261,7 @@ async def get_chathistory(
     chat_repo: ChatHistoryCRUDRepository = fastapi.Depends(get_repository(repo_type=ChatHistoryCRUDRepository)),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> list[ChatsWithTime]:
     """
 
@@ -331,8 +335,8 @@ async def save_chats(
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     chat_repo: ChatHistoryCRUDRepository = fastapi.Depends(get_repository(repo_type=ChatHistoryCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
-)->ChatUUIDResponse:
+    jwt_payload: dict = fastapi.Depends(jwt_required),
+) -> ChatUUIDResponse:
     """
 
     Save chat history to session by session uuid
@@ -379,10 +383,11 @@ async def save_chats(
 
     """
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
-    if session_repo.verify_session_by_account_id(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id) is False:
+    if (
+        session_repo.verify_session_by_account_id(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id)
+        is False
+    ):
         raise http_404_exc_uuid_not_found_request(uuid=chat_in_msg.sessionUuid)
     session = await session_repo.read_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid)
     await chat_repo.load_create_chat_history(session_id=session.id, chats=chat_in_msg.chats)
-    return ChatUUIDResponse(
-        sessionUuid=chat_in_msg.sessionUuid
-    )
+    return ChatUUIDResponse(sessionUuid=chat_in_msg.sessionUuid)

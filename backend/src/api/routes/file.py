@@ -12,7 +12,7 @@ from src.repository.crud.file import UploadedFileCRUDRepository
 from src.utilities.exceptions.database import EntityAlreadyExists
 
 from src.utilities.exceptions.http.exc_400 import (
-   http_400_exc_bad_file_name_request,
+    http_400_exc_bad_file_name_request,
 )
 
 router = fastapi.APIRouter(prefix="/file", tags=["file"])
@@ -62,6 +62,7 @@ async def upload_and_return_id(
 
     return FileInResponse(fileID=new_file.id)
 
+
 @router.get(
     path="/dataset",
     name="dataset:get-dataset-list",
@@ -86,18 +87,18 @@ async def get_dataset(
     - **updated_at**: The update date of the dataset
     """
     db_datasets = await dataset_repo.get_dataset_list()
-    datasets_list: list = list()    
+    datasets_list: list = list()
 
     for db_dataset in db_datasets:
-        # print(f"db_dataset:{type(db_dataset.id),type(db_dataset.name),type(db_dataset.created_at),type(db_dataset.updated_at)}")    
-        dataset_res = DatasetResponse(
+        # print(f"db_dataset:{type(db_dataset.id),type(db_dataset.name),type(db_dataset.created_at),type(db_dataset.updated_at)}")
+        dataset_res = (
+            DatasetResponse(
                 id=db_dataset.id,
                 dataset_name=db_dataset.name,
                 created_at=db_dataset.created_at,
                 updated_at=db_dataset.updated_at,
             ),
+        )
         datasets_list.append(dataset_res)
         # datasets_list.append(db_dataset.name)
     return datasets_list
-
-

@@ -21,8 +21,10 @@ def http_401_unauthorized_details() -> str:
 def http_403_forbidden_details() -> str:
     return "Refused access to the requested resource!"
 
+
 def http_404_uuid_details(uuid: str) -> str:
     return f"Either the session with uuid `{uuid}` doesn't exist, has been deleted, or you are not authorized!"
+
 
 def http_404_id_details(id: int) -> str:
     return f"Either the account with id `{id}` doesn't exist, has been deleted, or you are not authorized!"
@@ -36,6 +38,7 @@ def http_404_email_details(email: str) -> str:
     return f"Either the account with email `{email}` doesn't exist, has been deleted, or you are not authorized!"
 
 
-
-def http_400_file_name_details()->str:
-    return "The file_name already exists. Please refrain from uploading it again, or try uploading with a different name!"
+def http_400_file_name_details() -> str:
+    return (
+        "The file_name already exists. Please refrain from uploading it again, or try uploading with a different name!"
+    )

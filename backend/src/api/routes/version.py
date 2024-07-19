@@ -20,6 +20,7 @@ from src.config.manager import settings
 
 router = fastapi.APIRouter(prefix="/version", tags=["version"])
 
+
 @router.get(
     path="",
     name="version:get-version",
@@ -29,19 +30,19 @@ router = fastapi.APIRouter(prefix="/version", tags=["version"])
 async def get_version() -> ServiceVersionResponse:
     """
     Get the version of the service
-    
+
     ```bash
     curl http://localhost:8000/api/version -> {"llamacpp":"server--b1-a8d49d8","milvus":"v2.3.12","kirin":"v0.1.8"}
     ```
-    
-    Return ServiceVersionResponse: 
+
+    Return ServiceVersionResponse:
     - **kirin**: The version of the API aggregator
     - **milvus**: The version of the vector database
-    - **inference_engine**: The version of the inference engine 
+    - **inference_engine**: The version of the inference engine
     """
 
     return ServiceVersionResponse(
         kirin=settings.BACKEND_SERVER_VERSION,
         milvus=settings.MILVUS_VERSION,
-        inference_engine=settings.INFERENCE_ENG_VERSION
-  )
+        inference_engine=settings.INFERENCE_ENG_VERSION,
+    )

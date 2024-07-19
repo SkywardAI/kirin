@@ -43,7 +43,6 @@ class BackendBaseSettings(BaseSettings):
     MILVUS_PORT: int = decouple.config("MILVUS_PORT", cast=int)  # type: ignore
     MILVUS_VERSION: str = decouple.config("MILVUS_VERSION", cast=str)  # type: ignore
 
-
     POSTGRES_HOST: str = decouple.config("POSTGRES_HOST", cast=str)  # type: ignore
     DB_MAX_POOL_CON: int = decouple.config("DB_MAX_POOL_CON", cast=int)  # type: ignore
     POSTGRES_DB: str = decouple.config("POSTGRES_DB", cast=str)  # type: ignore
@@ -91,32 +90,32 @@ class BackendBaseSettings(BaseSettings):
     HASHING_SALT: str = decouple.config("HASHING_SALT", cast=str)  # type: ignore
     JWT_ALGORITHM: str = decouple.config("JWT_ALGORITHM", cast=str)  # type: ignore
 
-    INFERENCE_ENG: str = decouple.config("INFERENCE_ENG", cast=str) # type: ignore
-    INFERENCE_ENG_PORT: int=decouple.config("INFERENCE_ENG_PORT", cast=int) # type: ignore
-    INFERENCE_ENG_VERSION: str = decouple.config("INFERENCE_ENG_VERSION", cast=str) # type: ignore
-    
+    INFERENCE_ENG: str = decouple.config("INFERENCE_ENG", cast=str)  # type: ignore
+    INFERENCE_ENG_PORT: int = decouple.config("INFERENCE_ENG_PORT", cast=int)  # type: ignore
+    INFERENCE_ENG_VERSION: str = decouple.config("INFERENCE_ENG_VERSION", cast=str)  # type: ignore
+
     # Configurations for language model
-    LANGUAGE_MODEL_NAME: str = decouple.config("LANGUAGE_MODEL_NAME", cast=str) # type: ignore
+    LANGUAGE_MODEL_NAME: str = decouple.config("LANGUAGE_MODEL_NAME", cast=str)  # type: ignore
 
     # Admin setting
-    ADMIN_USERNAME: str = decouple.config("ADMIN_USERNAME", cast=str) # type: ignore
-    ADMIN_EMAIL: str = decouple.config("ADMIN_EMAIL", cast=str) # type: ignore
-    ADMIN_PASS: str = decouple.config("ADMIN_PASS", cast=str) # type: ignore
+    ADMIN_USERNAME: str = decouple.config("ADMIN_USERNAME", cast=str)  # type: ignore
+    ADMIN_EMAIL: str = decouple.config("ADMIN_EMAIL", cast=str)  # type: ignore
+    ADMIN_PASS: str = decouple.config("ADMIN_PASS", cast=str)  # type: ignore
 
     # Configurations for language model
-    INSTRUCTION: str = decouple.config("INSTRUCTION", cast=str) # type: ignore
+    INSTRUCTION: str = decouple.config("INSTRUCTION", cast=str)  # type: ignore
 
-    ETCD_AUTO_COMPACTION_MODE: str = decouple.config("ETCD_AUTO_COMPACTION_MODE", cast=str) # type: ignore
-    ETCD_AUTO_COMPACTION_RETENTION: int = decouple.config("ETCD_AUTO_COMPACTION_RETENTION", cast=int) # type: ignore
-    ETCD_QUOTA_BACKEND_BYTES: int = decouple.config("ETCD_QUOTA_BACKEND_BYTES", cast=int) # type: ignore
-    NUM_CPU_CORES: float = decouple.config("NUM_CPU_CORES", cast=float) # type: ignore
+    ETCD_AUTO_COMPACTION_MODE: str = decouple.config("ETCD_AUTO_COMPACTION_MODE", cast=str)  # type: ignore
+    ETCD_AUTO_COMPACTION_RETENTION: int = decouple.config("ETCD_AUTO_COMPACTION_RETENTION", cast=int)  # type: ignore
+    ETCD_QUOTA_BACKEND_BYTES: int = decouple.config("ETCD_QUOTA_BACKEND_BYTES", cast=int)  # type: ignore
+    NUM_CPU_CORES: float = decouple.config("NUM_CPU_CORES", cast=float)  # type: ignore
 
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True
         env_file: str = f"{str(ROOT_DIR)}/.env"
         validate_assignment: bool = True
         # https://docs.pydantic.dev/latest/api/config/#pydantic.config.ConfigDict.extra
-        #TODO: We need to make sure pydanic is really useful
+        # TODO: We need to make sure pydanic is really useful
         # extra='allow'
 
     @property

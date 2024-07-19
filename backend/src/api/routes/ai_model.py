@@ -18,7 +18,7 @@ from src.models.db.ai_model import AiModel
 import fastapi
 
 from src.api.dependencies.repository import get_rag_repository, get_repository
-from src.models.schemas.ai_model import AiModelCreate, AiModelChooseResponse, AiModelInResponse,AiModelCreateResponse
+from src.models.schemas.ai_model import AiModelCreate, AiModelChooseResponse, AiModelInResponse, AiModelCreateResponse
 from src.repository.crud.ai_model import AiModelCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
 
@@ -137,8 +137,4 @@ async def create_ai_model(
         raise EntityDoesNotExist(f"AiModel with id `{ai_model.name}`   alread exist!")
 
     ai_model = await aimodel_repo.create_aimodel(aimodel_create=req_model)
-    return AiModelCreateResponse(
-        id=ai_model.id,
-        name=ai_model.name,
-        des=ai_model.des
-    )
+    return AiModelCreateResponse(id=ai_model.id, name=ai_model.name, des=ai_model.des)
