@@ -20,7 +20,7 @@ import re
 from src.models.schemas.train import TrainFileIn
 from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM
 from src.repository.rag.base import BaseRAGRepository
-from src.repository.inference_eng import inference_helper
+from src.repository.inference_eng import InferenceHelper
 
 from typing import Any
 from collections.abc import AsyncGenerator
@@ -192,17 +192,18 @@ class RAGChatModelRepository(BaseRAGRepository):
         return re.sub(r'\W+', '', name)
     
 
-    def format_prompt(self, prmpt: str) -> str:
+    def format_prompt(self, prmpt: str, current_context:str = InferenceHelper.instruction) -> str:
         """
         Format the input questions, can be used for saving the conversation history
 
         Args:
         prmpt (str): input message
+        current_context (str): the context we got from the vector database
 
         Returns:
         str: formatted prompt
         """
-        return f"{inference_helper.instruction}\n" + f"\n### Human: {prmpt}\n### Assistant:"
+        return f"{current_context}\n" + f"\n### Human: {prmpt}\n### Assistant:"
     
 
     async def inference(
@@ -258,7 +259,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             "top_p": top_p,
             "n_keep": 0, # If the context window is full, we keep 0 tokens
             "n_predict": n_predict,
-            "cache_prompt": "false",
+            "cache_prompt": False,
             "slot_id": -1, # for cached prompt
             "stop": ["\n### Human:"],
             "stream": True,
@@ -268,7 +269,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             try:
                 async with client.stream(
                     "POST",
-                    inference_helper.completion_url,
+                    InferenceHelper.instruct_infer_url(),
                     headers={'Content-Type': 'application/json'},
                     json=data,
                     # We disable all timeout and trying to fix streaming randomly cutting off

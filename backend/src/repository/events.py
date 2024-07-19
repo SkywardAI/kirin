@@ -13,7 +13,6 @@ from src.securities.hashing.password import pwd_generator
 from src.repository.database import async_db
 from src.repository.table import Base
 from src.repository.vector_database import vector_db
-from src.repository.inference_eng import inference_helper
 
 @event.listens_for(target=async_db.async_engine.sync_engine, identifier="connect")
 def inspect_db_server_on_connection(
@@ -113,19 +112,3 @@ async def dispose_db_connection(backend_app: fastapi.FastAPI) -> None:
     await backend_app.state.db.async_engine.dispose()
 
     loguru.logger.info("Database Connection --- Successfully Disposed!")
-
-
-async def initialize_inference_client() -> None:
-    """
-    Initialize the inference helper, which include the OpenAI client 
-    and the URL for the inference engine.
-
-    Args:
-      * backend_app (fastapi.FastAPI): The FastAPI application instance
-
-    Returns:
-        None
-    """
-    loguru.logger.info("Inference helper --- Waiting for Initialization . . .")
-    inference_helper.init()
-    loguru.logger.info("Inference helper --- Successfully Initialized!")

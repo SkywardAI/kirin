@@ -20,17 +20,16 @@ import openai
 from src.config.manager import settings
 
 class InferenceHelper:
-    def init(self) -> None:
-        # TODO pydantic settings
-        self.infer_eng_url=settings.INFERENCE_ENG
-        self.infer_eng_port=settings.INFERENCE_ENG_PORT
-        self.instruction=settings.INSTRUCTION
-        self.client=self.openai_client() # OpenAI-compatible Chat Completions API
-        self.completion_url=self.instruct_infer_url()
-        self.tokenization_url=self.instruct_tokenize_url()
-
+    infer_eng_url=settings.INFERENCE_ENG
+    infer_eng_port=settings.INFERENCE_ENG_PORT
+    instruction=settings.INSTRUCTION
     
-    def openai_client(self) -> openai.OpenAI:
+    def init(self) -> None:
+        raise NotImplementedError("InferenceHelper is a singleton class. Use inference_helper instead.")
+
+
+    @classmethod
+    def openai_client(cls) -> openai.OpenAI:
         """
         Initialize OpenAI client
         
@@ -38,29 +37,26 @@ class InferenceHelper:
         openai.OpenAI: OpenAI client
         
         """
-        url=f'http://{self.infer_eng_url}:{self.infer_eng_port}/v1'
+        url=f'http://{cls.infer_eng_url}:{cls.infer_eng_port}/v1'
         api_key='sk-no-key-required'
         return openai.OpenAI(base_url=url, api_key=api_key)
 
-
-    def instruct_tokenize_url(self)->str:
+    @classmethod
+    def tokenizer_url(cls)->str:
         """
         Get the URL for the tokenization engine
 
         Returns:
         str: URL for the tokenization
         """
-        return f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/tokenize"
+        return f"http://{cls.infer_eng_url}:{cls.infer_eng_port}/tokenize"
 
-
-    def instruct_infer_url(self)->str:
+    @classmethod
+    def instruct_infer_url(cls)->str:
         """
         Get the URL for the inference engine
 
         Returns:
         str: URL for the inference engine
         """
-        return f"http://{inference_helper.infer_eng_url}:{inference_helper.infer_eng_port}/completion"
-
-
-inference_helper: InferenceHelper = InferenceHelper()
+        return f"http://{cls.infer_eng_url}:{cls.infer_eng_port}/completion"
