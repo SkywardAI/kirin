@@ -3,7 +3,12 @@ import typing
 import fastapi
 import loguru
 
-from src.repository.events import dispose_db_connection, initialize_db_connection, initialize_vectordb_collection
+from src.repository.events import (
+    dispose_db_connection,
+    initialize_db_connection,
+    initialize_vectordb_collection,
+    dispose_httpx_client,
+)
 
 
 def execute_backend_server_event_handler(backend_app: fastapi.FastAPI) -> typing.Any:
@@ -18,5 +23,6 @@ def terminate_backend_server_event_handler(backend_app: fastapi.FastAPI) -> typi
     @loguru.logger.catch
     async def stop_backend_server_events() -> None:
         await dispose_db_connection(backend_app=backend_app)
+        await dispose_httpx_client()
 
     return stop_backend_server_events

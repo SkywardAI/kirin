@@ -21,7 +21,7 @@ from src.models.schemas.train import TrainFileIn
 from src.config.settings.const import UPLOAD_FILE_PATH, RAG_NUM
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.inference_eng import InferenceHelper
-from src.utilities.httpkit.method_kit import infer_kit
+from src.utilities.httpkit.httpx_kit import httpx_kit
 from typing import Any
 from collections.abc import AsyncGenerator
 
@@ -242,7 +242,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         }
 
         try:
-            async with infer_kit.async_client.stream(
+            async with httpx_kit.async_client.stream(
                 "POST",
                 InferenceHelper.instruct_infer_url(),
                 headers={"Content-Type": "application/json"},
@@ -281,8 +281,10 @@ class RAGChatModelRepository(BaseRAGRepository):
 
             # tokenized_input
 
+            # search the context in the vector database
+            # combine the context with the input message
             context = ""
-            return context or None
+            return context or InferenceHelper.instruction
 
         data_with_context = {
             "prompt": self.format_prompt(input_msg, get_context_by_question(input_msg)),
@@ -298,7 +300,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         }
 
         try:
-            async with infer_kit.async_client.stream(
+            async with httpx_kit.async_client.stream(
                 "POST",
                 InferenceHelper.instruct_infer_url(),
                 headers={"Content-Type": "application/json"},

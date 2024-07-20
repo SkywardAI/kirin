@@ -13,6 +13,7 @@ from src.securities.hashing.password import pwd_generator
 from src.repository.database import async_db
 from src.repository.table import Base
 from src.repository.vector_database import vector_db
+from src.utilities.httpkit.httpx_kit import httpx_kit
 
 
 @event.listens_for(target=async_db.async_engine.sync_engine, identifier="connect")
@@ -115,3 +116,19 @@ async def dispose_db_connection(backend_app: fastapi.FastAPI) -> None:
     await backend_app.state.db.async_engine.dispose()
 
     loguru.logger.info("Database Connection --- Successfully Disposed!")
+
+
+async def dispose_httpx_client() -> None:
+    loguru.logger.info("Httpx Client --- Disposing . . .")
+
+    close_async = await httpx_kit.teardown_async_client()
+
+    loguru.logger.info(
+        "Httpx Async Client --- Successfully Disposed!" if close_async else "Httpx Async Client --- Failed to Dispose!"
+    )
+
+    close_sync = httpx_kit.teardown_sync_client()
+
+    loguru.logger.info(
+        "Httpx Sync Client --- Successfully Disposed!" if close_sync else "Httpx Sync Client --- Failed to Dispose!"
+    )

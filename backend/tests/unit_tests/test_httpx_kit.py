@@ -13,23 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import fastapi
-from src.models.schemas.health import HealthCheckResponse
+
+import unittest
+import pytest
+from src.utilities.httpkit.httpx_kit import httpx_kit
 
 
-router = fastapi.APIRouter(prefix="/health", tags=["health"])
+class TestHttpxKit(unittest.TestCase):
+    @pytest.mark.asyncio
+    async def test_teardown_async_client(self):
+        """
+        Test teardown of async client
+        """
+        self.assertTrue(await httpx_kit.teardown_async_client())
 
-
-@router.get("", name="health:health-check")
-async def health_check() -> HealthCheckResponse:
-    """
-    Check the health of the service
-
-    ```bash
-    curl http://localhost:8000/api/health -> {"status":"ok"}
-    ```
-
-    Return:
-    - **status**: The status of the service
-    """
-    return HealthCheckResponse(status="ok")
+    def test_teardown_sync_client(self):
+        """
+        Test teardown of sync client
+        """
+        self.assertTrue(httpx_kit.teardown_sync_client())

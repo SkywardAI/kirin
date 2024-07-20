@@ -17,7 +17,7 @@
 import httpx
 
 
-class InferKit:
+class HttpxKit:
     """
     A class to initialize an async and sync client using httpx
 
@@ -68,5 +68,22 @@ class InferKit:
         """
         return httpx.Client()
 
+    async def teardown_async_client(self) -> bool:
+        """
+        Close the async client
+        """
+        await self.async_client.aclose()
+        return self.async_client.is_closed
 
-infer_kit = InferKit()
+    def teardown_sync_client(self) -> bool:
+        """
+        Close the sync client
+
+        Returns:
+        *
+        """
+        self.sync_client.close()
+        return self.sync_client.is_closed
+
+
+httpx_kit = HttpxKit()
