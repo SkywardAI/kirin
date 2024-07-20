@@ -28,12 +28,14 @@ async def http_exc_400_credentials_bad_signin_request() -> Exception:
         detail=http_400_sigin_credentials_details(),
     )
 
+
 async def http_exc_400_failed_validate_request() -> Exception:
     return fastapi.HTTPException(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
         detail=http_400_sigin_credentials_details(),
         headers={"WWW-Authenticate": "Bearer"},
     )
+
 
 async def http_400_exc_bad_username_request(username: str) -> Exception:
     return fastapi.HTTPException(

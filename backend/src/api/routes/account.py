@@ -22,11 +22,15 @@ from src.models.schemas.account import AccountInResponse, AccountInUpdate, Accou
 from src.repository.crud.account import AccountCRUDRepository
 from src.securities.authorizations.jwt import jwt_generator, jwt_required
 from src.utilities.exceptions.database import EntityDoesNotExist
-from src.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_request, http_404_exc_username_not_found_request
+from src.utilities.exceptions.http.exc_404 import (
+    http_404_exc_id_not_found_request,
+    http_404_exc_username_not_found_request,
+)
 from src.utilities.exceptions.http.exc_401 import http_exc_401_cunauthorized_request
 
 router = fastapi.APIRouter(prefix="/accounts", tags=["accounts"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
+
 
 @router.get(
     path="",
@@ -37,7 +41,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 async def get_accounts(
     token: str = fastapi.Depends(oauth2_scheme),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> list[AccountInResponse]:
     """
     Get a list of accounts
@@ -99,7 +103,7 @@ async def get_account(
     id: int,
     token: str = fastapi.Depends(oauth2_scheme),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> AccountInResponse:
     """
     Get an account by id
@@ -151,6 +155,7 @@ async def get_account(
         ),
     )
 
+
 @router.patch(
     path="",
     name="accounts:update-current-account",
@@ -161,7 +166,7 @@ async def update_account(
     token: str = fastapi.Depends(oauth2_scheme),
     account_update: AccountInUpdate = fastapi.Body(...),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> AccountInResponse:
     """
     update current account info
@@ -226,6 +231,7 @@ async def update_account(
         ),
     )
 
+
 @router.patch(
     path="/{id}",
     name="accounts:update-account-by-id",
@@ -237,7 +243,7 @@ async def update_account_by_admin(
     token: str = fastapi.Depends(oauth2_scheme),
     account_update: AccountInUpdate = fastapi.Body(...),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> AccountInResponse:
     """
     update account info by account id
@@ -301,9 +307,10 @@ async def update_account_by_admin(
 
 @router.delete(path="", name="accounts:delete-account-by-id", status_code=fastapi.status.HTTP_200_OK)
 async def delete_account(
-    id: int, account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    id: int,
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     token: str = fastapi.Depends(oauth2_scheme),
-    jwt_payload: dict = fastapi.Depends(jwt_required)
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> dict[str, str]:
     """
     Delete an account by id

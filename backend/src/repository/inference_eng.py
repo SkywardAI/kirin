@@ -14,35 +14,35 @@
 # limitations under the License.
 
 
-# https://pypi.org/project/openai/1.35.5/
+import pydantic
 import openai
 
 from src.config.manager import settings
 
+
 class InferenceHelper:
-    infer_eng_url=settings.INFERENCE_ENG
-    infer_eng_port=settings.INFERENCE_ENG_PORT
-    instruction=settings.INSTRUCTION
-    
+    infer_eng_url: pydantic.StrictStr = settings.INFERENCE_ENG
+    infer_eng_port: pydantic.PositiveInt = settings.INFERENCE_ENG_PORT
+    instruction: pydantic.StrictStr = settings.INSTRUCTION
+
     def init(self) -> None:
         raise NotImplementedError("InferenceHelper is a singleton class. Use inference_helper instead.")
-
 
     @classmethod
     def openai_client(cls) -> openai.OpenAI:
         """
         Initialize OpenAI client
-        
+
         Returns:
         openai.OpenAI: OpenAI client
-        
+
         """
-        url=f'http://{cls.infer_eng_url}:{cls.infer_eng_port}/v1'
-        api_key='sk-no-key-required'
+        url = f"http://{cls.infer_eng_url}:{cls.infer_eng_port}/v1"
+        api_key = "sk-no-key-required"
         return openai.OpenAI(base_url=url, api_key=api_key)
 
     @classmethod
-    def tokenizer_url(cls)->str:
+    def tokenizer_url(cls) -> str:
         """
         Get the URL for the tokenization engine
 
@@ -52,7 +52,7 @@ class InferenceHelper:
         return f"http://{cls.infer_eng_url}:{cls.infer_eng_port}/tokenize"
 
     @classmethod
-    def instruct_infer_url(cls)->str:
+    def instruct_infer_url(cls) -> str:
         """
         Get the URL for the inference engine
 

@@ -12,10 +12,14 @@ class Session(Base):  # type: ignore
     __tablename__ = "session"
 
     id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(primary_key=True, autoincrement="auto")
-    uuid: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=36), nullable=False, default=lambda: str(uuid.uuid4()))
+    uuid: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(
+        sqlalchemy.String(length=36), nullable=False, default=lambda: str(uuid.uuid4())
+    )
     account_id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(nullable=True)
     name: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=64), nullable=True)
-    type: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.Enum("rag", "chat", name="session_type"), nullable=False, default="chat")
+    type: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(
+        sqlalchemy.Enum("rag", "chat", name="session_type"), nullable=False, default="chat"
+    )
     created_at: SQLAlchemyMapped[datetime.datetime] = sqlalchemy_mapped_column(
         sqlalchemy.DateTime(timezone=True), nullable=False, server_default=sqlalchemy_functions.now()
     )
@@ -32,7 +36,9 @@ class ChatHistory(Base):  # type: ignore
 
     id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(primary_key=True, autoincrement="auto")
     session_id: SQLAlchemyMapped[int] = sqlalchemy_mapped_column(nullable=False)
-    role: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.Enum("user", "assistant", name="role"), nullable=False, default="user")
+    role: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(
+        sqlalchemy.Enum("user", "assistant", name="role"), nullable=False, default="user"
+    )
     message: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=4096), nullable=False)
     created_at: SQLAlchemyMapped[datetime.datetime] = sqlalchemy_mapped_column(
         sqlalchemy.DateTime(timezone=True), nullable=False, server_default=sqlalchemy_functions.now()

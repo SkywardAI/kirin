@@ -9,11 +9,13 @@ class AiModelCreate(BaseSchemaModel):
     name: str = Field(..., title="Model Name", description="Model Name")
     des: str = Field(..., title="Details", description="Details")
 
+
 class AiModelCreateResponse(BaseSchemaModel):
     id: int = Field(..., title="id", description="id")
     name: str = Field(..., title="name", description="name")
     des: str = Field(..., title="Details", description="Details")
     msg: Optional[str] = None
+
 
 class AiModelInResponse(BaseSchemaModel):
     id: int = Field(..., title="id", description="id")

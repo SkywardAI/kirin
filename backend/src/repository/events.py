@@ -13,6 +13,8 @@ from src.securities.hashing.password import pwd_generator
 from src.repository.database import async_db
 from src.repository.table import Base
 from src.repository.vector_database import vector_db
+from src.utilities.httpkit.httpx_kit import httpx_kit
+
 
 @event.listens_for(target=async_db.async_engine.sync_engine, identifier="connect")
 def inspect_db_server_on_connection(
@@ -38,6 +40,7 @@ async def initialize_db_tables(connection: AsyncConnection) -> None:
 
     loguru.logger.info("Database Table Creation --- Successfully Initialized!")
 
+
 async def initialize_anonymous_user(async_session: AsyncSession) -> None:
     loguru.logger.info("Anonymous user --- Creating . . .")
 
@@ -46,7 +49,7 @@ async def initialize_anonymous_user(async_session: AsyncSession) -> None:
     new_account.set_hash_salt(hash_salt=pwd_generator.generate_salt)
     new_account.set_hashed_password(
         hashed_password=pwd_generator.generate_hashed_password(
-        hash_salt=new_account.hash_salt, new_password=ANONYMOUS_PASS
+            hash_salt=new_account.hash_salt, new_password=ANONYMOUS_PASS
         )
     )
 
@@ -56,6 +59,7 @@ async def initialize_anonymous_user(async_session: AsyncSession) -> None:
 
     loguru.logger.info("Anonymous user --- Successfully Created!")
 
+
 async def initialize_admin_user(async_session: AsyncSession) -> None:
     loguru.logger.info("Admin user --- Creating . . .")
 
@@ -64,7 +68,7 @@ async def initialize_admin_user(async_session: AsyncSession) -> None:
     new_account.set_hash_salt(hash_salt=pwd_generator.generate_salt)
     new_account.set_hashed_password(
         hashed_password=pwd_generator.generate_hashed_password(
-        hash_salt=new_account.hash_salt, new_password=settings.ADMIN_USERNAME
+            hash_salt=new_account.hash_salt, new_password=settings.ADMIN_USERNAME
         )
     )
 
@@ -73,6 +77,7 @@ async def initialize_admin_user(async_session: AsyncSession) -> None:
     await async_session.refresh(instance=new_account)
 
     loguru.logger.info("Admin user --- Successfully Created!")
+
 
 async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
     loguru.logger.info("Database Connection --- Establishing . . .")
@@ -89,7 +94,6 @@ async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
 
 
 async def initialize_vectordb_collection() -> None:
-    
     loguru.logger.info("Vector Database Connection --- Establishing . . .")
     # RAG data can be loaded manually from the frontend
     # https://github.com/SkywardAI/chat-backend/issues/172
@@ -112,3 +116,19 @@ async def dispose_db_connection(backend_app: fastapi.FastAPI) -> None:
     await backend_app.state.db.async_engine.dispose()
 
     loguru.logger.info("Database Connection --- Successfully Disposed!")
+
+
+async def dispose_httpx_client() -> None:
+    loguru.logger.info("Httpx Client --- Disposing . . .")
+
+    close_async = await httpx_kit.teardown_async_client()
+
+    loguru.logger.info(
+        "Httpx Async Client --- Successfully Disposed!" if close_async else "Httpx Async Client --- Failed to Dispose!"
+    )
+
+    close_sync = httpx_kit.teardown_sync_client()
+
+    loguru.logger.info(
+        "Httpx Sync Client --- Successfully Disposed!" if close_sync else "Httpx Sync Client --- Failed to Dispose!"
+    )

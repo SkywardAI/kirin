@@ -14,7 +14,8 @@
 # limitations under the License.
 
 from src.models.schemas.base import BaseSchemaModel
-from pydantic import(Field)
+from pydantic import Field
+
 
 class ServiceVersionResponse(BaseSchemaModel):
     """
@@ -24,6 +25,11 @@ class ServiceVersionResponse(BaseSchemaModel):
     - **milvus**: The version of the vector database
     - **inference_engine**: The version of the inference engine
     """
-    inference_engine: str | None = Field(..., title="infernece engine version", description="infernece engine version", examples=['server--b1-a8d49d8']) 
-    milvus : str | None = Field(..., title="milvus version", description="milvus version", examples=['v2.3.12']) 
-    kirin :str | None = Field(..., title="backend service version", description="backend service version", examples=['v0.1.8']) 
+
+    inference_engine: str | None = Field(
+        ..., title="infernece engine version", description="infernece engine version", examples=["server--b1-a8d49d8"]
+    )
+    milvus: str | None = Field(..., title="milvus version", description="milvus version", examples=["v2.3.12"])
+    kirin: str | None = Field(
+        ..., title="backend service version", description="backend service version", examples=["v0.1.8"]
+    )

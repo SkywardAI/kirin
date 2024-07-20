@@ -17,7 +17,7 @@ import fastapi
 from typing import Annotated
 from src.api.dependencies.repository import get_repository
 from src.models.schemas.account import AccountInCreate, AccountInLogin, AccountInResponse, AccountWithToken
-from src.config.settings.const import ANONYMOUS_USER,ANONYMOUS_PASS
+from src.config.settings.const import ANONYMOUS_USER, ANONYMOUS_PASS
 from src.repository.crud.account import AccountCRUDRepository
 from src.securities.authorizations.jwt import jwt_generator
 from src.utilities.exceptions.database import EntityAlreadyExists
@@ -28,6 +28,7 @@ from src.utilities.exceptions.http.exc_400 import (
 )
 
 router = fastapi.APIRouter(prefix="/auth", tags=["authentication"])
+
 
 @router.post(
     "/signup",
@@ -43,9 +44,9 @@ async def signup(
     Create a new account
 
     ```bash
-    curl -X 'POST' 'http://127.0.0.1:8000/api/auth/signup' 
-    -H 'accept: application/json' 
-    -H 'Content-Type: application/json' 
+    curl -X 'POST' 'http://127.0.0.1:8000/api/auth/signup'
+    -H 'accept: application/json'
+    -H 'Content-Type: application/json'
     -d '{"username": "aisuko", "email": "aisuko@example.com", "password": "aisuko"}'
     ```
 
@@ -61,7 +62,6 @@ async def signup(
         - **created_at**: The creation time
         - **updated_at**: The update time
     """
-
 
     try:
         await account_repo.is_username_taken(username=account_create.username)
@@ -123,7 +123,7 @@ async def signin(
 
     if account_login.username == ANONYMOUS_USER:
         raise await http_exc_400_credentials_bad_signin_request()
-    
+
     try:
         db_account = await account_repo.read_user_by_password_authentication(account_login=account_login)
 
@@ -146,6 +146,7 @@ async def signin(
         ),
     )
 
+
 @router.get(
     path="/token",
     name="authentication: token for anonymous user",
@@ -153,7 +154,7 @@ async def signin(
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def get_token(
-    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository))
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
 ) -> dict:
     """
     Get chat history for an anonymous user
@@ -170,6 +171,7 @@ async def get_token(
     access_token = jwt_generator.generate_access_token(account=db_account)
 
     return {"token": access_token}
+
 
 @router.post("/verify")
 async def login_for_access_token(
@@ -191,8 +193,9 @@ async def login_for_access_token(
     - **token_type**: The token type
     """
     try:
-        db_account= await account_repo.read_user_by_password_authentication(
-            account_login=AccountInLogin(username=form_data.username,password=form_data.password))
+        db_account = await account_repo.read_user_by_password_authentication(
+            account_login=AccountInLogin(username=form_data.username, password=form_data.password)
+        )
     except Exception:
         raise await http_exc_400_failed_validate_request()
     access_token = jwt_generator.generate_access_token(account=db_account)

@@ -16,10 +16,12 @@
 from src.models.schemas.base import BaseSchemaModel
 from pydantic import Field
 
+
 class HealthCheckResponse(BaseSchemaModel):
-   """
+    """
     The status of the service
 
     - **status**: The status of the service
     """
-   status: str = Field(..., title="status", description="The status of the service", examples=['ok'])
+
+    status: str = Field(..., title="status", description="The status of the service", examples=["ok"])

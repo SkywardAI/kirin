@@ -3,21 +3,21 @@ import sqlalchemy
 
 from src.models.db.file import UploadedFile
 from src.repository.crud.base import BaseCRUDRepository
-from src.utilities.verifier.file import file_verifier # type: ignore
+from src.utilities.verifier.file import file_verifier  # type: ignore
 from src.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
 
 
 class UploadedFileCRUDRepository(BaseCRUDRepository):
     async def create_uploadfile(self, file_name: str) -> UploadedFile:
-
-        file_name_stmt = sqlalchemy.select(UploadedFile.name).select_from(UploadedFile).where(UploadedFile.name == file_name)
+        file_name_stmt = (
+            sqlalchemy.select(UploadedFile.name).select_from(UploadedFile).where(UploadedFile.name == file_name)
+        )
         file_name_query = await self.async_session.execute(file_name_stmt)
         db_file_name = file_name_query.scalar()
-                
+
         if not file_verifier.is_file_available(name=db_file_name):
-            raise EntityAlreadyExists(f"The file_name `{file_name}` is already file_name!")  
-   
-   
+            raise EntityAlreadyExists(f"The file_name `{file_name}` is already file_name!")
+
         uploaded_file = UploadedFile(name=file_name)
 
         self.async_session.add(instance=uploaded_file)
@@ -38,7 +38,7 @@ class UploadedFileCRUDRepository(BaseCRUDRepository):
         if fileinfo is None:
             raise EntityDoesNotExist("File with id `{id}` does not exist!")
 
-        return fileinfo# type: ignore
+        return fileinfo  # type: ignore
 
     async def delete_file_by_id(self, id: int) -> str:
         select_stmt = sqlalchemy.select(UploadedFile).where(UploadedFile.id == id)

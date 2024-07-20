@@ -16,35 +16,34 @@
 import unittest
 import jwt as pyjwt
 
+
 @unittest.skip("Skip this test, it is a evidence of a security vulnerability")
 class TestJWTReplacedSolution(unittest.TestCase):
+    JWT_SECRET_KEY = "YOUR-KEY"
+    ALGORITHM = "HS256"
+    content = {"some": "payload"}
 
-    JWT_SECRET_KEY="YOUR-KEY"
-    ALGORITHM="HS256"
-    content={"some": "payload"}
-    
     @classmethod
     def setUpClass(cls) -> None:
         return super().setUpClass()
-    
+
     @classmethod
     def tearDownClass(cls) -> None:
         return super().tearDownClass()
-    
 
     def test_jwt_jose(self):
         pass
         # jose_str=jose_jwt.encode(self.content, key=self.JWT_SECRET_KEY, algorithm=self.ALGORITHM)
-        
+
         # pyjwt_str=pyjwt.encode(self.content, key=self.JWT_SECRET_KEY, algorithm=self.ALGORITHM)
 
         # # jose and pyjwt should produce the same token
         # assert jose_str == pyjwt_str
-    
+
     def test_jwt_decode(self):
         pass
         # jose_str=jose_jwt.encode(self.content, key=self.JWT_SECRET_KEY, algorithm=self.ALGORITHM)
-        
+
         # pyjwt_str=pyjwt.encode(self.content, key=self.JWT_SECRET_KEY, algorithm=self.ALGORITHM)
 
         # # jose and pyjwt should produce the same token
