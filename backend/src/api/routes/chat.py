@@ -206,7 +206,7 @@ async def chat(
                 n_predict=chat_in_msg.n_predict,
             )
         case _:  # default is chat robot
-            stream_func: ContentStream = rag_chat_repo.inference(
+            stream_func: ContentStream = rag_chat_repo.inference_with_rag(
                 session_id=session.id,
                 input_msg=chat_in_msg.message,
                 temperature=chat_in_msg.temperature,

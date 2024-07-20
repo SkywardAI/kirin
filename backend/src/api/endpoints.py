@@ -22,7 +22,7 @@ from src.api.routes.file import router as file_router
 from src.api.routes.train import router as train_router
 from src.api.routes.version import router as version_router
 from src.api.routes.health import router as health_router
-from src.api.routes.datasets import router as datasets_router
+from src.api.routes.rag_datasets import router as datasets_router
 
 router = fastapi.APIRouter()
 

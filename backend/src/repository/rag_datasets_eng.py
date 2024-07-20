@@ -28,7 +28,7 @@ class DatasetEng:
         pass
 
     @classmethod
-    async def load_dataset(cls, name: str) -> dict:
+    def load_dataset(cls, name: str) -> dict:
         """
         Load dataset from the given name, must connect to the internet
 
@@ -36,8 +36,11 @@ class DatasetEng:
         """
 
         ds = load_dataset(name)
-        ds_list = ds.to_list()
+        #TODO: validation isn't make sense, it should be removed
+        ds_list = ds.get("validation").to_list()
 
-        await vector_db.create_collection(collection_name=name)
+        name=name.replace("/", "_")
 
-        return await vector_db.insert_list(collection_name=name, data_list=ds_list)
+        vector_db.create_collection(collection_name=name)
+
+        return vector_db.insert_list(collection_name=name, data_list=ds_list)

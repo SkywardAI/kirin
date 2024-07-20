@@ -21,6 +21,7 @@ import httpx
 from src.repository.rag.base import BaseRAGRepository
 from src.repository.inference_eng import InferenceHelper
 from src.utilities.httpkit.httpx_kit import httpx_kit
+from src.repository.vector_database import vector_db
 
 
 class RAGChatModelRepository(BaseRAGRepository):
@@ -119,20 +120,32 @@ class RAGChatModelRepository(BaseRAGRepository):
         AsyncGenerator[Any, None]: response message
         """
 
-        def get_context_by_question(input_msg: str):
+        async def get_context_by_question(input_msg: str):
             """
             Get the context from v-db by the question
             """
 
             # tokenized_input
-
+            async with httpx.AsyncClient() as client:
+                try:
+                    res=await client.post(
+                        InferenceHelper.tokenizer_url(),
+                        json={"content": input_msg},
+                    )
+                    res.raise_for_status()
+                    tokenized_input = res.json().get("tokens")
+                except Exception as e:
+                    pass
             # search the context in the vector database
+            result=await vector_db.search(tokenized_input, 1, collection_name="aisuko_squad01")
             # combine the context with the input message
             context = ""
             return context or InferenceHelper.instruction
+        
+        current_context = await get_context_by_question(input_msg)
 
         data_with_context = {
-            "prompt": self.format_prompt(input_msg, get_context_by_question(input_msg)),
+            "prompt": self.format_prompt(input_msg, current_context),
             "temperature": temperature,
             "top_k": top_k,
             "top_p": top_p,
