@@ -197,9 +197,15 @@ async def chat(
 
     match session.type:
         case "rag":
-            # TODO: Implement RAG
-            pass
-        case _:
+            stream_func: ContentStream = rag_chat_repo.inference_with_rag(
+                session_id=session.id,
+                input_msg=chat_in_msg.message,
+                temperature=chat_in_msg.temperature,
+                top_k=chat_in_msg.top_k,
+                top_p=chat_in_msg.top_p,
+                n_predict=chat_in_msg.n_predict,
+            )
+        case _:  # default is chat robot
             stream_func: ContentStream = rag_chat_repo.inference(
                 session_id=session.id,
                 input_msg=chat_in_msg.message,

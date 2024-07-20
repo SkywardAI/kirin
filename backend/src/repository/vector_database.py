@@ -18,7 +18,7 @@ class MilvusHelper:
                 err = e
                 # loguru.logger.info(f"Exception --- {e}")
                 # print(f"Failed to connect to Milvus: {e}")
-                time.sleep(10)
+                time.sleep(5)
         else:
             raise Exception(f"Failed to connect to Milvus after 3 attempts:{err}")
 
@@ -42,15 +42,19 @@ class MilvusHelper:
             loguru.logger.info(f"Vector Databse --- Milvus: collection {collection_name} exist, dropping..")
             self.client.drop_collection(collection_name)
 
-        self.client.create_collection(collection_name=collection_name, dimension=dimension)
+        self.client.create_collection(
+            collection_name=collection_name,
+            dimension=dimension,
+            auto_id=True,  # enable auto id
+            enable_dynamic_field=True,  # enable dynamic field
+            vector_field_name="question_embedding",  # map vector field name and embedding field name
+            consistency_level="Strong",  # To enable search with latest data
+        )
         loguru.logger.info(f"Vector Database --- Milvus: collection {collection_name} created")
 
-    def insert_list(self, embedding, data, collection_name=DEFAULT_COLLECTION, start_idx=0):
+    def insert_list(self, collection_name: str = DEFAULT_COLLECTION, data_list: list = []) -> dict:
         try:
-            for i, item in enumerate(embedding):
-                self.client.insert(
-                    collection_name=collection_name, data={"id": i + start_idx, "vector": item, "doc": data[i]}
-                )
+            return self.client.insert(collection_name=collection_name, data=data_list)
         except Exception as e:
             loguru.logger.info(f"Vector Databse --- Error: {e}")
 
