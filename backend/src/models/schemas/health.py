@@ -13,24 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import fastapi
-from src.models.schemas.health import HealthCheckResponse
+from src.models.schemas.base import BaseSchemaModel
+from pydantic import Field
 
+class HealthCheckResponse(BaseSchemaModel):
+   """
+    The status of the service
 
-router = fastapi.APIRouter(prefix="/health", tags=["health"])
-
-
-@router.get("", name="health:health-check")
-
-async def health_check() -> HealthCheckResponse:
-    """
-    Check the health of the service
-
-    ```bash
-    curl http://localhost:8000/api/health -> {"status":"ok"}
-    ```
-
-    Return:
     - **status**: The status of the service
     """
-    return HealthCheckResponse(status="ok")
+   status: str = Field(..., title="status", description="The status of the service", examples=['ok'])
