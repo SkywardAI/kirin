@@ -313,7 +313,7 @@ async def get_chathistory(
     ```
     """
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
-    if session_repo.verify_session_by_account_id(session_uuid=uuid, account_id=current_user.id) is False:
+    if await session_repo.verify_session_by_account_id(session_uuid=uuid, account_id=current_user.id) is False:
         raise http_404_exc_uuid_not_found_request(uuid=uuid)
     session = await session_repo.read_sessions_by_uuid(session_uuid=uuid)
     chats = await chat_repo.read_chat_history_by_session_id(id=session.id)
