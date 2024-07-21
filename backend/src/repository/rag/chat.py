@@ -137,7 +137,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             except Exception as e:
                 loguru.logger.error(e)
             # collection name for testing
-            context = vector_db.search(embedd_input, 1, collection_name="aisuko_squad01")
+            context = vector_db.search(list(embedd_input), 1, collection_name="aisuko_squad01")
             return context or InferenceHelper.instruction
 
         current_context = await get_context_by_question(input_msg)
