@@ -72,6 +72,9 @@ LANGUAGE_MODEL_NAME:=Phi-3-mini-4k-instruct-q4.gguf
 LANGUAGE_MODEL_URL:=https://huggingface.co/aisuko/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi3-mini-4k-instruct-Q4.gguf?download=true
 INSTRUCTION:="A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the questions from human."
 
+EMBEDDING_MODEL_NAME:=all-MiniLM-L6-v2-Q4_K_M-v2.gguf
+EMBEDDING_MODEL_URL:=https://huggingface.co/aisuko/all-MiniLM-L6-v2-gguf/resolve/main/all-MiniLM-L6-v2-Q4_K_M-v2.gguf?download=true
+
 ADMIN_USERNAME:=admin
 ADMIN_EMAIL:=admin@admin.com
 ADMIN_PASS:=admin
@@ -129,6 +132,7 @@ env:
 	@echo "ADMIN_PASS=$(ADMIN_PASS)">> $(FILE_NAME)
 	@echo "TIMEZONE=$(TIMEZONE)">> $(FILE_NAME)
 	@echo "INSTRUCTION"=$(INSTRUCTION)>> $(FILE_NAME)
+	@echo "EMBEDDING_MODEL_NAME"=$(EMBEDDING_MODEL_NAME) >> $(FILE_NAME)
 
 
 .PHONY: prepare
@@ -197,6 +201,8 @@ ruff:
 .PHONY: lm
 lm:
 	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
+	@wget -O volumes/models/$(EMBEDDING_MODEL_NAME) $(EMBEDDING_MODEL_URL)
+
 
 .PHONY: localinfer
 localinfer: lm
