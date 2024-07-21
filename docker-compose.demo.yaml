@@ -99,6 +99,7 @@ services:
       - db
       - standalone
       - llamacpp
+      - embedding_eng
 
 
   etcd:
@@ -185,12 +186,14 @@ services:
 
   rebel:
     container_name: rebel
-    image: ghcr.io/skywardai/rebel:v0.1.5
+    image: ghcr.io/skywardai/rebel:v0.1.6
     restart: always
     expose:
       - 80
     ports:
       - 80:80
+    depends_on:
+      - kirin
 
 volumes:
   postgresql_db_data:
