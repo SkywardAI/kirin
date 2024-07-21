@@ -392,7 +392,7 @@ async def save_chats(
     """
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
     if (
-        session_repo.verify_session_by_account_id(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id)
+        await session_repo.verify_session_by_account_id(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id)
         is False
     ):
         raise http_404_exc_uuid_not_found_request(uuid=chat_in_msg.sessionUuid)
