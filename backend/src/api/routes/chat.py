@@ -168,7 +168,7 @@ async def chat(
     "topK": 40,
     "topP": 0.9,
     "nPredict": 512,
-    "collection_name": aisuko/test
+    "collection_name": "aisuko/test"
     }'
     ```
 
