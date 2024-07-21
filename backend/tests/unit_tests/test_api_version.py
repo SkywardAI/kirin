@@ -43,5 +43,5 @@ class TestAPIVersion(unittest.TestCase):
         assert response.json() == {
             "inferenceEngine": "server--b1-2321a5e",
             "milvus": "v2.3.12",
-            "kirin": "v0.1.15",
+            "kirin": "v0.1.16",
         }
