@@ -50,7 +50,7 @@ class ChatInMessage(BaseSchemaModel):
     top_k: int = Field(..., title="Top_k", description="Top_k parameter for inference(int)")
     top_p: float = Field(..., title="Top_p", description="Top_p parameter for inference(float)")
     n_predict: int = Field(..., title="n_predict", description="n_predict parameter for inference(int)")
-    collection_name: Optional[str] | None = Field(..., title="Collection Name", description="Collection Name")
+    collection_name: Optional[str] | None = Field(default=None, title="Collection Name", description="Collection Name")
 
 
 class ChatInResponse(BaseSchemaModel):
