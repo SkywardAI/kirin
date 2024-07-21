@@ -102,6 +102,7 @@ services:
       - db
       - standalone
       - llamacpp
+      - embedding_eng
 
 
   etcd:
@@ -191,6 +192,8 @@ services:
       - 80
     ports:
       - 80:80
+    depends_on:
+      - kirin
 
 volumes:
   postgresql_db_data:
