@@ -22,6 +22,7 @@ from src.repository.rag.base import BaseRAGRepository
 from src.repository.inference_eng import InferenceHelper
 from src.utilities.httpkit.httpx_kit import httpx_kit
 from src.repository.vector_database import vector_db
+from src.config.settings.const import DEFAULT_COLLECTION
 
 
 class RAGChatModelRepository(BaseRAGRepository):
@@ -112,6 +113,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         top_k: int = 40,
         top_p: float = 0.9,
         n_predict: int = 128,
+        collection_name: str = DEFAULT_COLLECTION,
     ) -> AsyncGenerator[Any, None]:
         """
         Inference using RAG
@@ -137,7 +139,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             except Exception as e:
                 loguru.logger.error(e)
             # collection name for testing
-            context = vector_db.search(list(embedd_input), 1, collection_name="aisuko_squad01")
+            context = vector_db.search(list(embedd_input), 1, collection_name=collection_name)
             return context or InferenceHelper.instruction
 
         current_context = await get_context_by_question(input_msg)
