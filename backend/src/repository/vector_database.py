@@ -63,7 +63,7 @@ class MilvusHelper:
         try:
             res = self.client.search(
                 collection_name=collection_name,
-                data=data,
+                data=[data],
                 limit=n_results,
                 search_params=search_params,
                 output_fields=["title"],
