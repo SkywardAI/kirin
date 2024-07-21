@@ -1,3 +1,19 @@
+# coding=utf-8
+
+# Copyright [2024] [SkywardAI]
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#        http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 import datetime
 from typing import Optional
 from typing import Literal
@@ -33,6 +49,7 @@ class ChatInMessage(BaseSchemaModel):
     top_k: int = Field(..., title="Top_k", description="Top_k parameter for inference(int)")
     top_p: float = Field(..., title="Top_p", description="Top_p parameter for inference(float)")
     n_predict: int = Field(..., title="n_predict", description="n_predict parameter for inference(int)")
+    collection_name: Optional[str] = Field(..., title="Collection Name", description="Collection Name")
 
 
 class ChatInResponse(BaseSchemaModel):
