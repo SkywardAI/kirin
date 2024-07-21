@@ -75,6 +75,8 @@ services:
       - INFERENCE_ENG=${INFERENCE_ENG}
       - INFERENCE_ENG_PORT=${INFERENCE_ENG_PORT}
       - INFERENCE_ENG_VERSION=${INFERENCE_ENG_VERSION}
+      - EMBEDDING_ENG=${EMBEDDING_ENG}
+      - EMBEDDING_ENG_PORT=${EMBEDDING_ENG_PORT}
       - LANGUAGE_MODEL_NAME=${LANGUAGE_MODEL_NAME}
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
@@ -85,6 +87,8 @@ services:
       - ETCD_AUTO_COMPACTION_RETENTION=${ETCD_AUTO_COMPACTION_RETENTION}
       - ETCD_QUOTA_BACKEND_BYTES=${ETCD_QUOTA_BACKEND_BYTES}
       - NUM_CPU_CORES=${NUM_CPU_CORES}
+      - NUM_CPU_CORES_EMBEDDING=${NUM_CPU_CORES_EMBEDDING}
+      - EMBEDDING_MODEL_NAME=${EMBEDDING_MODEL_NAME}
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
     expose:
@@ -159,7 +163,25 @@ services:
       - 8080
     ports:
       - 8080:8080
-    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","4096"]
+    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","8192"]
+
+
+  embedding_eng:
+    container_name: ${EMBEDDING_ENG}
+    image: gclub/llama.cpp:${INFERENCE_ENG_VERSION}
+    restart: always
+    deploy: # https://github.com/compose-spec/compose-spec/blob/master/deploy.md
+      resources:
+        reservations:
+          cpus: "${NUM_CPU_CORES_EMBEDDING}"
+    volumes:
+      - "${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models"
+    expose:
+      - 8080
+    ports:
+      - 8082:8080
+    command: ["-m", "models/${EMBEDDING_MODEL_NAME}","--embeddings","--pooling","mean","-c","512"]
+
 
   rebel:
     container_name: rebel

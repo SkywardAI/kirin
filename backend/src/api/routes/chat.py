@@ -197,10 +197,16 @@ async def chat(
 
     match session.type:
         case "rag":
-            # TODO: Implement RAG
-            pass
-        case _:
-            stream_func: ContentStream = rag_chat_repo.inference(
+            stream_func: ContentStream = rag_chat_repo.inference_with_rag(
+                session_id=session.id,
+                input_msg=chat_in_msg.message,
+                temperature=chat_in_msg.temperature,
+                top_k=chat_in_msg.top_k,
+                top_p=chat_in_msg.top_p,
+                n_predict=chat_in_msg.n_predict,
+            )
+        case _:  # default is chat robot
+            stream_func: ContentStream = rag_chat_repo.inference_with_rag(
                 session_id=session.id,
                 input_msg=chat_in_msg.message,
                 temperature=chat_in_msg.temperature,
@@ -307,7 +313,7 @@ async def get_chathistory(
     ```
     """
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
-    if session_repo.verify_session_by_account_id(session_uuid=uuid, account_id=current_user.id) is False:
+    if await session_repo.verify_session_by_account_id(session_uuid=uuid, account_id=current_user.id) is False:
         raise http_404_exc_uuid_not_found_request(uuid=uuid)
     session = await session_repo.read_sessions_by_uuid(session_uuid=uuid)
     chats = await chat_repo.read_chat_history_by_session_id(id=session.id)

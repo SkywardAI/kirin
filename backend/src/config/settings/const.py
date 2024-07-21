@@ -3,6 +3,7 @@ UPLOAD_FILE_PATH = "./uploaded_files/"
 MAX_SQL_LENGTH = 200
 
 DEFAULT_COLLECTION = "default_collection"
+# embedding dimension depending on model
 DEFAULT_DIM = 384
 
 # DEFAULT MODELS

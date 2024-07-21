@@ -64,12 +64,20 @@ INFERENCE_ENG:=llamacpp
 INFERENCE_ENG_PORT:=8080
 INFERENCE_ENG_VERSION:=server--b1-2321a5e
 NUM_CPU_CORES:=8.00
+NUM_CPU_CORES_EMBEDDING:=4.00
+
+# Embedding engine and it uses same version with Inference Engine
+EMBEDDING_ENG:=embedding_eng
+EMBEDDING_ENG_PORT:=8080
 
 # Language model, default is phi3-mini-4k-instruct-q4.gguf
 # https://github.com/SkywardAI/llama.cpp/blob/9b2f16f8055265c67e074025350736adc1ea0666/tests/test-chat-template.cpp#L91-L92
 LANGUAGE_MODEL_NAME:=Phi-3-mini-4k-instruct-q4.gguf
 LANGUAGE_MODEL_URL:=https://huggingface.co/aisuko/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi3-mini-4k-instruct-Q4.gguf?download=true
 INSTRUCTION:="A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the questions from human."
+
+EMBEDDING_MODEL_NAME:=all-MiniLM-L6-v2-Q4_K_M-v2.gguf
+EMBEDDING_MODEL_URL:=https://huggingface.co/aisuko/all-MiniLM-L6-v2-gguf/resolve/main/all-MiniLM-L6-v2-Q4_K_M-v2.gguf?download=true
 
 ADMIN_USERNAME:=admin
 ADMIN_EMAIL:=admin@admin.com
@@ -120,13 +128,17 @@ env:
 	@echo "INFERENCE_ENG=$(INFERENCE_ENG)">> $(FILE_NAME)
 	@echo "INFERENCE_ENG_PORT=$(INFERENCE_ENG_PORT)">> $(FILE_NAME)
 	@echo "INFERENCE_ENG_VERSION=$(INFERENCE_ENG_VERSION)">> $(FILE_NAME)
+	@echo "EMBEDDING_ENG=$(EMBEDDING_ENG)">> $(FILE_NAME)
+	@echo "EMBEDDING_ENG_PORT=$(EMBEDDING_ENG_PORT)">> $(FILE_NAME)
 	@echo "NUM_CPU_CORES=$(NUM_CPU_CORES)">> $(FILE_NAME)
+	@echo "NUM_CPU_CORES_EMBEDDING=$(NUM_CPU_CORES_EMBEDDING)" >> $(FILE_NAME)
 	@echo "LANGUAGE_MODEL_NAME=$(LANGUAGE_MODEL_NAME)">> $(FILE_NAME)
 	@echo "ADMIN_USERNAME=$(ADMIN_USERNAME)">> $(FILE_NAME)
 	@echo "ADMIN_EMAIL=$(ADMIN_EMAIL)">> $(FILE_NAME)
 	@echo "ADMIN_PASS=$(ADMIN_PASS)">> $(FILE_NAME)
 	@echo "TIMEZONE=$(TIMEZONE)">> $(FILE_NAME)
 	@echo "INSTRUCTION"=$(INSTRUCTION)>> $(FILE_NAME)
+	@echo "EMBEDDING_MODEL_NAME"=$(EMBEDDING_MODEL_NAME) >> $(FILE_NAME)
 
 
 .PHONY: prepare
@@ -195,6 +207,8 @@ ruff:
 .PHONY: lm
 lm:
 	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
+	@wget -O volumes/models/$(EMBEDDING_MODEL_NAME) $(EMBEDDING_MODEL_URL)
+
 
 .PHONY: localinfer
 localinfer: lm

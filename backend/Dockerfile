@@ -26,7 +26,7 @@ RUN pip --disable-pip-version-check --no-cache-dir install -r requirements.txt &
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=60s --timeout=30s --retries=5 CMD ["curl", "-f", "http://localhost:8000/api/health"]
+HEALTHCHECK --interval=300s --timeout=30s --retries=5 CMD ["curl", "-f", "http://localhost:8000/api/health"]
 
 # Execute entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]

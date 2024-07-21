@@ -96,6 +96,7 @@ class BackendBaseSettings(BaseSettings):
 
     # Configurations for language model
     LANGUAGE_MODEL_NAME: str = decouple.config("LANGUAGE_MODEL_NAME", cast=str)  # type: ignore
+    EMBEDDING_MODEL_NAME: str = decouple.config("EMBEDDING_MODEL_NAME", cast=str)  # type: ignore
 
     # Admin setting
     ADMIN_USERNAME: str = decouple.config("ADMIN_USERNAME", cast=str)  # type: ignore
@@ -109,6 +110,10 @@ class BackendBaseSettings(BaseSettings):
     ETCD_AUTO_COMPACTION_RETENTION: int = decouple.config("ETCD_AUTO_COMPACTION_RETENTION", cast=int)  # type: ignore
     ETCD_QUOTA_BACKEND_BYTES: int = decouple.config("ETCD_QUOTA_BACKEND_BYTES", cast=int)  # type: ignore
     NUM_CPU_CORES: float = decouple.config("NUM_CPU_CORES", cast=float)  # type: ignore
+
+    EMBEDDING_ENG: str = decouple.config("EMBEDDING_ENG", cast=str)  # type: ignore
+    EMBEDDING_ENG_PORT: int = decouple.config("EMBEDDING_ENG_PORT", cast=int)  # type: ignore
+    NUM_CPU_CORES_EMBEDDING: int = decouple.config("NUM_CPU_CORES_EMBEDDING", cast=str)  # type: ignore
 
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True
