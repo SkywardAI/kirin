@@ -110,6 +110,9 @@ class BackendBaseSettings(BaseSettings):
     ETCD_QUOTA_BACKEND_BYTES: int = decouple.config("ETCD_QUOTA_BACKEND_BYTES", cast=int)  # type: ignore
     NUM_CPU_CORES: float = decouple.config("NUM_CPU_CORES", cast=float)  # type: ignore
 
+    EMBEDDING_MODEL_NAME: str=decouple.config("EMBEDDING_MODEL_NAME", cast=str) # type: ignore
+    NUM_CPU_CORES_EMBEDDING: int=decouple.config("NUM_CPU_CORES_EMBEDDING", cast=str) # type: ignore
+
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True
         env_file: str = f"{str(ROOT_DIR)}/.env"
