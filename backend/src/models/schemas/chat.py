@@ -40,7 +40,8 @@ class ChatInMessage(BaseSchemaModel):
         Top_p parameter for inference(float)
     n_predict: int
         n_predict parameter for inference(int)
-
+    collection_name: str
+        collection name
     """
 
     sessionUuid: Optional[str] | None = Field(..., title="Session UUID", description="Session UUID")

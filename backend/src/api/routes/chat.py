@@ -167,7 +167,8 @@ async def chat(
     "temperature": 0.2,
     "topK": 40,
     "topP": 0.9,
-    "nPredict": 512
+    "nPredict": 512,
+    "collection_name": aisuko/test
     }'
     ```
 
