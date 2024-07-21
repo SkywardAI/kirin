@@ -29,10 +29,9 @@ router = fastapi.APIRouter(prefix="/ds", tags=["datasets"])
 async def get_dataset_list() -> list[RagDatasetResponse]:
     """
     Waiting for implementing
-    
+
     """
     pass
-
 
 
 @router.get(
@@ -77,15 +76,12 @@ async def load_dataset(
     "status": "Success"
     }
     """
-    
-    res:dict=DatasetEng.load_dataset(rag_ds_create.name)
 
-    if res.get('insert_count')>0:
-        status="Success"
+    res: dict = DatasetEng.load_dataset(rag_ds_create.name)
+
+    if res.get("insert_count") > 0:
+        status = "Success"
     else:
-        status="Failed"
-    
-    return RagDatasetResponse(
-        name=rag_ds_create.name,
-        status=status
-    )
+        status = "Failed"
+
+    return RagDatasetResponse(name=rag_ds_create.name, status=status)

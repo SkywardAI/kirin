@@ -77,6 +77,8 @@ services:
       - INFERENCE_ENG=${INFERENCE_ENG}
       - INFERENCE_ENG_PORT=${INFERENCE_ENG_PORT}
       - INFERENCE_ENG_VERSION=${INFERENCE_ENG_VERSION}
+      - EMBEDDING_ENG=${EMBEDDING_ENG}
+      - EMBEDDING_ENG_PORT=${EMBEDDING_ENG_PORT}
       - LANGUAGE_MODEL_NAME=${LANGUAGE_MODEL_NAME}
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
@@ -150,7 +152,7 @@ services:
       - "minio"
 
   llamacpp:
-    container_name: llamacpp
+    container_name: ${INFERENCE_ENG}
     image: gclub/llama.cpp:${INFERENCE_ENG_VERSION}
     restart: always
     deploy: # https://github.com/compose-spec/compose-spec/blob/master/deploy.md
@@ -166,7 +168,7 @@ services:
     command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","8192"]
 
   embedding_eng:
-    container_name: embedding_eng
+    container_name: ${EMBEDDING_ENG}
     image: gclub/llama.cpp:${INFERENCE_ENG_VERSION}
     restart: always
     deploy: # https://github.com/compose-spec/compose-spec/blob/master/deploy.md

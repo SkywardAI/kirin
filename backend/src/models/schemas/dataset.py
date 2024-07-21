@@ -37,6 +37,7 @@ class RagDatasetCreate(BaseSchemaModel):
     des: str | None = Field(..., title="Details", description="Details")
     ratio: Optional[float] = Field(..., title="Ratio", description="Ratio")
 
+
 class RagDatasetResponse(BaseSchemaModel):
     name: str = Field(..., title="DataSet Name", description="DataSet Name")
     # created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")

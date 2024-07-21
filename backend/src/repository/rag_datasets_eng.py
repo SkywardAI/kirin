@@ -36,10 +36,10 @@ class DatasetEng:
         """
 
         ds = load_dataset(name)
-        #TODO: validation isn't make sense, it should be removed
+        # TODO: validation isn't make sense, it should be removed
         ds_list = ds.get("validation").to_list()
 
-        name=name.replace("/", "_")
+        name = name.replace("/", "_")
 
         vector_db.create_collection(collection_name=name)
 

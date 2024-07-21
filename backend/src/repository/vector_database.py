@@ -61,7 +61,6 @@ class MilvusHelper:
     def search(self, data, n_results, collection_name=DEFAULT_COLLECTION):
         search_params = {"metric_type": "COSINE", "params": {}}
         try:
-
             res = self.client.search(
                 collection_name=collection_name,
                 data=data,
@@ -79,8 +78,6 @@ class MilvusHelper:
         except Exception as e:
             loguru.logger.error(e)
         return None
-
-
 
     def create_index(self, index_name, index_params, collection_name=DEFAULT_COLLECTION):
         self.client.create_index(collection_name, index_name, index_params)
