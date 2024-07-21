@@ -60,3 +60,9 @@ class InferenceHelper:
         str: URL for the inference engine
         """
         return f"http://{cls.infer_eng_url}:{cls.infer_eng_port}/completion"
+    
+    @classmethod
+    def instruct_embedding_url(cls) -> str:
+        """
+        """
+        return f"http://embedding_eng:8082/embedding"

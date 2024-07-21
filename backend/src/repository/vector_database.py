@@ -60,19 +60,27 @@ class MilvusHelper:
 
     def search(self, data, n_results, collection_name=DEFAULT_COLLECTION):
         search_params = {"metric_type": "COSINE", "params": {}}
-        res = self.client.search(
-            collection_name=collection_name,
-            data=data,
-            limit=n_results,
-            search_params=search_params,
-            output_fields=["title"],
-        )
-        loguru.logger.info(f"Vector Database --- Result: {res}")
-        sentences = []
-        for hits in res:
-            for hit in hits:
-                sentences.append(hit.get("entity").get("title"))
-        return sentences
+        try:
+
+            res = self.client.search(
+                collection_name=collection_name,
+                data=data,
+                limit=n_results,
+                search_params=search_params,
+                output_fields=["title"],
+            )
+
+            loguru.logger.info(f"Vector Database --- Result: {res}")
+            sentences = []
+            for hits in res:
+                for hit in hits:
+                    sentences.append(hit.get("entity").get("title"))
+            return sentences
+        except Exception as e:
+            loguru.logger.error(e)
+        return None
+
+
 
     def create_index(self, index_name, index_params, collection_name=DEFAULT_COLLECTION):
         self.client.create_index(collection_name, index_name, index_params)

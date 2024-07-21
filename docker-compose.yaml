@@ -87,6 +87,7 @@ services:
       - ETCD_AUTO_COMPACTION_RETENTION=${ETCD_AUTO_COMPACTION_RETENTION}
       - ETCD_QUOTA_BACKEND_BYTES=${ETCD_QUOTA_BACKEND_BYTES}
       - NUM_CPU_CORES=${NUM_CPU_CORES}
+      - NUM_CPU_CORES_EMBEDDING=${NUM_CPU_CORES_EMBEDDING}
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
@@ -162,6 +163,22 @@ services:
     ports:
       - 8080:8080
     command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","8192"]
+
+  embedding_eng:
+    container_name: embedding_eng
+    image: gclub/llama.cpp:${INFERENCE_ENG_VERSION}
+    restart: always
+    deploy: # https://github.com/compose-spec/compose-spec/blob/master/deploy.md
+      resources:
+        reservations:
+          cpus: "${NUM_CPU_CORES_EMBEDDING}"
+    volumes:
+      - "${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models"
+    expose:
+      - 8080
+    ports:
+      - 8082:8080
+    command: ["-m", "models/${LANGUAGE_MODEL_NAME}","--embeddings","--pooling","mean","-c","512"]
 
   rebel:
     container_name: rebel

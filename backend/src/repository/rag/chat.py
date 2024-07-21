@@ -126,26 +126,29 @@ class RAGChatModelRepository(BaseRAGRepository):
             """
 
             # tokenized_input
-            async with httpx.AsyncClient() as client:
-                try:
-                    res=await client.post(
-                        InferenceHelper.tokenizer_url(),
-                        json={"content": input_msg},
-                    )
-                    res.raise_for_status()
-                    tokenized_input = res.json().get("tokens")
-                except Exception as e:
-                    pass
+
+            try:
+                res=await httpx_kit.async_client.post(
+                    InferenceHelper.instruct_embedding_url(),
+                    headers={"Content-Type": "application/json"},
+                    json={"content": input_msg},
+                    timeout=httpx.Timeout(timeout=None)
+                )
+                res.raise_for_status()
+                tokenized_input = res.json().get("embedding")
+            except Exception as e:
+                loguru.logger.error(e)
             # search the context in the vector database
-            result=await vector_db.search(tokenized_input, 1, collection_name="aisuko_squad01")
+            # context=vector_db.search(tokenized_input, 1, collection_name="aisuko_squad01")
+            context=""
             # combine the context with the input message
-            context = ""
             return context or InferenceHelper.instruction
         
         current_context = await get_context_by_question(input_msg)
 
+
         data_with_context = {
-            "prompt": self.format_prompt(input_msg, current_context),
+            "prompt": self.format_prompt(input_msg, current_context=""),
             "temperature": temperature,
             "top_k": top_k,
             "top_p": top_p,
