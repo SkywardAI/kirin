@@ -65,4 +65,4 @@ class InferenceHelper:
     def instruct_embedding_url(cls) -> str:
         """
         """
-        return f"http://embedding_eng:8082/embedding"
+        return f"http://embedding_eng:8080/embedding"
