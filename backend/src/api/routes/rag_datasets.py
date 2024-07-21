@@ -27,7 +27,12 @@ router = fastapi.APIRouter(prefix="/ds", tags=["datasets"])
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def get_dataset_list() -> list[RagDatasetResponse]:
+    """
+    Waiting for implementing
+    
+    """
     pass
+
 
 
 @router.get(
@@ -37,6 +42,9 @@ async def get_dataset_list() -> list[RagDatasetResponse]:
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def get_dataset_by_name(name: str) -> RagDatasetResponse:
+    """
+    Waiting for implementing
+    """
     pass
 
 
