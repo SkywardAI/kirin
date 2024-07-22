@@ -115,6 +115,8 @@ class BackendBaseSettings(BaseSettings):
     EMBEDDING_ENG_PORT: int = decouple.config("EMBEDDING_ENG_PORT", cast=int)  # type: ignore
     NUM_CPU_CORES_EMBEDDING: int = decouple.config("NUM_CPU_CORES_EMBEDDING", cast=str)  # type: ignore
 
+    METRICS_PATHS: str = decouple.config("METRICS_PATHS", cast=str)  # type: ignore
+
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True
         env_file: str = f"{str(ROOT_DIR)}/.env"
