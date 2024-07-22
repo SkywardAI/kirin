@@ -207,7 +207,7 @@ ruff:
 .PHONY: lm
 lm:
 	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
-	@mkdir -p volumes/models && [ -f volumes/models/$(EMBEDDING_MODEL_URL) ] || wget -O volumes/models/$(EMBEDDING_MODEL_NAME) $(EMBEDDING_MODEL_URL)
+	@mkdir -p volumes/models && [ -f volumes/models/$(EMBEDDING_MODEL_NAME) ] || wget -O volumes/models/$(EMBEDDING_MODEL_NAME) $(EMBEDDING_MODEL_URL)
 
 
 .PHONY: localinfer
