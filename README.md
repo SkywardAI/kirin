@@ -15,18 +15,19 @@ https://github.com/SkywardAI/kirin/assets/8053949/143b016c-2264-4644-a7ae-304c90
 
 # Features
 
-- [x] Inference mode(default): Chat with the small language model at consumer grade hardware with 8 CPUs
-- [x] RAG mode: Chat with small language model based on pre-processed datasets
-- [x] CRM features: Multiple users login, chat/chat(RAG), save chat history and share the chat history by JSON format
-- [ ] Neural Network define
+- [x] **Inference mode(default)**: Chat with the small language model at consumer grade hardware with 8 CPUs
+- [x] **RAG mode**: Chat with small language model based on pre-processed datasets
+- [x] **CRM feature**s: Multiple users login, chat/chat(RAG), save chat history and share the chat history by JSON format
+- [ ] **Neural Network define**
      - [ ] Pre-define neural network as template, support load weights and fine-tune
      - [ ] Support multiple neural network types
      - [ ] Support custom simple neural network by UI
 
-- [ ] Training Factory
+- [ ] **Training Factory**
      - [ ] Train the neural network with the given dataset  
      - [ ] Quantize the model and upload it to the server with the given tokens  
-     - [ ] Visualize the neural network and the training process  
+     - [ ] Visualize the neural network and the training process
+ 
 # Requirements
 
 See [Requirements.md](./docs/Requirements.md)
