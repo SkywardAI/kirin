@@ -59,6 +59,7 @@ class SessionCRUDRepository(BaseCRUDRepository):
             .where(Session.uuid == session.sessionUuid)
             .values(updated_at=sqlalchemy_functions.now())
         )  # type: ignore
+
         if session.name:
             update_stmt = update_stmt.values(name=session.name)
 

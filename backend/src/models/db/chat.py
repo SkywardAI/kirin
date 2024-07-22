@@ -35,6 +35,7 @@ class Session(Base):  # type: ignore
     session_type: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(
         sqlalchemy.Enum("rag", "chat", name="session_type"), nullable=False, default="chat"
     )
+    dataset_name: SQLAlchemyMapped[str] = sqlalchemy_mapped_column(sqlalchemy.String(length=256), nullable=True)
     created_at: SQLAlchemyMapped[datetime.datetime] = sqlalchemy_mapped_column(
         sqlalchemy.DateTime(timezone=True), nullable=False, server_default=sqlalchemy_functions.now()
     )

@@ -96,6 +96,7 @@ class Session(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
     name: str | None = Field(..., title="Name", description="Name")
     session_type: str | None = Field(..., title="Session Type", description="Type of current session")
+    dataset_name: str | None = Field(default=None, title="Dataset Name", description="Dataset Name")
     created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
 
 

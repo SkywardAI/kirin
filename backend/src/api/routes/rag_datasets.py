@@ -37,7 +37,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 )
 async def get_dataset_list() -> list[RagDatasetResponse]:
     """
-    Waiting for implementing
+    Get all the dataset list by using user's ID from pg
 
     """
     pass
@@ -51,7 +51,7 @@ async def get_dataset_list() -> list[RagDatasetResponse]:
 )
 async def get_dataset_by_name(name: str) -> RagDatasetResponse:
     """
-    Waiting for implementing
+    Get the dataset by using the dataset name and user's ID from pg
     """
     pass
 
@@ -70,6 +70,7 @@ async def load_dataset(
     jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> RagDatasetResponse:
     """
+    TODO: need to update
 
     Loading the specific dataset into the vector db. However here are some requirements:
     * The dataset should be in the format of the RAG dataset. And we define the RAG dataset.
@@ -93,6 +94,7 @@ async def load_dataset(
     }
     """
 
+    # TODO: we can't get session when loading dataset
     res: dict = DatasetEng.load_dataset(rag_ds_create.name)
 
     if res.get("insert_count") > 0:
@@ -100,4 +102,9 @@ async def load_dataset(
     else:
         status = "Failed"
 
+    # TODO: Save the ds to the db
+
+    # TODO: save dataset name to the session
+
+    # TODO If we bounding ds to specific user's session, we should upadte ds name to the session and return the session
     return RagDatasetResponse(name=rag_ds_create.name, status=status)
