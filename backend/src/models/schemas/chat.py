@@ -87,13 +87,15 @@ class SessionUpdate(BaseSchemaModel):
 
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
     name: Optional[str] = Field(default=None, title="Name", description="Name")
-    type: Optional[Literal["rag", "chat"]] = Field(default=None, title="Type", description="Type")
+    session_type: Optional[Literal["rag", "chat"]] = Field(
+        default=None, title="Session Type", description="Type of current session"
+    )
 
 
 class Session(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
     name: str | None = Field(..., title="Name", description="Name")
-    type: str | None = Field(..., title="Type", description="Type")
+    session_type: str | None = Field(..., title="Session Type", description="Type of current session")
     created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
 
 

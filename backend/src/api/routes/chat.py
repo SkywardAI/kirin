@@ -131,7 +131,7 @@ async def chat_uuid(
     "",
     name="chat:chatbot",
     response_model=ChatInResponse,
-    status_code=fastapi.status.HTTP_201_CREATED,
+    status_code=fastapi.status.HTTP_200_OK,
 )
 async def chat(
     chat_in_msg: ChatInMessage,
@@ -196,7 +196,7 @@ async def chat(
         session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id, name=chat_in_msg.message[:20]
     )
 
-    match session.type:
+    match session.session_type:
         case "rag":
             stream_func: ContentStream = rag_chat_repo.inference_with_rag(
                 session_id=session.id,
@@ -247,7 +247,7 @@ async def get_session(
             res_session = Session(
                 sessionUuid=session.uuid,
                 name=session.name,
-                type=session.type,
+                session_type=session.session_type,
                 created_at=session.created_at,
             )
             sessions_list.append(res_session)
@@ -392,7 +392,9 @@ async def save_chats(
     """
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
     if (
-        await session_repo.verify_session_by_account_id(session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id)
+        await session_repo.verify_session_by_account_id(
+            session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id
+        )
         is False
     ):
         raise http_404_exc_uuid_not_found_request(uuid=chat_in_msg.sessionUuid)

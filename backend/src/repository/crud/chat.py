@@ -1,3 +1,18 @@
+# coding=utf-8
+
+# Copyright [2024] [SkywardAI]
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#        http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import typing
 from typing import Optional
 import loguru
@@ -47,8 +62,8 @@ class SessionCRUDRepository(BaseCRUDRepository):
         if session.name:
             update_stmt = update_stmt.values(name=session.name)
 
-        if session.type:
-            update_stmt = update_stmt.values(type=session.type)
+        if session.session_type:
+            update_stmt = update_stmt.values(session_type=session.session_type)
         await self.async_session.execute(statement=update_stmt)
         await self.async_session.commit()
         await self.async_session.refresh(instance=update_session)
