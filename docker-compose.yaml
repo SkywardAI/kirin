@@ -194,6 +194,20 @@ services:
       - 80:80
     depends_on:
       - kirin
+      - yeager
+
+  yeager:
+    container_name: yeager
+    image: ghcr.io/skywardai/yeager:v0.1.0
+    restart: always
+    entrypoint: ["python3", "-m", "tensorboard.main","--port=80","--bind_all","--logdir=${METRICS_PATHS}"]
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/runs:/app/runs
+    expose:
+      - 80
+    ports:
+      - 6006:80
+
 
 volumes:
   postgresql_db_data:
