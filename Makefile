@@ -72,7 +72,7 @@ EMBEDDING_ENG_PORT:=8080
 
 # Language model, default is phi3-mini-4k-instruct-q4.gguf
 # https://github.com/SkywardAI/llama.cpp/blob/9b2f16f8055265c67e074025350736adc1ea0666/tests/test-chat-template.cpp#L91-L92
-LANGUAGE_MODEL_NAME:=Phi-3-mini-4k-instruct-q4.gguf
+LANGUAGE_MODEL_NAME:=Phi3-mini-4k-instruct-Q4.gguf
 LANGUAGE_MODEL_URL:=https://huggingface.co/aisuko/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi3-mini-4k-instruct-Q4.gguf?download=true
 INSTRUCTION:="A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the questions from human."
 
@@ -207,7 +207,7 @@ ruff:
 .PHONY: lm
 lm:
 	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(LANGUAGE_MODEL_URL)
-	@wget -O volumes/models/$(EMBEDDING_MODEL_NAME) $(EMBEDDING_MODEL_URL)
+	@mkdir -p volumes/models && [ -f volumes/models/$(EMBEDDING_MODEL_URL) ] || wget -O volumes/models/$(EMBEDDING_MODEL_NAME) $(EMBEDDING_MODEL_URL)
 
 
 .PHONY: localinfer
