@@ -27,15 +27,35 @@ https://github.com/SkywardAI/kirin/assets/8053949/143b016c-2264-4644-a7ae-304c90
      - [ ] Train the neural network with the given dataset  
      - [ ] Quantize the model and upload it to the server with the given tokens  
      - [ ] Visualize the neural network and the training process
- 
+
+
 # Requirements
 
-See [Requirements.md](./docs/Requirements.md)
+You need to make sure Docker and docker-compose on your environment. See [Requirements.md](./docs/Requirements.md)
 
 
 # Quick setup
 
+If you want to setup the project quickly, please follow the steps below:
+
+```
+git clone https://github.com/SkywardAI/kirin.git
+
+cd kirin
+
+make demo
+```
+
 See [quick start](https://skywardai.github.io/skywardai.io/docs/quick-start.html)
+
+
+# Build and deployment
+
+<!-- https://stackoverflow.com/questions/2068344/how-do-i-get-a-youtube-video-thumbnail-from-the-youtube-api -->
+
+[![Build and Deployment](https://img.youtube.com/vi/63OxSmcBkhI/0.jpg)](https://youtu.be/63OxSmcBkhI?si=G82BOtcwRvQE7dLU)
+
+Also See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build_and_run.html). And if you are interested in docker-in-docker development, see [Development.md](./docs/Development.md)
 
 
 # Tech stack
@@ -70,15 +90,6 @@ The above-listed technologies are just the main ones. There are other technologi
 * [GitHub Actions](https://github.com/features/actions) $\rightarrow$ The platform to setup our CI/CD by GitHub.
 * [SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html) $\rightarrow$ The go-to database interface library for Python. The 2.0 is the most recent update where it provides an asynchronous setup.
 * [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) $\rightarrow$ A file for distributing the responsibilities in our project to each team/teammate.
-
-
-# Build and deployment
-
-<!-- https://stackoverflow.com/questions/2068344/how-do-i-get-a-youtube-video-thumbnail-from-the-youtube-api -->
-
-[![Build and Deployment](https://img.youtube.com/vi/63OxSmcBkhI/0.jpg)](https://youtu.be/63OxSmcBkhI?si=G82BOtcwRvQE7dLU)
-
-Also See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build_and_run.html). And if you are interested in docker-in-docker development, see [Development.md](./docs/Development.md)
 
 
 ## Acknowledgements

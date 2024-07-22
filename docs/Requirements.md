@@ -44,11 +44,3 @@ ubuntu:~/workspace/aisuko/kirin$ docker compose version
 Docker Compose version 2.24.6+ds1-0ubuntu1~22.04.1
 ```
 
-## Python 3.11
-
-
-```bash
-pip3 install -r https://raw.githubusercontent.com/SkywardAI/containers/main/requirements.txt
-```
-
-If you are interested in docker-in-docker devlopment, see [Development.md](./Development.md)
