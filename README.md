@@ -94,10 +94,11 @@ The above-listed technologies are just the main ones. There are other technologi
 
 ## Acknowledgements
 
+* [LocalAI](https://github.com/mudler/LocalAI)
 * [FastAPI](https://fastapi.tiangolo.com/)
 * [SQLAlchemy](https://www.sqlalchemy.org/)
 * [llama.cpp](https://github.com/ggerganov/llama.cpp)
-* [HuggingFace](https://huggingface.co)
+* [HuggingFace Community](https://huggingface.co/aisuko)
 * [RMIT Race Hub](https://race.rmit.edu.au)
 * [Microsoft Phi-3 Series](https://huggingface.co/aisuko/Phi-3-mini-4k-instruct-gguf)
 
