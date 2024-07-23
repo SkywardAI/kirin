@@ -71,6 +71,36 @@ class SessionCRUDRepository(BaseCRUDRepository):
 
         return update_session  # type: ignore
 
+    async def append_ds_name_to_session(self, session_uuid: str, account_id: int, ds_name: str) -> Session:
+        """
+        Append the dataset name to specific session of the specific account
+
+        Args:
+            session_uuid (str): Session UUID
+            account_id (int): Account ID
+            ds_name (str): Dataset Name
+
+        Returns:
+            Session: Updated Session instance
+        """
+        stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid, Session.account_id == account_id)
+        query = await self.async_session.execute(statement=stmt)
+        session = query.scalar()
+        if session is None:
+            raise EntityDoesNotExist("Session with uuid `{session_uuid}` does not exist!")
+
+        update_stmt = (
+            sqlalchemy.update(table=Session)
+            .where(Session.uuid == session_uuid)
+            .values(updated_at=sqlalchemy_functions.now(), dataset_name=ds_name)
+        )
+
+        await self.async_session.execute(statement=update_stmt)
+        await self.async_session.commit()
+        await self.async_session.refresh(instance=session)
+
+        return session  # type: ignore
+
     async def read_create_sessions_by_uuid(self, session_uuid: str, account_id: int, name: str) -> Session:
         stmt = sqlalchemy.select(Session).where(Session.uuid == session_uuid)
         query = await self.async_session.execute(statement=stmt)

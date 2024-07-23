@@ -17,11 +17,13 @@ import fastapi
 from fastapi.security import OAuth2PasswordBearer
 
 from src.api.dependencies.repository import get_repository
-from src.models.schemas.dataset import RagDatasetCreate, RagDatasetResponse
+from src.models.schemas.dataset import RagDatasetCreate, RagDatasetResponse, LoadRAGDSResponse
 from src.repository.rag_datasets_eng import DatasetEng
 from src.repository.crud.account import AccountCRUDRepository
+from src.repository.crud.dataset_db import DataSetCRUDRepository
 from src.securities.authorizations.jwt import jwt_required
 from src.repository.crud.chat import SessionCRUDRepository
+from src.utilities.formatters import DatasetFormatter
 
 
 router = fastapi.APIRouter(prefix="/ds", tags=["datasets"])
@@ -35,31 +37,39 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
     response_model=list[RagDatasetResponse],
     status_code=fastapi.status.HTTP_200_OK,
 )
-async def get_dataset_list() -> list[RagDatasetResponse]:
+async def get_dataset_list(
+    token: str = fastapi.Depends(oauth2_scheme),
+    ds_repo: DataSetCRUDRepository = fastapi.Depends(get_repository(repo_type=DataSetCRUDRepository)),
+) -> list[RagDatasetResponse]:
     """
-    Get all the dataset list by using user's ID from pg
+    Get all the pre-processed dataset list.
 
-    """
-    pass
+    ```
+    curl -X 'GET' \
+    'http://127.0.0.1:8000/api/ds/list' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFub255bW91cyIsImVtYWlsIjoiYW5vbnltb3VzQGFub255LmNvbSIsImV4cCI6MTcyMjIyMDUzMiwic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.S4Y2xvvWmKHlT-OXgrRpO2ycNQcTFOg81J9W3syFekg'
+    ```
 
+    Returns:
+    
+    ```
+    [
+        {
+            "name": "aisuko_squad01"
+        }
+    ]
+    ```
+    """
+    list_ds = await ds_repo.get_dataset_list()
 
-@router.get(
-    path="/{name}",
-    name="datasets:get-dataset-by-name",
-    response_model=RagDatasetResponse,
-    status_code=fastapi.status.HTTP_200_OK,
-)
-async def get_dataset_by_name(name: str) -> RagDatasetResponse:
-    """
-    Get the dataset by using the dataset name and user's ID from pg
-    """
-    pass
+    return [RagDatasetResponse(name=ds.name) for ds in list_ds]
 
 
 @router.post(
     path="/load",
     name="datasets:load-dataset",
-    response_model=RagDatasetResponse,
+    response_model=LoadRAGDSResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def load_dataset(
@@ -68,43 +78,51 @@ async def load_dataset(
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required),
-) -> RagDatasetResponse:
+) -> LoadRAGDSResponse:
     """
-    TODO: need to update
 
     Loading the specific dataset into the vector db. However here are some requirements:
     * The dataset should be in the format of the RAG dataset. And we define the RAG dataset.
     * Anonymous user can't load the dataset. The user should be authenticated.
     * The dataset related to the specific user's specific session.
 
+    ```
     curl -X 'POST' \
     'http://127.0.0.1:8000/api/ds/load' \
     -H 'accept: application/json' \
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFub255bW91cyIsImVtYWlsIjoiYW5vbnltb3VzQGFub255LmNvbSIsImV4cCI6MTcyMjIyMDAxNiwic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.8JIiQ91Lh10n6N5bWOdb3A_QbCRT5FsCKRwEKXhNsRw' \
     -H 'Content-Type: application/json' \
     -d '{
+    "sessionUuid": "0a38c59f-b8fd-4ec4-abd7-581f731aebd7",
     "name": "aisuko/squad01",
     "des": "string",
     "ratio": 0
     }'
+    ```
 
-    Return:
+    Returns:
+    ```
     {
     "name": "aisuko/squad01",
-    "status": "Success"
+    "status": true
     }
+    ```
     """
 
-    # TODO: we can't get session when loading dataset
-    res: dict = DatasetEng.load_dataset(rag_ds_create.name)
+    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    # Here we don't use async because load_dataset is a sync function in HF ds
+    status: bool = True if DatasetEng.load_dataset(rag_ds_create.name).get("insert_count") > 0 else False
 
-    if res.get("insert_count") > 0:
-        status = "Success"
-    else:
-        status = "Failed"
+    match status:
+        case True:
+            await session_repo.append_ds_name_to_session(
+                session_uuid=rag_ds_create.sessionUuid,
+                account_id=current_user.id,
+                ds_name=DatasetFormatter.format_dataset_by_name(
+                    rag_ds_create.name
+                ),  # ds_name should be same as collectioname in vector db
+            )
+        case False:
+            return LoadRAGDSResponse(name=rag_ds_create.name, status=status)
 
-    # TODO: Save the ds to the db
-
-    # TODO: save dataset name to the session
-
-    # TODO If we bounding ds to specific user's session, we should upadte ds name to the session and return the session
-    return RagDatasetResponse(name=rag_ds_create.name, status=status)
+    return LoadRAGDSResponse(name=rag_ds_create.name, status=status)
