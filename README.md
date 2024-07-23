@@ -13,7 +13,7 @@
 https://github.com/SkywardAI/kirin/assets/8053949/143b016c-2264-4644-a7ae-304c908fbedf
 
 
-# Features
+# Roadmap
 
 - [x] **Inference mode(default)**: Chat with the small language model at consumer grade hardware with 8 CPUs
 - [x] **RAG mode**: Chat with small language model based on pre-processed datasets
