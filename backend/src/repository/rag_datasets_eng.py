@@ -15,6 +15,7 @@
 
 from datasets import load_dataset
 from src.repository.vector_database import vector_db
+from src.utilities.formatters import DatasetFormatter
 
 
 class DatasetEng:
@@ -39,7 +40,7 @@ class DatasetEng:
         # TODO: validation isn't make sense, it should be removed
         ds_list = ds.get("validation").to_list()
 
-        name = name.replace("/", "_")
+        name = DatasetFormatter.format_dataset_by_name(name) if name else None
 
         vector_db.create_collection(collection_name=name)
 

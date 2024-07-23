@@ -116,6 +116,7 @@ class BackendBaseSettings(BaseSettings):
     NUM_CPU_CORES_EMBEDDING: int = decouple.config("NUM_CPU_CORES_EMBEDDING", cast=str)  # type: ignore
 
     METRICS_PATHS: str = decouple.config("METRICS_PATHS", cast=str)  # type: ignore
+    DEFAULT_RAG_DS_NAME: str = decouple.config("DEFAULT_RAG_DS_NAME", cast=str)  # type: ignore
 
     class Config(pydantic.ConfigDict):
         case_sensitive: bool = True

@@ -1,3 +1,19 @@
+# coding=utf-8
+
+# Copyright [2024] [SkywardAI]
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#        http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 import fastapi
 import loguru
 from sqlalchemy import event
@@ -9,11 +25,13 @@ from sqlalchemy.pool.base import _ConnectionRecord
 from src.config.settings.const import ANONYMOUS_USER, ANONYMOUS_EMAIL, ANONYMOUS_PASS
 from src.config.manager import settings
 from src.models.db.account import Account
+from src.models.db.dataset import DataSet
 from src.securities.hashing.password import pwd_generator
 from src.repository.database import async_db
 from src.repository.table import Base
 from src.repository.vector_database import vector_db
 from src.utilities.httpkit.httpx_kit import httpx_kit
+from src.utilities.formatters import DatasetFormatter
 
 
 @event.listens_for(target=async_db.async_engine.sync_engine, identifier="connect")
@@ -79,6 +97,18 @@ async def initialize_admin_user(async_session: AsyncSession) -> None:
     loguru.logger.info("Admin user --- Successfully Created!")
 
 
+async def initialize_rag_datasets(async_session: AsyncSession) -> None:
+    """
+    Initialize ds for RAG
+    """
+    loguru.logger.info("RAG datasets --- Creating . . .")
+    ds = DataSet(name=DatasetFormatter.format_dataset_by_name(settings.DEFAULT_RAG_DS_NAME))
+    async_session.add(instance=ds)
+    await async_session.commit()
+    await async_session.refresh(instance=ds)
+    loguru.logger.info("RAG datasets --- Successfully Created!")
+
+
 async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
     loguru.logger.info("Database Connection --- Establishing . . .")
 
@@ -89,6 +119,7 @@ async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
     async with async_db.async_session as async_session:
         await initialize_anonymous_user(async_session=async_session)
         await initialize_admin_user(async_session=async_session)
+        await initialize_rag_datasets(async_session=async_session)
 
     loguru.logger.info("Database Connection --- Successfully Established!")
 
