@@ -92,6 +92,7 @@ services:
       - NUM_CPU_CORES_EMBEDDING=${NUM_CPU_CORES_EMBEDDING}
       - EMBEDDING_MODEL_NAME=${EMBEDDING_MODEL_NAME}
       - METRICS_PATHS=${METRICS_PATHS}
+      - DEFAULT_RAG_DS_NAME=${DEFAULT_RAG_DS_NAME}
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
