@@ -24,6 +24,7 @@ from src.repository.crud.dataset_db import DataSetCRUDRepository
 from src.securities.authorizations.jwt import jwt_required
 from src.repository.crud.chat import SessionCRUDRepository
 from src.utilities.formatters.ds_formatter import DatasetFormatter
+from src.config.manager import settings
 
 
 router = fastapi.APIRouter(prefix="/ds", tags=["datasets"])
@@ -62,9 +63,11 @@ async def get_dataset_list(
     ```
 
     """
-    list_ds = await ds_repo.get_dataset_list()
+    # list_ds = await ds_repo.get_dataset_list()
 
-    return [RagDatasetResponse(dataset_name=DatasetFormatter.format_dataset_name_back(ds.name)) for ds in list_ds]
+    list_ds = [settings.DEFAULT_RAG_DS_NAME]
+
+    return [RagDatasetResponse(dataset_name=ds_name) for ds_name in list_ds]
 
 
 @router.post(
