@@ -40,7 +40,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 )
 async def get_dataset_list(
     token: str = fastapi.Depends(oauth2_scheme),
-    ds_repo: DataSetCRUDRepository = fastapi.Depends(get_repository(repo_type=DataSetCRUDRepository)),
 ) -> list[RagDatasetResponse]:
     """
     Get all the pre-processed dataset list.
