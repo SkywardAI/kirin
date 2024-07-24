@@ -249,7 +249,9 @@ async def get_session(
                 sessionUuid=session.uuid,
                 name=session.name,
                 session_type=session.session_type,
-                dataset_name=DatasetFormatter.format_dataset_name_back(session.dataset_name),
+                dataset_name=DatasetFormatter.format_dataset_name_back(session.dataset_name)
+                if session.dataset_name
+                else None,
                 created_at=session.created_at,
             )
             sessions_list.append(res_session)
