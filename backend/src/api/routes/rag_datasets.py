@@ -23,7 +23,7 @@ from src.repository.crud.account import AccountCRUDRepository
 from src.repository.crud.dataset_db import DataSetCRUDRepository
 from src.securities.authorizations.jwt import jwt_required
 from src.repository.crud.chat import SessionCRUDRepository
-from src.utilities.formatters import DatasetFormatter
+from src.utilities.formatters.ds_formatter import DatasetFormatter
 
 
 router = fastapi.APIRouter(prefix="/ds", tags=["datasets"])
