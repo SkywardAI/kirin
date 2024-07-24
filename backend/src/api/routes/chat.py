@@ -35,6 +35,7 @@ from src.models.schemas.chat import (
 from src.repository.crud.chat import ChatHistoryCRUDRepository, SessionCRUDRepository
 from src.repository.crud.account import AccountCRUDRepository
 from src.repository.rag.chat import RAGChatModelRepository
+from src.utilities.formatters.ds_formatter import DatasetFormatter
 
 router = fastapi.APIRouter(prefix="/chat", tags=["chatbot"])
 # Automatically get the token from the request header for Swagger UI
@@ -248,7 +249,7 @@ async def get_session(
                 sessionUuid=session.uuid,
                 name=session.name,
                 session_type=session.session_type,
-                dataset_name=session.dataset_name,
+                dataset_name=DatasetFormatter.format_dataset_name_back(session.dataset_name),
                 created_at=session.created_at,
             )
             sessions_list.append(res_session)

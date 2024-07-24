@@ -64,7 +64,7 @@ async def get_dataset_list(
     """
     list_ds = await ds_repo.get_dataset_list()
 
-    return [RagDatasetResponse(dataset_name=ds.name) for ds in list_ds]
+    return [RagDatasetResponse(dataset_name=DatasetFormatter.format_dataset_name_back(ds.name)) for ds in list_ds]
 
 
 @router.post(
