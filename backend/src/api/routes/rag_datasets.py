@@ -56,14 +56,15 @@ async def get_dataset_list(
     ```
     [
         {
-            "name": "aisuko_squad01"
+            "dataset_name": "aisuko/squad01"
         }
     ]
     ```
+
     """
     list_ds = await ds_repo.get_dataset_list()
 
-    return [RagDatasetResponse(name=ds.name) for ds in list_ds]
+    return [RagDatasetResponse(dataset_name=ds.name) for ds in list_ds]
 
 
 @router.post(
@@ -111,7 +112,7 @@ async def load_dataset(
 
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
     # Here we don't use async because load_dataset is a sync function in HF ds
-    status: bool = True if DatasetEng.load_dataset(rag_ds_create.name).get("insert_count") > 0 else False
+    status: bool = True if DatasetEng.load_dataset(rag_ds_create.dataset_name).get("insert_count") > 0 else False
 
     match status:
         case True:
@@ -119,10 +120,10 @@ async def load_dataset(
                 session_uuid=rag_ds_create.sessionUuid,
                 account_id=current_user.id,
                 ds_name=DatasetFormatter.format_dataset_by_name(
-                    rag_ds_create.name
+                    rag_ds_create.dataset_name
                 ),  # ds_name should be same as collectioname in vector db
             )
         case False:
-            return LoadRAGDSResponse(name=rag_ds_create.name, status=status)
+            return LoadRAGDSResponse(dataset_name=rag_ds_create.dataset_name, status=status)
 
-    return LoadRAGDSResponse(name=rag_ds_create.name, status=status)
+    return LoadRAGDSResponse(dataset_name=rag_ds_create.dataset_name, status=status)
