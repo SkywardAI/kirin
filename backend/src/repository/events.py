@@ -31,7 +31,7 @@ from src.repository.database import async_db
 from src.repository.table import Base
 from src.repository.vector_database import vector_db
 from src.utilities.httpkit.httpx_kit import httpx_kit
-from src.utilities.formatters import DatasetFormatter
+from src.utilities.formatters.ds_formatter import DatasetFormatter
 
 
 @event.listens_for(target=async_db.async_engine.sync_engine, identifier="connect")
