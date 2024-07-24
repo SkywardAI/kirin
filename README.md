@@ -8,9 +8,9 @@
 ![](./imgs/SkywardAI(Mind%20Map)%20-%20APIs%20aggregator.svg)
 
 
-# Doing inference on 8 CPUs
+# Doing inference on 12 CPUs
 
-https://github.com/SkywardAI/kirin/assets/8053949/143b016c-2264-4644-a7ae-304c908fbedf
+https://github.com/user-attachments/assets/3890b4cd-392b-489f-ad48-4e9692d4dc15
 
 
 # Roadmap
