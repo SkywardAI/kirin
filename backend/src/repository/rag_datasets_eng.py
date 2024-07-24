@@ -15,7 +15,7 @@
 
 from datasets import load_dataset
 from src.repository.vector_database import vector_db
-from src.utilities.formatters import DatasetFormatter
+from src.utilities.formatters.ds_formatter import DatasetFormatter
 
 
 class DatasetEng:
