@@ -102,7 +102,7 @@ async def initialize_rag_datasets(async_session: AsyncSession) -> None:
     Initialize ds for RAG
     """
     loguru.logger.info("RAG datasets --- Creating . . .")
-    ds = DataSet(name=DatasetFormatter.format_dataset_by_name(settings.DEFAULT_RAG_DS_NAME))
+    ds = DataSet(name=settings.DEFAULT_RAG_DS_NAME)
     async_session.add(instance=ds)
     await async_session.commit()
     await async_session.refresh(instance=ds)

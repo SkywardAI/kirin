@@ -34,13 +34,13 @@ class DatasetResponse(BaseSchemaModel):
 
 class RagDatasetCreate(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
-    name: str = Field(..., title="DataSet Name", description="DataSet Name")
+    dataset_name: str = Field(..., title="DataSet Name", description="DataSet Name")
     des: str | None = Field(..., title="Details", description="Details")
     ratio: Optional[float] = Field(..., title="Ratio", description="Ratio")
 
 
 class RagDatasetResponse(BaseSchemaModel):
-    name: str = Field(..., title="DataSet Name", description="DataSet Name")
+    dataset_name: str = Field(..., title="DataSet Name", description="DataSet Name")
     # status: bool = Field(..., title="Status", description="Status")
     # created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
     # updated_at: datetime.datetime | None = Field(..., title="Update  time", description="Update time")
@@ -48,7 +48,7 @@ class RagDatasetResponse(BaseSchemaModel):
 
 
 class LoadRAGDSResponse(BaseSchemaModel):
-    name: str = Field(..., title="DataSet Name", description="DataSet Name")
+    dataset_name: str = Field(..., title="DataSet Name", description="DataSet Name")
     status: bool = Field(default=False, title="Status", description="Status")
     # created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
     # updated_at: datetime.datetime | None = Field(..., title="Update  time", description="Update time")
