@@ -29,3 +29,11 @@ class DatasetFormatter:
 
         """
         return name.replace("/", "_")
+
+    @classmethod
+    def format_dataset_name_back(cls, name: str):
+        """
+        Replace the "_" in the dataset name with "/"
+
+        """
+        return name.replace("_", "/")
