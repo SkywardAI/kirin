@@ -95,19 +95,6 @@ async def initialize_admin_user(async_session: AsyncSession) -> None:
 
     loguru.logger.info("Admin user --- Successfully Created!")
 
-
-async def initialize_rag_datasets(async_session: AsyncSession) -> None:
-    """
-    Initialize ds for RAG
-    """
-    loguru.logger.info("RAG datasets --- Creating . . .")
-    ds = DataSet(name=settings.DEFAULT_RAG_DS_NAME)
-    async_session.add(instance=ds)
-    await async_session.commit()
-    await async_session.refresh(instance=ds)
-    loguru.logger.info("RAG datasets --- Successfully Created!")
-
-
 async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
     loguru.logger.info("Database Connection --- Establishing . . .")
 
@@ -118,7 +105,6 @@ async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
     async with async_db.async_session as async_session:
         await initialize_anonymous_user(async_session=async_session)
         await initialize_admin_user(async_session=async_session)
-        await initialize_rag_datasets(async_session=async_session)
 
     loguru.logger.info("Database Connection --- Successfully Established!")
 
