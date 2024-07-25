@@ -27,7 +27,7 @@ from src.utilities.formatters.ds_formatter import DatasetFormatter
 from src.config.manager import settings
 
 
-router = fastapi.APIRouter(prefix="/ds", tags=["datasets"])
+router = fastapi.APIRouter(prefix="/ds", tags=["RAG datasets"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 
@@ -62,6 +62,7 @@ async def get_dataset_list(
     ```
 
     """
+    # It is unthread safe
     # list_ds = await ds_repo.get_dataset_list()
 
     list_ds = [settings.DEFAULT_RAG_DS_NAME]

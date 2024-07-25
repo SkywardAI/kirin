@@ -23,6 +23,7 @@ from src.api.routes.train import router as train_router
 from src.api.routes.version import router as version_router
 from src.api.routes.health import router as health_router
 from src.api.routes.rag_datasets import router as datasets_router
+from src.api.routes.neural_nets import router as neural_nets_router
 
 router = fastapi.APIRouter()
 
@@ -34,3 +35,4 @@ router.include_router(router=file_router)
 router.include_router(router=version_router)
 router.include_router(router=health_router)
 router.include_router(router=datasets_router)
+router.include_router(router=neural_nets_router)
