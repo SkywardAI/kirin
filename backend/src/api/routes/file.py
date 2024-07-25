@@ -28,6 +28,7 @@ async def save_upload_file(contents: bytes, save_file: str):
     name="file:upload file",
     response_model=FileInResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
+    deprecated=True,
 )
 async def upload_and_return_id(
     background_tasks: BackgroundTasks,
@@ -68,6 +69,7 @@ async def upload_and_return_id(
     name="dataset:get-dataset-list",
     response_model=list[DatasetResponse],
     status_code=fastapi.status.HTTP_200_OK,
+    deprecated=True,
 )
 async def get_dataset(
     dataset_repo: DataSetCRUDRepository = fastapi.Depends(get_repository(repo_type=DataSetCRUDRepository)),
