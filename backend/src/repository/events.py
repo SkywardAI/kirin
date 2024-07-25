@@ -25,7 +25,6 @@ from sqlalchemy.pool.base import _ConnectionRecord
 from src.config.settings.const import ANONYMOUS_USER, ANONYMOUS_EMAIL, ANONYMOUS_PASS
 from src.config.manager import settings
 from src.models.db.account import Account
-from src.models.db.dataset import DataSet
 from src.securities.hashing.password import pwd_generator
 from src.repository.database import async_db
 from src.repository.table import Base
@@ -94,6 +93,7 @@ async def initialize_admin_user(async_session: AsyncSession) -> None:
     await async_session.refresh(instance=new_account)
 
     loguru.logger.info("Admin user --- Successfully Created!")
+
 
 async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
     loguru.logger.info("Database Connection --- Establishing . . .")
