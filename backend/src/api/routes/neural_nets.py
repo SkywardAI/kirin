@@ -22,7 +22,6 @@ router = fastapi.APIRouter(prefix="/nn", tags=["Neural network templates"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 
 
-
 @router.get(
     path="/list",
     name="nn:get-neural-net-list",
@@ -40,11 +39,11 @@ async def get_neural_net_list(
         {
             "name": "GPT",
             "description": "GPT is a transformer-based model",
-            "modules": ["BigramLanguageModel((token_embedding_table): Embedding(65, 65))","Embedding(65, 65)"]
+            "modules": ["BigramLanguageModel((token_embedding_table): Embedding(65, 65))", "Embedding(65, 65)"],
         },
         {
             "name": "Makemore",
             "description": "Makemore is a character-level language model",
-            "modules": ["Makemore((token_embedding_table): Embedding(65, 65))","Embedding(65, 65)"]
-        }
+            "modules": ["Makemore((token_embedding_table): Embedding(65, 65))", "Embedding(65, 65)"],
+        },
     ]
