@@ -16,6 +16,7 @@ router = fastapi.APIRouter(prefix="/train", tags=["train"])
     name="train:Save file or dataset to DB",
     response_model=TrainFileInResponse,
     status_code=fastapi.status.HTTP_201_CREATED,
+    deprecated=True,
 )
 async def save(
     train_in_msg: TrainFileIn,
