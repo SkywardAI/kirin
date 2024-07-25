@@ -196,7 +196,7 @@ services:
       - 80:80
     depends_on:
       - kirin
-      - yeager
+      # - yeager
 
   # yeager:
   #   container_name: yeager
