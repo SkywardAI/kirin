@@ -15,7 +15,6 @@
 
 import fastapi
 from fastapi.security import OAuth2PasswordBearer
-from src.api.dependencies.repository import get_repository
 from src.models.schemas.neural_nets import NeuralnetsResponse
 
 
