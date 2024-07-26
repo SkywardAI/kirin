@@ -95,6 +95,12 @@ async def initialize_admin_user(async_session: AsyncSession) -> None:
     loguru.logger.info("Admin user --- Successfully Created!")
 
 
+async def initialize_default_data() -> None:
+    async with async_db.async_session_maker() as async_session:
+        await initialize_anonymous_user(async_session=async_session)
+        await initialize_admin_user(async_session=async_session)
+
+
 async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
     loguru.logger.info("Database Connection --- Establishing . . .")
 
@@ -102,9 +108,6 @@ async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
 
     async with backend_app.state.db.async_engine.begin() as connection:
         await initialize_db_tables(connection=connection)
-    async with async_db.async_session as async_session:
-        await initialize_anonymous_user(async_session=async_session)
-        await initialize_admin_user(async_session=async_session)
 
     loguru.logger.info("Database Connection --- Successfully Established!")
 
