@@ -20,6 +20,7 @@ from src.api.dependencies.repository import get_repository
 from src.models.schemas.dataset import RagDatasetCreate, RagDatasetResponse, LoadRAGDSResponse
 from src.repository.rag_datasets_eng import DatasetEng
 from src.repository.crud.account import AccountCRUDRepository
+from src.repository.crud.dataset_db import DataSetCRUDRepository
 from src.securities.authorizations.jwt import jwt_required
 from src.repository.crud.chat import SessionCRUDRepository
 from src.utilities.formatters.ds_formatter import DatasetFormatter
@@ -39,6 +40,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 )
 async def get_dataset_list(
     token: str = fastapi.Depends(oauth2_scheme),
+    ds_repo: DataSetCRUDRepository = fastapi.Depends(get_repository(repo_type=DataSetCRUDRepository)),
 ) -> list[RagDatasetResponse]:
     """
     Get all the pre-processed dataset list.
@@ -62,7 +64,7 @@ async def get_dataset_list(
 
     """
     # It is unthread safe
-    # list_ds = await ds_repo.get_dataset_list()
+    # list_ds_from_db = await ds_repo.get_dataset_list()
 
     list_ds = [settings.DEFAULT_RAG_DS_NAME]
 

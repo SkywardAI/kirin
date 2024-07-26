@@ -20,7 +20,6 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine as create_sqlalchemy_async_engine,
 )
 from sqlalchemy.pool import Pool as SQLAlchemyPool
-from sqlalchemy.pool import NullPool
 from sqlalchemy import create_engine
 from src.config.manager import settings
 
@@ -33,13 +32,14 @@ class AsyncDatabase:
         self.async_engine: SQLAlchemyAsyncEngine = create_sqlalchemy_async_engine(
             url=self.set_async_db_uri,
             echo=settings.IS_DB_ECHO_LOG,
+            echo_pool=True,
             future=True,
-            # pool_size=settings.DB_POOL_SIZE,
+            pool_size=settings.DB_POOL_SIZE,
+            pool_timeout=60,
             # max_overflow=settings.DB_POOL_OVERFLOW,
             # pool_recycle=3600,  # Periodically recycle connections (optional)
-            # pool_pre_ping=True,  # Check the connection status before using it
+            pool_pre_ping=True,  # Check the connection status before using it
             # https://github.com/MagicStack/asyncpg/issues/863
-            poolclass=NullPool,
         )
         self.sync_engine = create_engine(
             f"{settings.POSTGRES_SCHEMA}://{settings.POSTGRES_USERNAME}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
