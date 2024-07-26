@@ -202,11 +202,11 @@ async def chat(
             stream_func: ContentStream = rag_chat_repo.inference_with_rag(
                 session_id=session.id,
                 input_msg=chat_in_msg.message,
+                collection_name=chat_in_msg.collection_name,
                 temperature=chat_in_msg.temperature,
                 top_k=chat_in_msg.top_k,
                 top_p=chat_in_msg.top_p,
                 n_predict=chat_in_msg.n_predict,
-                collection_name=chat_in_msg.collection_name,
             )
         case _:  # default is chat robot
             stream_func: ContentStream = rag_chat_repo.inference(
