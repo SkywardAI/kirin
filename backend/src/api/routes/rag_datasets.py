@@ -63,6 +63,7 @@ async def get_dataset_list(
     ```
 
     """
+    # TODO: load datasets from db in v0.1.8
     # It is unthread safe
     # list_ds_from_db = await ds_repo.get_dataset_list()
 
