@@ -66,14 +66,14 @@ class MilvusHelper:
                 data=[data],
                 limit=n_results,
                 search_params=search_params,
-                output_fields=["title"],
+                output_fields=["answer"],
             )
 
             loguru.logger.info(f"Vector Database --- Result: {res}")
             sentences = []
             for hits in res:
                 for hit in hits:
-                    sentences.append(hit.get("entity").get("title"))
+                    sentences.append(hit.get("entity").get("answer"))
             return sentences
         except Exception as e:
             loguru.logger.error(e)
