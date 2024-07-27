@@ -142,7 +142,7 @@ class RAGChatModelRepository(BaseRAGRepository):
             context = vector_db.search(
                 list(embedd_input), 1, collection_name=DatasetFormatter.format_dataset_by_name(collection_name)
             )
-            if len(context) > 0:
+            if context and (len(context) > 0):
                 context = f"Please answer the question based on answer {context[0]}"
             else:
                 context = InferenceHelper.instruction
