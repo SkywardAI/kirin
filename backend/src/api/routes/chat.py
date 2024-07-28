@@ -23,6 +23,7 @@ from src.securities.authorizations.jwt import jwt_required
 from src.utilities.exceptions.database import EntityDoesNotExist
 from src.utilities.exceptions.http.exc_404 import http_404_exc_uuid_not_found_request
 from src.config.settings.const import ANONYMOUS_USER
+from src.config.manager import settings
 from src.models.schemas.chat import (
     ChatsWithTime,
     ChatInMessage,
@@ -88,6 +89,53 @@ async def update_session(
     except EntityDoesNotExist:
         raise await http_404_exc_uuid_not_found_request(uuid=session_info.sessionUuid)
     return ChatUUIDResponse(sessionUuid=sessions.uuid)
+
+
+@router.delete(
+    path="/session/{uuid}",
+    name="Session:delete-session-by-uuid",
+    status_code=fastapi.status.HTTP_200_OK,
+)
+async def delete_session(
+    uuid: str,
+    token: str = fastapi.Depends(oauth2_scheme),
+    session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required),
+) -> dict[str, str]:
+    """
+    Delete a session by uuid
+
+    This endpoint deletes an existing session by its uuid.
+
+    It is **IRREVERSIBLE** and should be used with caution.
+
+    It requires an admin token to access.
+
+    ```bash
+    curl -X 'DELETE' \
+    'http://127.0.0.1:8000/api/chat/session/fa250ff0-fb22-49f5-a7f9-2b057b7a7398' \
+    -H 'accept: application/json' \
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFiYyIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsImV4cCI6MTcyMjY3MzU2OCwic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.THYudCS7r0dwuW4s21QG9YmGNSc8-qkuumbtvhWychM'
+    ```
+
+    Returns a dictionary:
+
+    {
+    "notification": "Session with uuid 'fa250ff0-fb22-49f5-a7f9-2b057b7a7398' is successfully deleted!"
+    }
+    """
+    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    account_id=current_user.id
+    if current_user.username == settings.ADMIN_USERNAME: 
+        account_id=0
+    try:
+        deletion_result = await session_repo.delete_session_by_uuid(uuid=uuid, account_id=account_id)
+
+    except EntityDoesNotExist:
+        raise await http_404_exc_uuid_not_found_request(uuid=uuid)
+
+    return {"notification": deletion_result}
 
 
 @router.get(
