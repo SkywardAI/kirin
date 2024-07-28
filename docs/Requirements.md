@@ -44,3 +44,14 @@ ubuntu:~/workspace/aisuko/kirin$ docker compose version
 Docker Compose version 2.24.6+ds1-0ubuntu1~22.04.1
 ```
 
+## Rootless docker
+
+```
+ec2-user@ip-10-110-144-85:~/workspace/kirin$ sudo usermod -aG docker $USER
+ec2-user@ip-10-110-144-85:~/workspace/kirin$ newgrp docker
+
+ec2-user@ip-10-110-144-85:~/workspace/kirin$ docker ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+```
+
+And you are good to go.

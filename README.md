@@ -3,6 +3,10 @@
 [![Linter and Builder 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/linter-and-builder.yaml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/linter-and-builder.yaml) [![Release Drafter 🚀](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml/badge.svg)](https://github.com/SkywardAI/chat-backend/actions/workflows/release-drafter.yml) [![Releasing Image 🚀](https://github.com/SkywardAI/kirin/actions/workflows/release-image.yaml/badge.svg)](https://github.com/SkywardAI/kirin/actions/workflows/release-image.yaml) [![CodeQL](https://github.com/SkywardAI/kirin/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/SkywardAI/kirin/actions/workflows/github-code-scanning/codeql)
 
 
+>[!Warning]
+>**Kirin is currently in Development**: Expect breaking changes and bugs!
+
+
 # Architecture
 
 ![](./imgs/SkywardAI(Mind%20Map)%20-%20APIs%20aggregator.svg)
@@ -38,6 +42,8 @@ You need to make sure Docker and docker-compose on your environment. See [Requir
 
 If you want to setup the project quickly, please follow the steps below:
 
+Please check the [Requirements.md](./docs/Requirements.md) to prepare you env
+
 ```
 git clone https://github.com/SkywardAI/kirin.git
 
@@ -46,8 +52,6 @@ cd kirin
 make demo
 ```
 
-See [quick start](https://skywardai.github.io/skywardai.io/docs/quick-start.html)
-
 
 # Build and deployment
 
@@ -55,7 +59,7 @@ See [quick start](https://skywardai.github.io/skywardai.io/docs/quick-start.html
 
 [![Build and Deployment](https://img.youtube.com/vi/63OxSmcBkhI/0.jpg)](https://youtu.be/63OxSmcBkhI?si=G82BOtcwRvQE7dLU)
 
-Also See [deployment](https://skywardai.github.io/skywardai.io/docs/development/build_and_run.html). And if you are interested in docker-in-docker development, see [Development.md](./docs/Development.md)
+And if you are interested in docker-in-docker development, see [Development.md](./docs/Development.md)
 
 
 # Tech stack
