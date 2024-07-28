@@ -70,6 +70,23 @@ class SessionCRUDRepository(BaseCRUDRepository):
         await self.async_session.refresh(instance=update_session)
 
         return update_session  # type: ignore
+    
+    async def delete_session_by_uuid(self, uuid: str, account_id: int) -> Session:
+        if account_id == 0:
+            select_stmt = sqlalchemy.select(Session).where(Session.uuid == uuid)
+        else:
+            select_stmt = sqlalchemy.select(Session).where(Session.uuid == uuid, Session.account_id == account_id)
+        query = await self.async_session.execute(statement=select_stmt)
+        delete_session = query.scalar()
+        if delete_session is None:
+            raise EntityDoesNotExist(f"Session with uuid `{uuid}` does not exist!")
+
+        stmt = sqlalchemy.delete(table=Session).where(Session.uuid == uuid)
+
+        await self.async_session.execute(statement=stmt)
+        await self.async_session.commit()
+
+        return f"Session with uuid '{uuid}' is successfully deleted!"
 
     async def append_ds_name_to_session(self, session_uuid: str, account_id: int, ds_name: str) -> Session:
         """
