@@ -96,6 +96,7 @@ services:
     volumes:
       - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/vdata:/vdata
     expose:
       - 8000
     ports:
