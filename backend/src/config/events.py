@@ -30,7 +30,7 @@ from src.repository.events import (
 def execute_backend_server_event_handler(backend_app: fastapi.FastAPI) -> typing.Any:
     async def launch_backend_server_events() -> None:
         await initialize_db_connection(backend_app=backend_app)
-        await initialize_vectordb_collection()
+        # await initialize_vectordb_collection()
         await initialize_default_data()
 
     return launch_backend_server_events

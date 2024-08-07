@@ -96,51 +96,37 @@ class MilvusHelper:
 
 class LanceHelper:
     def __init__(self):
-        uri = "vdata/default-lancedb"
+        uri = "/vdata/default-lancedb"
         self.db = lancedb.connect(uri)
 
-    def create_table(self, table_name=DEFAULT_COLLECTION, dimension=DEFAULT_DIM, recreate=True):
-        schema = pa.schema(
-            [
-                pa.field("vector", pa.list_(pa.float16(), dimension)),
-                pa.field("question", pa.string()),
-                pa.field("answer", pa.string())
-            ]
-        )
+    def create_table(self, table_name=DEFAULT_COLLECTION, data: list =[], recreate=True):
         try:
             if recreate:
-                self.db.create_table(table_name, schema=schema, mode="overwrite")
+                self.db.create_table(table_name, data=data , mode="overwrite")
             else:
-                self.db.create_table(table_name, schema=schema)
+                self.db.create_table(table_name, data=data)
         except Exception as e:
             loguru.logger.error(e)
         return None
     
-    def insert_list(self, collection_name: str = DEFAULT_COLLECTION, data_list: list = []) -> dict:
+    def insert_list(self, table_name: str = DEFAULT_COLLECTION, data_list: list = []):
         try:
-            return self.client.insert(collection_name=collection_name, data=data_list)
+            tbl = self.db.open_table(table_name)
+            tbl.add(data_list)
         except Exception as e:
             loguru.logger.info(f"Vector Databse --- Error: {e}")
     
-    def search(self, data, n_results, collection_name=DEFAULT_COLLECTION):
-        search_params = {"metric_type": "COSINE", "params": {}}
+    def search(self, data, n_results, table_name=DEFAULT_COLLECTION):
+        print(table_name)
         try:
-            res = self.client.search(
-                collection_name=collection_name,
-                data=[data],
-                limit=n_results,
-                search_params=search_params,
-                output_fields=["answer"],
-            )
-
-            loguru.logger.info(f"Vector Database --- Result: {res}")
-            sentences = []
-            for hits in res:
-                for hit in hits:
-                    sentences.append(hit.get("entity").get("answer"))
-            return sentences
+            tbl = self.db.open_table(table_name)
+            df = tbl.search(data) \
+                .limit(n_results) \
+                .to_list()
+            return df
         except Exception as e:
             loguru.logger.error(e)
         return None
 
-vector_db: MilvusHelper = MilvusHelper()
+# vector_db: MilvusHelper = MilvusHelper()
+vector_db: MilvusHelper = LanceHelper()

@@ -116,7 +116,7 @@ async def initialize_vectordb_collection() -> None:
     loguru.logger.info("Vector Database Connection --- Establishing . . .")
     # RAG data can be loaded manually from the frontend
     # https://github.com/SkywardAI/chat-backend/issues/172
-    vector_db.create_collection()
+    # vector_db.create_collection()
     # Create sample embeddings for testing
     # Sample can be loaded either dataset or directly from strings
     # For network consideration, default method is to use strings

@@ -42,6 +42,7 @@ class DatasetEng:
 
         name = DatasetFormatter.format_dataset_by_name(name) if name else None
 
-        vector_db.create_collection(collection_name=name)
+        # vector_db.create_collection(collection_name=name)
+        vector_db.create_table(table_name=name, data=[ds_list[0]])
 
-        return vector_db.insert_list(collection_name=name, data_list=ds_list)
+        return vector_db.insert_list(table_name=name, data_list=ds_list)
