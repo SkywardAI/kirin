@@ -39,9 +39,13 @@ class DatasetEng:
         ds = load_dataset(name)
         # TODO: validation isn't make sense, it should be removed
         ds_list = ds.get("validation").to_list()
-
+        for item in ds_list:
+            for key, value in list(item.items()):
+                if isinstance(value, list):
+                    item['vector'] = item.pop(key)
         name = DatasetFormatter.format_dataset_by_name(name) if name else None
 
-        vector_db.create_collection(collection_name=name)
+        # vector_db.create_collection(collection_name=name)
+        vector_db.create_table(table_name=name, data=[ds_list[0]])
 
-        return vector_db.insert_list(collection_name=name, data_list=ds_list)
+        return vector_db.insert_list(table_name=name, data_list=ds_list)

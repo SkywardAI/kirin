@@ -140,10 +140,10 @@ class RAGChatModelRepository(BaseRAGRepository):
                 loguru.logger.error(e)
             # collection name for testing
             context = vector_db.search(
-                list(embedd_input), 1, collection_name=DatasetFormatter.format_dataset_by_name(collection_name)
+                list(embedd_input), 1, table_name=DatasetFormatter.format_dataset_by_name(collection_name)
             )
-            if context and (len(context) > 0):
-                context = f"Please answer the question based on answer {context[0]}"
+            if context:
+                context = f"Please answer the question based on answer {context}"
             else:
                 context = InferenceHelper.instruction
 

@@ -39,10 +39,6 @@ class BackendBaseSettings(BaseSettings):
     REDOC_URL: str = "/redoc"
     OPENAPI_PREFIX: str = ""
 
-    MILVUS_HOST: str = decouple.config("MILVUS_HOST", cast=str)  # type: ignore
-    MILVUS_PORT: int = decouple.config("MILVUS_PORT", cast=int)  # type: ignore
-    MILVUS_VERSION: str = decouple.config("MILVUS_VERSION", cast=str)  # type: ignore
-
     POSTGRES_HOST: str = decouple.config("POSTGRES_HOST", cast=str)  # type: ignore
     DB_MAX_POOL_CON: int = decouple.config("DB_MAX_POOL_CON", cast=int)  # type: ignore
     POSTGRES_DB: str = decouple.config("POSTGRES_DB", cast=str)  # type: ignore
@@ -106,9 +102,6 @@ class BackendBaseSettings(BaseSettings):
     # Configurations for language model
     INSTRUCTION: str = decouple.config("INSTRUCTION", cast=str)  # type: ignore
 
-    ETCD_AUTO_COMPACTION_MODE: str = decouple.config("ETCD_AUTO_COMPACTION_MODE", cast=str)  # type: ignore
-    ETCD_AUTO_COMPACTION_RETENTION: int = decouple.config("ETCD_AUTO_COMPACTION_RETENTION", cast=int)  # type: ignore
-    ETCD_QUOTA_BACKEND_BYTES: int = decouple.config("ETCD_QUOTA_BACKEND_BYTES", cast=int)  # type: ignore
     NUM_CPU_CORES: float = decouple.config("NUM_CPU_CORES", cast=float)  # type: ignore
 
     EMBEDDING_ENG: str = decouple.config("EMBEDDING_ENG", cast=str)  # type: ignore

@@ -28,7 +28,6 @@ from src.models.db.account import Account
 from src.securities.hashing.password import pwd_generator
 from src.repository.database import async_db
 from src.repository.table import Base
-from src.repository.vector_database import vector_db
 from src.utilities.httpkit.httpx_kit import httpx_kit
 
 
@@ -50,7 +49,7 @@ def inspect_db_server_on_close(
 
 async def initialize_db_tables(connection: AsyncConnection) -> None:
     loguru.logger.info("Database Table Creation --- Initializing . . .")
-
+    
     await connection.run_sync(Base.metadata.drop_all)
     await connection.run_sync(Base.metadata.create_all)
 
@@ -116,7 +115,7 @@ async def initialize_vectordb_collection() -> None:
     loguru.logger.info("Vector Database Connection --- Establishing . . .")
     # RAG data can be loaded manually from the frontend
     # https://github.com/SkywardAI/chat-backend/issues/172
-    vector_db.create_collection()
+    # vector_db.create_collection()
     # Create sample embeddings for testing
     # Sample can be loaded either dataset or directly from strings
     # For network consideration, default method is to use strings

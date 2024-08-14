@@ -43,6 +43,5 @@ async def get_version() -> ServiceVersionResponse:
 
     return ServiceVersionResponse(
         kirin=settings.BACKEND_SERVER_VERSION,
-        milvus=settings.MILVUS_VERSION,
         inference_engine=settings.INFERENCE_ENG_VERSION,
     )

@@ -42,6 +42,5 @@ class TestAPIVersion(unittest.TestCase):
         assert response.status_code == 200
         assert response.json() == {
             "inferenceEngine": "server--b1-2321a5e",
-            "milvus": "v2.3.12",
             "kirin": "v0.1.19",
         }

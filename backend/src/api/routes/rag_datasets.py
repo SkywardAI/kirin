@@ -114,10 +114,16 @@ async def load_dataset(
     }
     ```
     """
-
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
     # Here we don't use async because load_dataset is a sync function in HF ds
-    status: bool = True if DatasetEng.load_dataset(rag_ds_create.dataset_name).get("insert_count") > 0 else False
+    # status: bool = True if DatasetEng.load_dataset(rag_ds_create.dataset_name).get("insert_count") > 0 else False
+    try:
+        # Here we use async because we need to update the session db
+        DatasetEng.load_dataset(rag_ds_create.dataset_name)
+        status: bool =True
+    except Exception:
+        status: bool = False
+        
 
     match status:
         case True:

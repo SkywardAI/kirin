@@ -24,7 +24,6 @@ passlib = "1.7.4"
 pathlib = "1.0.1"
 psycopg2-binary = "2.9.9"
 pydantic-settings = "2.2.1"
-pymilvus = "2.3.7"
 python-decouple = "3.8"
 python-dotenv = "1.0.1"
 PyJWT= "2.8.0"
@@ -35,6 +34,7 @@ trio = "0.25.0"
 uvicorn = "0.29.0"
 openai = "1.35.7"
 datasets = "2.18.0"
+lancedb = "^0.11.0"
 
 
 [tool.poetry.dev-dependencies]
