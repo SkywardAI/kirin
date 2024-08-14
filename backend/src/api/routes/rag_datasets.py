@@ -115,7 +115,6 @@ async def load_dataset(
     }
     ```
     """
-    loguru.logger.info("-------------------------------")
     current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
     # Here we don't use async because load_dataset is a sync function in HF ds
     # status: bool = True if DatasetEng.load_dataset(rag_ds_create.dataset_name).get("insert_count") > 0 else False
