@@ -28,7 +28,6 @@ from src.models.db.account import Account
 from src.securities.hashing.password import pwd_generator
 from src.repository.database import async_db
 from src.repository.table import Base
-from src.repository.vector_database import vector_db
 from src.utilities.httpkit.httpx_kit import httpx_kit
 
 

@@ -21,7 +21,6 @@ import loguru
 from src.repository.events import (
     dispose_db_connection,
     initialize_db_connection,
-    initialize_vectordb_collection,
     dispose_httpx_client,
     initialize_default_data,
 )
