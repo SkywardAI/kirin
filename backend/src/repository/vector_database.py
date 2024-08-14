@@ -6,8 +6,6 @@ from src.config.manager import settings
 from src.config.settings.const import DEFAULT_COLLECTION, DEFAULT_DIM
 
 import lancedb
-import pandas as pd
-import pyarrow as pa
 
 
 class MilvusHelper:
@@ -122,11 +120,12 @@ class LanceHelper:
             tbl = self.db.open_table(table_name)
             df = tbl.search(data) \
                 .limit(n_results) \
+                .select(["answer"]) \
                 .to_list()
-            return df
+            return df[0].get("answer")
         except Exception as e:
             loguru.logger.error(e)
         return None
 
 # vector_db: MilvusHelper = MilvusHelper()
-vector_db: MilvusHelper = LanceHelper()
+vector_db: LanceHelper = LanceHelper()
