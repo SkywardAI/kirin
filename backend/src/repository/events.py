@@ -15,14 +15,17 @@
 
 
 import fastapi
+import lancedb
 import loguru
+from src.models.meta import Account as newAccount
+
 from sqlalchemy import event
 from sqlalchemy.dialects.postgresql.asyncpg import AsyncAdapt_asyncpg_connection
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.pool.base import _ConnectionRecord
 
-from src.config.settings.const import ANONYMOUS_USER, ANONYMOUS_EMAIL, ANONYMOUS_PASS
+from src.config.settings.const import ANONYMOUS_USER, ANONYMOUS_EMAIL, ANONYMOUS_PASS, META_LANCEDB
 from src.config.manager import settings
 from src.models.db.account import Account
 from src.securities.hashing.password import pwd_generator
@@ -93,12 +96,26 @@ async def initialize_admin_user(async_session: AsyncSession) -> None:
 
     loguru.logger.info("Admin user --- Successfully Created!")
 
+async def initialize_meta_table( db: lancedb.db) -> None:
+    loguru.logger.info("Meta Table Creation --- Initializing . . .")
+    db.create_table("account", schema = newAccount, mode="overwrite")
+    loguru.logger.info("Meta Table Creation --- Successfully Initialized!")
+    
+async def initialize_meta_data() -> None:
+    loguru.logger.info("Meta data Creation --- Initializing . . .")
+
+    loguru.logger.info("Meta data Creation --- Successfully Initialized!")
 
 async def initialize_default_data() -> None:
     async with async_db.async_session_maker() as async_session:
         await initialize_anonymous_user(async_session=async_session)
         await initialize_admin_user(async_session=async_session)
 
+async def initialize_meta_database() -> None:
+    loguru.logger.info("Meta database initializing . . .")
+    meta_db = lancedb.connect(META_LANCEDB)
+    await initialize_meta_table( meta_db )
+    loguru.logger.info("Meta database initialized!")
 
 async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
     loguru.logger.info("Database Connection --- Establishing . . .")
@@ -109,23 +126,6 @@ async def initialize_db_connection(backend_app: fastapi.FastAPI) -> None:
         await initialize_db_tables(connection=connection)
 
     loguru.logger.info("Database Connection --- Successfully Established!")
-
-
-async def initialize_vectordb_collection() -> None:
-    loguru.logger.info("Vector Database Connection --- Establishing . . .")
-    # RAG data can be loaded manually from the frontend
-    # https://github.com/SkywardAI/chat-backend/issues/172
-    # vector_db.create_collection()
-    # Create sample embeddings for testing
-    # Sample can be loaded either dataset or directly from strings
-    # For network consideration, default method is to use strings
-    # Dataset examples are shown as following
-    # embedding_list=load_dataset('aisuko/sentences_of_Melbourne')
-    # ps=embedding_list['train'].to_pandas().to_numpy()
-    # vector_db.insert_list(ps, SAMPLE_CONTEXT)
-    # embedding_list = ai_model.encode_string(SAMPLE_CONTEXT)
-    # vector_db.insert_list(embedding_list, SAMPLE_CONTEXT)
-    loguru.logger.info("Vector Database Connection --- Successfully Established!")
 
 
 async def dispose_db_connection(backend_app: fastapi.FastAPI) -> None:

@@ -3,6 +3,8 @@ UPLOAD_FILE_PATH = "./uploaded_files/"
 MAX_SQL_LENGTH = 200
 
 DEFAULT_COLLECTION = "default_collection"
+DATASET_LANCEDB = "/vdata/rag-lancedb" 
+META_LANCEDB = "/vdata/meta-lancedb"
 # embedding dimension depending on model
 DEFAULT_DIM = 384
 
