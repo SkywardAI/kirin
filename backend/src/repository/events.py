@@ -17,6 +17,8 @@
 import fastapi
 import lancedb
 import loguru
+
+from datetime import datetime
 from src.models.meta import Account as newAccount
 
 from sqlalchemy import event
@@ -98,13 +100,36 @@ async def initialize_admin_user(async_session: AsyncSession) -> None:
 
 async def initialize_meta_table( db: lancedb.db) -> None:
     loguru.logger.info("Meta Table Creation --- Initializing . . .")
-    db.create_table("account", schema = newAccount, mode="overwrite")
+    tbl = db.create_table("account", schema = newAccount, mode="overwrite")
+    await initialize_meta_data( tbl )
     loguru.logger.info("Meta Table Creation --- Successfully Initialized!")
     
-async def initialize_meta_data() -> None:
-    loguru.logger.info("Meta data Creation --- Initializing . . .")
-
-    loguru.logger.info("Meta data Creation --- Successfully Initialized!")
+async def initialize_meta_data( tbl: lancedb.table.Table) -> None:
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    tbl.add([{
+        "username": ANONYMOUS_USER,
+        "email": ANONYMOUS_EMAIL,
+        "_hashed_password": pwd_generator.generate_hashed_password(
+            hash_salt=pwd_generator.generate_salt, new_password=ANONYMOUS_PASS
+        ),
+        "_hash_salt": pwd_generator.generate_salt,
+        "is_active": True,
+        "created_at": current_time,
+        "updated_at": current_time
+    }])
+    loguru.logger.info("Anonymous user added!")
+    tbl.add([{
+        "username": settings.ADMIN_USERNAME,
+        "email": settings.ADMIN_EMAIL,
+        "_hashed_password": pwd_generator.generate_hashed_password(
+            hash_salt=pwd_generator.generate_salt, new_password=settings.ADMIN_PASS
+        ),
+        "_hash_salt": pwd_generator.generate_salt,
+        "is_active": True,
+        "created_at": current_time,
+        "updated_at": current_time
+    }])
+    loguru.logger.info("Admin user added!")
 
 async def initialize_default_data() -> None:
     async with async_db.async_session_maker() as async_session:
