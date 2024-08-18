@@ -1,145 +1,135 @@
 import typing
 
-import sqlalchemy
-from sqlalchemy.sql import functions as sqlalchemy_functions
-
-from src.models.db.account import Account
-from src.models.schemas.account import AccountInCreate, AccountInLogin, AccountInUpdate
+import lancedb
+import loguru
+from src.config.settings.const import META_LANCEDB
+from datetime import datetime
+from src.models.schemas.account import AccountInCreate, AccountInLogin, AccountInUpdate, Account
 from src.repository.crud.base import BaseCRUDRepository
 from src.securities.hashing.password import pwd_generator
-from src.securities.verifications.credentials import credential_verifier
-from src.utilities.exceptions.database import EntityAlreadyExists, EntityDoesNotExist
+from src.utilities.exceptions.database import EntityDoesNotExist
 from src.utilities.exceptions.password import PasswordDoesNotMatch
 
 
 class AccountCRUDRepository(BaseCRUDRepository):
-    async def create_account(self, account_create: AccountInCreate) -> Account:
-        new_account = Account(username=account_create.username, email=account_create.email, is_logged_in=True)
+    def __init__(self):
+        self.db = lancedb.connect(META_LANCEDB)
+        self.tbl = self.db.open_table("account")
 
-        new_account.set_hash_salt(hash_salt=pwd_generator.generate_salt)
-        new_account.set_hashed_password(
-            hashed_password=pwd_generator.generate_hashed_password(
-                hash_salt=new_account.hash_salt, new_password=account_create.password
-            )
-        )
+    def create_account(self, account_create: AccountInCreate) -> Account:
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        hash_salt = pwd_generator.generate_salt
+        new_id = self._get_next_id()
+        self.tbl.add([{
+        "id": new_id,
+        "username": account_create.username,
+        "email": account_create.email,
+        "_hashed_password": pwd_generator.generate_hashed_password(
+            hash_salt=hash_salt, new_password=account_create.password
+        ),
+        "_hash_salt": hash_salt,
+        "is_verified": True,
+        "is_active": True,
+        "is_logged_in": True,
+        "created_at": current_time,
+        "updated_at": current_time
+        }])
+        new_account = self.tbl.search().where(f"username = '{account_create.username}'", prefilter=True).limit(1).to_list()[0]
+        loguru.logger.info(f"User {account_create.username} created ")
+        return Account.from_dict(new_account)
 
-        self.async_session.add(instance=new_account)
-        await self.async_session.commit()
-        await self.async_session.refresh(instance=new_account)
+    def read_accounts(self) -> list[Account]:
+        loguru.logger.info("Read all accounts")
+        accounts_dict_list = self.tbl.search().to_list()
+        return [Account.from_dict(account_dict) for account_dict in accounts_dict_list]
 
-        return new_account
-
-    async def read_accounts(self) -> typing.Sequence[Account]:
-        stmt = sqlalchemy.select(Account)
-        query = await self.async_session.execute(statement=stmt)
-        return query.scalars().all()
-
-    async def read_account_by_id(self, id: int) -> Account:
-        stmt = sqlalchemy.select(Account).where(Account.id == id)
-        query = await self.async_session.execute(statement=stmt)
-        account = query.scalar()
-        if account is None:
+    def read_account_by_id(self, id: int) -> Account:
+        try:
+            account = self.tbl.search().where(f"id = '{id}'", prefilter=True).limit(1).to_list()[0]
+        except Exception as e:
+            loguru.logger.error(f"{e}")
             raise EntityDoesNotExist("Account with id `{id}` does not exist!")
+        loguru.logger.info(f"Read user {id}")
+        return Account.from_dict(account)
 
-        return account  # type: ignore
-
-    async def read_account_by_username(self, username: str) -> Account:
-        stmt = sqlalchemy.select(Account).where(Account.username == username)
-        query = await self.async_session.execute(statement=stmt)
-        account = query.scalar()
-        if account is None:
+    def read_account_by_username(self, username: str) -> Account:
+        try:
+            account = self.tbl.search().where(f"username = '{username}'", prefilter=True).limit(1).to_list()[0]
+        except Exception as e:
+            loguru.logger.error(f"{e}")
             raise EntityDoesNotExist("Account with username `{username}` does not exist!")
+        loguru.logger.info(f"Read user {username}")
+        return Account.from_dict(account)
 
-        return account  # type: ignore
-
-    async def read_account_by_email(self, email: str) -> Account:
-        stmt = sqlalchemy.select(Account).where(Account.email == email)
-        query = await self.async_session.execute(statement=stmt)
-        account = query.scalar()
-        if account is None:
+    def read_account_by_email(self, email: str) -> Account:
+        try:
+            account = self.tbl.search().where(f"username = '{email}'", prefilter=True).limit(1).to_list()[0]
+        except Exception as e:
+            loguru.logger.error(f"{e}")
             raise EntityDoesNotExist("Account with email `{email}` does not exist!")
+        loguru.logger.info(f"Read user {email}")
+        return Account.from_dict(account)
 
-        return account  # type: ignore
+    def read_user_by_password_authentication(self, account_login: AccountInLogin) -> Account:
+        try:
+            account = self.tbl.search().where(f"username = '{account_login.username}'", prefilter=True).limit(1).to_list()[0]
+        except Exception as e:
+            loguru.logger.error(f"{e}")
+            raise EntityDoesNotExist("Account with username `{account_login.username}` does not exist!")
+        try:
+            hash_salt=account.get("_hash_salt")
+            if not pwd_generator.is_password_authenticated(
+                hash_salt=hash_salt, password=account_login.password, hashed_password=account.get("_hashed_password")
+            ):  # type: ignore
+                raise PasswordDoesNotMatch("Password does not match!")
+        except Exception as e:
+            loguru.logger.error(f"{e}")
+        loguru.logger.info(f"Read user {account_login.username} with password authentication")
+        return Account.from_dict(account)  # type: ignore
 
-    async def read_user_by_password_authentication(self, account_login: AccountInLogin) -> Account:
-        stmt = sqlalchemy.select(Account).where(Account.username == account_login.username)
-        query = await self.async_session.execute(statement=stmt)
-        db_account = query.scalar()
+    def update_account_by_id(self, id: int, account_update: AccountInUpdate) -> Account:
+        try:
+            self.tbl.search().where(f"id = '{id}'", prefilter=True).limit(1).to_list()[0]
+        except Exception as e:
+            loguru.logger.error(f"{e}")
+            raise EntityDoesNotExist("Account with id `{id}` does not exist!")
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        if account_update["email"]:
+            self.tbl.update(where=f"id = '{id}'", values={"email": account_update["email"], "updated_at": current_time})
+        if account_update["password"]:
+            self.tbl.update(where=f"id = '{id}'", values={
+                "_hashed_password": pwd_generator.generate_hashed_password(
+                            hash_salt=pwd_generator.generate_salt, new_password=account_update["password"]
+                            ),
+                "_hash_salt": pwd_generator.generate_salt,
+                "updated_at": current_time})
+        update_account = self.tbl.search().where(f"id = '{id}'", prefilter=True).limit(1).to_list()[0]
+        loguru.logger.info(f"Update user {id}")
+        return Account.from_dict(update_account)
 
-        if not db_account:
-            raise EntityDoesNotExist("Wrong username!")
-
-        if not pwd_generator.is_password_authenticated(
-            hash_salt=db_account.hash_salt, password=account_login.password, hashed_password=db_account.hashed_password
-        ):  # type: ignore
-            raise PasswordDoesNotMatch("Password does not match!")
-
-        return db_account  # type: ignore
-
-    async def update_account_by_id(self, id: int, account_update: AccountInUpdate) -> Account:
-        new_account_data = account_update.dict()
-
-        select_stmt = sqlalchemy.select(Account).where(Account.id == id)
-        query = await self.async_session.execute(statement=select_stmt)
-        update_account = query.scalar()
-
-        if not update_account:
+    def delete_account_by_id(self, id: int) -> str:
+        try:
+            self.tbl.delete(f"id = '{id}'")
+        except Exception as e:
+            loguru.logger.error(f"{e}")
             raise EntityDoesNotExist(f"Account with id `{id}` does not exist!")  # type: ignore
-
-        update_stmt = (
-            sqlalchemy.update(table=Account)
-            .where(Account.id == update_account.id)
-            .values(updated_at=sqlalchemy_functions.now())
-        )  # type: ignore
-
-        if new_account_data["email"]:
-            update_stmt = update_stmt.values(email=new_account_data["email"])
-
-        if new_account_data["password"]:
-            update_account.set_hash_salt(hash_salt=pwd_generator.generate_salt)  # type: ignore
-            update_account.set_hashed_password(
-                hashed_password=pwd_generator.generate_hashed_password(
-                    hash_salt=update_account.hash_salt, new_password=new_account_data["password"]
-                )
-            )  # type: ignore
-
-        await self.async_session.execute(statement=update_stmt)
-        await self.async_session.commit()
-        await self.async_session.refresh(instance=update_account)
-
-        return update_account  # type: ignore
-
-    async def delete_account_by_id(self, id: int) -> str:
-        select_stmt = sqlalchemy.select(Account).where(Account.id == id)
-        query = await self.async_session.execute(statement=select_stmt)
-        delete_account = query.scalar()
-
-        if not delete_account:
-            raise EntityDoesNotExist(f"Account with id `{id}` does not exist!")  # type: ignore
-
-        stmt = sqlalchemy.delete(table=Account).where(Account.id == delete_account.id)
-
-        await self.async_session.execute(statement=stmt)
-        await self.async_session.commit()
-
+        loguru.logger.info(f"Delete user {id}")
         return f"Account with id '{id}' is successfully deleted!"
 
-    async def is_username_taken(self, username: str) -> bool:
-        username_stmt = sqlalchemy.select(Account.username).select_from(Account).where(Account.username == username)
-        username_query = await self.async_session.execute(username_stmt)
-        db_username = username_query.scalar()
+    def is_username_taken(self, username: str) -> bool:
+        try:
+            self.tbl.search().where(f"username = '{username}'", prefilter=True).limit(1).to_list()[0]
+        except Exception :
+            return True
+        return False
 
-        if not credential_verifier.is_username_available(username=db_username):
-            raise EntityAlreadyExists(f"The username `{username}` is already taken!")  # type: ignore
+    def is_email_taken(self, email: str) -> bool:
+        try:
+            self.tbl.search().where(f"email = '{email}'", prefilter=True).limit(1).to_list()[0]
+        except Exception :
+            return True
+        return False
 
-        return True
-
-    async def is_email_taken(self, email: str) -> bool:
-        email_stmt = sqlalchemy.select(Account.email).select_from(Account).where(Account.email == email)
-        email_query = await self.async_session.execute(email_stmt)
-        db_email = email_query.scalar()
-
-        if not credential_verifier.is_email_available(email=db_email):
-            raise EntityAlreadyExists(f"The email `{email}` is already registered!")  # type: ignore
-
-        return True
+    def _get_next_id(self):
+        return len(self.tbl.search().to_list()) +1

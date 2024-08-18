@@ -35,3 +35,19 @@ class AccountWithToken(BaseSchemaModel):
 class AccountInResponse(BaseSchemaModel):
     id: int
     authorized_account: AccountWithToken
+
+class Account(BaseSchemaModel):
+    id: int
+    username: str
+    email: EmailStr
+    is_verified: Optional[bool] = None
+    is_active: Optional[bool] = None
+    is_logged_in: Optional[bool] = None
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
+    _hash_salt: Optional[str] = None
+    _hashed_password: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(**data)

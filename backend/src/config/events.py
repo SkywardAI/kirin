@@ -23,7 +23,6 @@ from src.repository.events import (
     initialize_meta_database,
     initialize_db_connection,
     dispose_httpx_client,
-    initialize_default_data,
 )
 
 
@@ -31,7 +30,6 @@ def execute_backend_server_event_handler(backend_app: fastapi.FastAPI) -> typing
     async def launch_backend_server_events() -> None:
         await initialize_meta_database()
         await initialize_db_connection(backend_app=backend_app)
-        await initialize_default_data()
 
     return launch_backend_server_events
 

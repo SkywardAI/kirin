@@ -68,7 +68,7 @@ async def get_accounts(
         - **created_at**: The creation time
         - **updated_at**: The update time
     """
-    db_accounts = await account_repo.read_accounts()
+    db_accounts = account_repo.read_accounts()
     db_account_list: list = list()
     if jwt_payload.username != settings.ADMIN_USERNAME:
         raise await http_exc_401_cunauthorized_request()
@@ -132,13 +132,13 @@ async def get_account(
         - **updated_at**: The update time
     """
     try:
-        db_account = await account_repo.read_account_by_id(id=id)
+        db_account = account_repo.read_account_by_id(id=id)
         access_token = jwt_generator.generate_access_token(account=db_account)
 
     except EntityDoesNotExist:
         raise await http_404_exc_id_not_found_request(id=id)
     if jwt_payload.username != settings.ADMIN_USERNAME:
-        current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+        current_user = account_repo.read_account_by_username(username=jwt_payload.username)
         if current_user != db_account:
             raise await http_exc_401_cunauthorized_request()
     return AccountInResponse(
@@ -208,10 +208,10 @@ async def update_account(
     """
     if jwt_payload.username == ANONYMOUS_USER:
         raise await http_exc_401_cunauthorized_request()
-    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
 
     try:
-        updated_db_account = await account_repo.update_account_by_id(id=current_user.id, account_update=account_update)
+        updated_db_account = account_repo.update_account_by_id(id=current_user.id, account_update=account_update)
 
     except EntityDoesNotExist:
         raise await http_404_exc_username_not_found_request(username=jwt_payload.username)
@@ -284,7 +284,7 @@ async def update_account_by_admin(
     if jwt_payload.username != settings.ADMIN_USERNAME:
         raise await http_exc_401_cunauthorized_request()
     try:
-        updated_db_account = await account_repo.update_account_by_id(id=query_id, account_update=account_update)
+        updated_db_account = account_repo.update_account_by_id(id=query_id, account_update=account_update)
 
     except EntityDoesNotExist:
         raise await http_404_exc_id_not_found_request(id=query_id)
@@ -334,7 +334,7 @@ async def delete_account(
     if jwt_payload.username != settings.ADMIN_USERNAME:
         raise await http_exc_401_cunauthorized_request()
     try:
-        deletion_result = await account_repo.delete_account_by_id(id=id)
+        deletion_result = account_repo.delete_account_by_id(id=id)
 
     except EntityDoesNotExist:
         raise await http_404_exc_id_not_found_request(id=id)
