@@ -82,7 +82,7 @@ async def update_session(
     {"sessionUuid": "3917151c-173b-4a9e-92aa-ac1d633472d2"}
 
     """
-    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     try:
         sessions = await session_repo.update_sessions_by_uuid(session=session_info, account_id=current_user.id)
 
@@ -125,7 +125,7 @@ async def delete_session(
     "notification": "Session with uuid 'fa250ff0-fb22-49f5-a7f9-2b057b7a7398' is successfully deleted!"
     }
     """
-    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     account_id=current_user.id
     if current_user.username == settings.ADMIN_USERNAME: 
         account_id=0
@@ -169,7 +169,7 @@ async def chat_uuid(
     """
 
     # multiple await keyword will caused the error
-    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     new_session = await session_repo.create_session(account_id=current_user.id, name="new session")
     session_uuid = new_session.uuid
 
@@ -238,7 +238,7 @@ async def chat(
     # Note: await keyword will cause issue. See https://github.com/sqlalchemy/sqlalchemy/discussions/9757
     #
 
-    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
 
     # TODO: Only read session here @Micost
     session = await session_repo.read_create_sessions_by_uuid(
@@ -288,7 +288,7 @@ async def get_session(
     # Anonymous user won't related to any session
     if jwt_payload.username == ANONYMOUS_USER:
         return sessions_list
-    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     sessions = await session_repo.read_sessions_by_account_id(id=current_user.id)
     for session in sessions:
         loguru.logger.info(f"Session Details --- {session.name}")
@@ -366,7 +366,7 @@ async def get_chathistory(
     ]
     ```
     """
-    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     if await session_repo.verify_session_by_account_id(session_uuid=uuid, account_id=current_user.id) is False:
         raise http_404_exc_uuid_not_found_request(uuid=uuid)
     session = await session_repo.read_sessions_by_uuid(session_uuid=uuid)
@@ -442,7 +442,7 @@ async def save_chats(
     {"sessionUuid": "6dcf3f30-4521-4d8e-b944-e7e1b80c4861"}
 
     """
-    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     if (
         await session_repo.verify_session_by_account_id(
             session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id

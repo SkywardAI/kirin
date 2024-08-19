@@ -19,7 +19,7 @@ import lancedb
 import loguru
 
 from datetime import datetime
-from src.models.meta import Account, NextID
+from src.models.meta import Account, NextID, Session, ChatHistory, DataSet
 
 from sqlalchemy import event
 from sqlalchemy.dialects.postgresql.asyncpg import AsyncAdapt_asyncpg_connection
@@ -67,6 +67,10 @@ async def initialize_meta_table( db: lancedb.db) -> None:
     tbl_next_id.add([{
         "id": 3
     }])
+    db.create_table("session", schema = Session, mode="overwrite")
+    db.create_table("chat_history", schema = ChatHistory, mode="overwrite")
+    db.create_table("data_set", schema = DataSet, mode="overwrite")
+    
     loguru.logger.info("Meta Table Creation --- Successfully Initialized!")
     
 async def initialize_meta_data( tbl: lancedb.table.Table) -> None:

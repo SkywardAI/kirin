@@ -18,3 +18,34 @@ NextID = pa.schema(
   [
       pa.field("id", pa.int64()),
   ])
+
+Session = pa.schema(
+  [
+      pa.field("id", pa.int64()),
+      pa.field("uuid", pa.string()),
+      pa.field("account_id", pa.int64()),
+      pa.field("name", pa.string()),
+      pa.field("session_type", pa.string()),
+      pa.field("dataset_name", pa.bool_()),
+      pa.field("created_at", pa.timestamp('s')),
+      pa.field("updated_at", pa.timestamp('s')),
+  ])
+
+ChatHistory = pa.schema(
+  [
+      pa.field("id", pa.int64()),
+      pa.field("session_id", pa.int64()),
+      pa.field("role", pa.string()),
+      pa.field("message", pa.string()),
+      pa.field("created_at", pa.timestamp('ms')),
+  ])
+
+DataSet = pa.schema(
+  [
+      pa.field("uuid", pa.string()),
+      pa.field("name", pa.string()),
+      pa.field("account_id", pa.int64()),
+      pa.field("table_name", pa.string()),
+      pa.field("created_at", pa.timestamp('s')),
+      pa.field("updated_at", pa.timestamp('s')),
+  ])

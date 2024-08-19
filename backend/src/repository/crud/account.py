@@ -2,7 +2,6 @@
 
 import lancedb
 import loguru
-import numpy as np
 from src.config.settings.const import META_LANCEDB
 from datetime import datetime
 from src.models.schemas.account import AccountInCreate, AccountInLogin, AccountInUpdate, Account
