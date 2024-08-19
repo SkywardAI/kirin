@@ -239,7 +239,7 @@ async def update_account(
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def update_account_by_admin(
-    query_id: int,
+    id: int,
     token: str = fastapi.Depends(oauth2_scheme),
     account_update: AccountInUpdate = fastapi.Body(...),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
@@ -284,10 +284,10 @@ async def update_account_by_admin(
     if jwt_payload.username != settings.ADMIN_USERNAME:
         raise await http_exc_401_cunauthorized_request()
     try:
-        updated_db_account = account_repo.update_account_by_id(id=query_id, account_update=account_update)
+        updated_db_account = account_repo.update_account_by_id(id=id, account_update=account_update)
 
     except EntityDoesNotExist:
-        raise await http_404_exc_id_not_found_request(id=query_id)
+        raise await http_404_exc_id_not_found_request(id=id)
     access_token = jwt_generator.generate_access_token(account=updated_db_account)
 
     return AccountInResponse(

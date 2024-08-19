@@ -13,3 +13,8 @@ Account = pa.schema(
       pa.field("created_at", pa.timestamp('s')),
       pa.field("updated_at", pa.timestamp('s')),
   ])
+
+NextID = pa.schema(
+  [
+      pa.field("id", pa.int64()),
+  ])

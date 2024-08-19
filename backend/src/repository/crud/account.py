@@ -1,7 +1,8 @@
-import typing
+
 
 import lancedb
 import loguru
+import numpy as np
 from src.config.settings.const import META_LANCEDB
 from datetime import datetime
 from src.models.schemas.account import AccountInCreate, AccountInLogin, AccountInUpdate, Account
@@ -45,7 +46,7 @@ class AccountCRUDRepository(BaseCRUDRepository):
 
     def read_account_by_id(self, id: int) -> Account:
         try:
-            account = self.tbl.search().where(f"id = '{id}'", prefilter=True).limit(1).to_list()[0]
+            account = self.tbl.search().where(f"id = {id}", prefilter=True).limit(1).to_list()[0]
         except Exception as e:
             loguru.logger.error(f"{e}")
             raise EntityDoesNotExist("Account with id `{id}` does not exist!")
@@ -89,28 +90,28 @@ class AccountCRUDRepository(BaseCRUDRepository):
 
     def update_account_by_id(self, id: int, account_update: AccountInUpdate) -> Account:
         try:
-            self.tbl.search().where(f"id = '{id}'", prefilter=True).limit(1).to_list()[0]
+            self.tbl.search().where(f"id = {id}", prefilter=True).limit(1).to_list()[0]
         except Exception as e:
             loguru.logger.error(f"{e}")
             raise EntityDoesNotExist("Account with id `{id}` does not exist!")
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        if account_update["email"]:
-            self.tbl.update(where=f"id = '{id}'", values={"email": account_update["email"], "updated_at": current_time})
-        if account_update["password"]:
-            self.tbl.update(where=f"id = '{id}'", values={
+        if account_update.email:
+            self.tbl.update(where=f"id = {id}", values={"email": account_update.email, "updated_at": current_time})
+        if account_update.password:
+            self.tbl.update(where=f"id = {id}", values={
                 "_hashed_password": pwd_generator.generate_hashed_password(
-                            hash_salt=pwd_generator.generate_salt, new_password=account_update["password"]
+                            hash_salt=pwd_generator.generate_salt, new_password=account_update.password
                             ),
                 "_hash_salt": pwd_generator.generate_salt,
                 "updated_at": current_time})
-        update_account = self.tbl.search().where(f"id = '{id}'", prefilter=True).limit(1).to_list()[0]
+        update_account = self.tbl.search().where(f"id = {id}", prefilter=True).limit(1).to_list()[0]
         loguru.logger.info(f"Update user {id}")
         return Account.from_dict(update_account)
 
     def delete_account_by_id(self, id: int) -> str:
         try:
-            self.tbl.delete(f"id = '{id}'")
+            self.tbl.delete(f"id = {id}")
         except Exception as e:
             loguru.logger.error(f"{e}")
             raise EntityDoesNotExist(f"Account with id `{id}` does not exist!")  # type: ignore
@@ -132,4 +133,7 @@ class AccountCRUDRepository(BaseCRUDRepository):
         return False
 
     def _get_next_id(self):
-        return len(self.tbl.search().to_list()) +1
+        tbl = self.db.open_table("next_id")
+        next_id = tbl.search().select(["id"]).limit(1).to_list()[0].get("id")
+        tbl.update(where=f"id = {next_id}", values={"id":next_id+1})
+        return next_id
