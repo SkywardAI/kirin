@@ -1,9 +1,9 @@
 import typing
 
-import fastapi
-from sqlalchemy.ext.asyncio import AsyncSession as SQLAlchemyAsyncSession
+# import fastapi
+# from sqlalchemy.ext.asyncio import AsyncSession as SQLAlchemyAsyncSession
 
-from src.api.dependencies.session import get_async_session
+# from src.api.dependencies.session import get_async_session
 from src.repository.crud.base import BaseCRUDRepository
 from src.repository.rag.base import BaseRAGRepository
 
