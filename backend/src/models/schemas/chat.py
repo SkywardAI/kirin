@@ -91,14 +91,37 @@ class SessionUpdate(BaseSchemaModel):
         default=None, title="Session Type", description="Type of current session"
     )
 
-
-class Session(BaseSchemaModel):
+class SessionResponse(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
     name: str | None = Field(..., title="Name", description="Name")
     session_type: str | None = Field(..., title="Session Type", description="Type of current session")
     dataset_name: str | None = Field(default=None, title="Dataset Name", description="Dataset Name")
     created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
 
+class Session(BaseSchemaModel):
+    session_uuid: str = Field(..., title="Session UUID", description="Session UUID")
+    account_id: int = Field(..., title="Account ID", description="Account ID")
+    name: str | None = Field(..., title="Name", description="Name")
+    session_type: str | None = Field(..., title="Session Type", description="Type of current session")
+    dataset_name: str | None = Field(default=None, title="Dataset Name", description="Dataset Name")
+    created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(**data)
+
+
+class ChatHistory(BaseSchemaModel):
+    session_uuid: str = Field(..., title="Session UUID", description="Session UUID")
+    account_id: int = Field(..., title="Account ID", description="Account ID")
+    name: str | None = Field(..., title="Name", description="Name")
+    session_type: str | None = Field(..., title="Session Type", description="Type of current session")
+    dataset_name: str | None = Field(default=None, title="Dataset Name", description="Dataset Name")
+    created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(**data)
 
 class Chats(BaseSchemaModel):
     """

@@ -29,7 +29,7 @@ from src.models.schemas.chat import (
     ChatInMessage,
     ChatInResponse,
     SessionUpdate,
-    Session,
+    SessionResponse,
     ChatUUIDResponse,
     SaveChatHistory,
 )
@@ -170,8 +170,8 @@ async def chat_uuid(
 
     # multiple await keyword will caused the error
     current_user = account_repo.read_account_by_username(username=jwt_payload.username)
-    new_session = await session_repo.create_session(account_id=current_user.id, name="new session")
-    session_uuid = new_session.uuid
+    new_session = session_repo.create_session(account_id=current_user.id, name="new session")
+    session_uuid = new_session.session_uuid
 
     return ChatUUIDResponse(sessionUuid=session_uuid)
 
@@ -241,7 +241,7 @@ async def chat(
     current_user = account_repo.read_account_by_username(username=jwt_payload.username)
 
     # TODO: Only read session here @Micost
-    session = await session_repo.read_create_sessions_by_uuid(
+    session = session_repo.read_create_sessions_by_uuid(
         session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id, name=chat_in_msg.message[:20]
     )
 
@@ -275,7 +275,7 @@ async def chat(
 @router.get(
     path="",
     name="chat:get-session-of-current-user",
-    response_model=list[Session],
+    response_model=list[SessionResponse],
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def get_session(
@@ -283,18 +283,18 @@ async def get_session(
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required),
-) -> list[Session]:
+) -> list[SessionResponse]:
     sessions_list: list = list()
     # Anonymous user won't related to any session
     if jwt_payload.username == ANONYMOUS_USER:
         return sessions_list
     current_user = account_repo.read_account_by_username(username=jwt_payload.username)
-    sessions = await session_repo.read_sessions_by_account_id(id=current_user.id)
+    sessions = session_repo.read_sessions_by_account_id(id=current_user.id)
     for session in sessions:
         loguru.logger.info(f"Session Details --- {session.name}")
         try:
-            res_session = Session(
-                sessionUuid=session.uuid,
+            res_session = SessionResponse(
+                sessionUuid=session.session_uuid,
                 name=session.name,
                 session_type=session.session_type,
                 dataset_name=DatasetFormatter.format_dataset_name_back(session.dataset_name)
@@ -367,10 +367,10 @@ async def get_chathistory(
     ```
     """
     current_user = account_repo.read_account_by_username(username=jwt_payload.username)
-    if await session_repo.verify_session_by_account_id(session_uuid=uuid, account_id=current_user.id) is False:
+    if session_repo.verify_session_by_account_id(session_uuid=uuid, account_id=current_user.id) is False:
         raise http_404_exc_uuid_not_found_request(uuid=uuid)
-    session = await session_repo.read_sessions_by_uuid(session_uuid=uuid)
-    chats = await chat_repo.read_chat_history_by_session_id(id=session.id)
+    session = session_repo.read_sessions_by_uuid(session_uuid=uuid)
+    chats = chat_repo.read_chat_history_by_session_uuid(uuid=session.uuid)
     chats_list: list = list()
     for chat in chats:
         res_session = ChatsWithTime(
@@ -444,12 +444,12 @@ async def save_chats(
     """
     current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     if (
-        await session_repo.verify_session_by_account_id(
+        session_repo.verify_session_by_account_id(
             session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id
         )
         is False
     ):
         raise http_404_exc_uuid_not_found_request(uuid=chat_in_msg.sessionUuid)
-    session = await session_repo.read_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid)
-    await chat_repo.load_create_chat_history(session_id=session.id, chats=chat_in_msg.chats)
+    session = session_repo.read_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid)
+    chat_repo.load_create_chat_history(session_uuid=session.uuid, chats=chat_in_msg.chats)
     return ChatUUIDResponse(sessionUuid=chat_in_msg.sessionUuid)

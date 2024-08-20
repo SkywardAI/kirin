@@ -135,7 +135,7 @@ async def load_dataset(
             table_name = DatasetFormatter.format_dataset_by_name(
                     rag_ds_create.dataset_name
                 )
-            await session_repo.append_ds_name_to_session(
+            session_repo.append_ds_name_to_session(
                 session_uuid=rag_ds_create.sessionUuid,
                 account_id=current_user.id,
                 ds_name=table_name,  # ds_name should be same as collectioname in vector db

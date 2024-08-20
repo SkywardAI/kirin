@@ -21,7 +21,7 @@ from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from src.config.manager import settings
-from src.models.db.account import Account
+from src.models.schemas.account import Account
 from src.models.schemas.jwt import JWTAccount, JWToken
 
 

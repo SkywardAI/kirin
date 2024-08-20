@@ -22,9 +22,6 @@ from src.models.schemas.dataset import DatasetCreate, DataSet
 from src.utilities.exceptions.database import EntityDoesNotExist
 
 
-import typing
-
-
 class DataSetCRUDRepository(BaseCRUDRepository):
     def __init__(self):
         self.db = lancedb.connect(META_LANCEDB)
@@ -34,20 +31,20 @@ class DataSetCRUDRepository(BaseCRUDRepository):
         try:
             data_set = self.tbl.search().where(f"name = '{dataset_create.name}', account_id = {account_id}", prefilter=True).limit(1).to_list()[0]
         except Exception :
-            uuid=str(uuid.uuid4())
+            uuid_id=str(uuid.uuid4())
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             self.tbl.add([{
-            "uuid": uuid,
-            "name": dataset_create.name,
+            "uuid": uuid_id,
+            "name": dataset_create.dataset_name,
             "table_name": dataset_create.table_name,
             "account_id": account_id,
             "created_at": current_time,
             "updated_at": current_time
             }])
-            new_dataset = self.tbl.search().where(f"uuid = '{uuid}'", prefilter=True).limit(1).to_list()[0]
-            loguru.logger.info(f"Dataset not exist , new {dataset_create.username} saved ")
+            new_dataset = self.tbl.search().where(f"uuid = '{uuid_id}'", prefilter=True).limit(1).to_list()[0]
+            loguru.logger.info(f"Dataset not exist , new {dataset_create.dataset_name} saved ")
             return DataSet.from_dict(new_dataset)
-        loguru.logger.info(f"Dataset {dataset_create.username} exist")
+        loguru.logger.info(f"Dataset {dataset_create.dataset_name} exist")
         return DataSet.from_dict(data_set)
 
     def get_dataset_by_name(self, dataset_name: str) -> DataSet:
@@ -55,7 +52,7 @@ class DataSetCRUDRepository(BaseCRUDRepository):
             data_set = self.tbl.search().where(f"name = '{dataset_name}'", prefilter=True).limit(1).to_list()[0]
         except Exception as e:
             loguru.logger.error(f"{e}")
-            raise EntityDoesNotExist("Dataset with username `{dataset_name}` does not exist!")
+            raise EntityDoesNotExist("Dataset with name `{dataset_name}` does not exist!")
         loguru.logger.info(f"Read dataset {dataset_name}")
         return DataSet.from_dict(data_set)
 
@@ -65,7 +62,7 @@ class DataSetCRUDRepository(BaseCRUDRepository):
             self.tbl.update(where=f"name = '{dataset_name}'", values={"updated_at": current_time})
         except Exception as e:
             loguru.logger.error(f"{e}")
-            raise EntityDoesNotExist("Dataset with username `{dataset_name}` does not exist!")
+            raise EntityDoesNotExist("Dataset with name `{dataset_name}` does not exist!")
         loguru.logger.info(f"Update dataset {dataset_name}")
         updated_dateset = self.tbl.search().where(f"name = '{dataset_name}'", prefilter=True).limit(1).to_list()[0]
         return DataSet.from_dict(updated_dateset)
