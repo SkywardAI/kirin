@@ -369,8 +369,7 @@ async def get_chathistory(
     current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     if session_repo.verify_session_by_account_id(session_uuid=uuid, account_id=current_user.id) is False:
         raise http_404_exc_uuid_not_found_request(uuid=uuid)
-    session = session_repo.read_sessions_by_uuid(session_uuid=uuid)
-    chats = chat_repo.read_chat_history_by_session_uuid(uuid=session.uuid)
+    chats = chat_repo.read_chat_history_by_session_uuid(uuid=uuid)
     chats_list: list = list()
     for chat in chats:
         res_session = ChatsWithTime(
@@ -451,5 +450,5 @@ async def save_chats(
     ):
         raise http_404_exc_uuid_not_found_request(uuid=chat_in_msg.sessionUuid)
     session = session_repo.read_sessions_by_uuid(session_uuid=chat_in_msg.sessionUuid)
-    chat_repo.load_create_chat_history(session_uuid=session.uuid, chats=chat_in_msg.chats)
+    chat_repo.load_create_chat_history(session_uuid=session.session_uuid, chats=chat_in_msg.chats)
     return ChatUUIDResponse(sessionUuid=chat_in_msg.sessionUuid)

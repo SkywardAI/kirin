@@ -40,7 +40,7 @@ class SessionCRUDRepository(BaseCRUDRepository):
             "created_at": current_time
         }])
         new_session = self.tbl.search().where(f"session_uuid = '{uuid_id}'", prefilter=True).limit(1).to_list()[0]
-        loguru.logger.info(f"Session {name} created ")
+        loguru.logger.info(f"Session {name} {uuid_id} created ")
         return Session.from_dict(new_session) 
 
     def read_sessions(self) -> list[Session]:
@@ -146,7 +146,7 @@ class SessionCRUDRepository(BaseCRUDRepository):
 
     def verify_session_by_account_id(self, session_uuid: str, account_id: int) -> bool:
         try:
-            self.tbl.search().where(f"uuid = '{session_uuid}' , account_id = {account_id}", prefilter=True).limit(1).to_list()[0]
+            self.tbl.search().where(f"session_uuid = '{session_uuid}' , account_id = {account_id}", prefilter=True).limit(1).to_list()[0]
             return True
         except Exception as e:
             loguru.logger.error(f"{e}")
@@ -170,7 +170,7 @@ class ChatHistoryCRUDRepository(BaseCRUDRepository):
     def load_create_chat_history(self, session_uuid: str, chats: list[Chats]):
         try:
             for chat in chats:
-                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
                 self.tbl.add([{
                     "session_uuid": session_uuid,
                     "role": chat.role,

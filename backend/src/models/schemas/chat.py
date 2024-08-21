@@ -112,12 +112,10 @@ class Session(BaseSchemaModel):
 
 
 class ChatHistory(BaseSchemaModel):
-    session_uuid: str = Field(..., title="Session UUID", description="Session UUID")
-    account_id: int = Field(..., title="Account ID", description="Account ID")
-    name: str | None = Field(..., title="Name", description="Name")
-    session_type: str | None = Field(..., title="Session Type", description="Type of current session")
-    dataset_name: str | None = Field(default=None, title="Dataset Name", description="Dataset Name")
-    created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
+    session_uuid: str
+    role: str
+    message: str
+    created_at: datetime.datetime
 
     @classmethod
     def from_dict(cls, data: dict):

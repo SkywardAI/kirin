@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import AsyncSession as SQLAlchemyAsyncSession
+# from sqlalchemy.ext.asyncio import AsyncSession as SQLAlchemyAsyncSession
 
 
 class BaseCRUDRepository:
