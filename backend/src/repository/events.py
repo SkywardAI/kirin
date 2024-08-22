@@ -14,7 +14,6 @@
 # limitations under the License.
 
 
-import fastapi
 import lancedb
 import loguru
 

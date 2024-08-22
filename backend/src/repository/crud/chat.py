@@ -21,7 +21,6 @@ from src.config.settings.const import META_LANCEDB
 from src.models.schemas.chat import SessionUpdate, Chats, Session, ChatHistory
 from src.repository.crud.base import BaseCRUDRepository
 from src.utilities.exceptions.database import EntityDoesNotExist
-from typing import Optional
 
 class SessionCRUDRepository(BaseCRUDRepository):
     def __init__(self):

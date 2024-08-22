@@ -1,6 +1,4 @@
-import loguru
-
-from src.config.settings.const import DEFAULT_COLLECTION, META_LANCEDB
+from src.config.settings.const import META_LANCEDB
 
 import lancedb
 
