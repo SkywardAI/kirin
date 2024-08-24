@@ -17,7 +17,7 @@ import fastapi
 from fastapi.security import OAuth2PasswordBearer
 
 from src.api.dependencies.repository import get_repository
-from src.models.schemas.dataset import RagDatasetCreate, RagDatasetResponse, LoadRAGDSResponse
+from src.models.schemas.dataset import RagDatasetCreate, RagDatasetResponse, LoadRAGDSResponse, DatasetCreate
 from src.repository.rag_datasets_eng import DatasetEng
 from src.repository.crud.account import AccountCRUDRepository
 from src.repository.crud.dataset_db import DataSetCRUDRepository
@@ -41,9 +41,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/verify")
 async def get_dataset_list(
     token: str = fastapi.Depends(oauth2_scheme),
     ds_repo: DataSetCRUDRepository = fastapi.Depends(get_repository(repo_type=DataSetCRUDRepository)),
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> list[RagDatasetResponse]:
     """
-    Get all the pre-processed dataset list.
+    Get all the pre-processed dataset list for admin users
+    Get dataset list for the specific user
 
     ```
     curl -X 'GET' \
@@ -63,11 +66,14 @@ async def get_dataset_list(
     ```
 
     """
-    # TODO: load datasets from db in v0.1.8
-    # It is unthread safe
-    # list_ds_from_db = await ds_repo.get_dataset_list()
-
-    list_ds = [settings.DEFAULT_RAG_DS_NAME]
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
+    account_id=current_user.id
+    if current_user.username == settings.ADMIN_USERNAME: 
+        list_ds = ds_repo.get_dataset_list()
+    else:
+        list_ds = ds_repo.get_dataset_list_by_account_id(account_id=account_id)
+    if not list_ds:
+        list_ds = [settings.DEFAULT_RAG_DS_NAME]
 
     return [RagDatasetResponse(dataset_name=ds_name) for ds_name in list_ds]
 
@@ -82,6 +88,7 @@ async def load_dataset(
     rag_ds_create: RagDatasetCreate,
     token: str = fastapi.Depends(oauth2_scheme),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
+    ds_repo: DataSetCRUDRepository = fastapi.Depends(get_repository(repo_type=DataSetCRUDRepository)),
     account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
     jwt_payload: dict = fastapi.Depends(jwt_required),
 ) -> LoadRAGDSResponse:
@@ -114,7 +121,7 @@ async def load_dataset(
     }
     ```
     """
-    current_user = await account_repo.read_account_by_username(username=jwt_payload.username)
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     # Here we don't use async because load_dataset is a sync function in HF ds
     # status: bool = True if DatasetEng.load_dataset(rag_ds_create.dataset_name).get("insert_count") > 0 else False
     try:
@@ -127,13 +134,19 @@ async def load_dataset(
 
     match status:
         case True:
-            await session_repo.append_ds_name_to_session(
+            table_name = DatasetFormatter.format_dataset_by_name(
+                    rag_ds_create.dataset_name
+                )
+            session_repo.append_ds_name_to_session(
                 session_uuid=rag_ds_create.sessionUuid,
                 account_id=current_user.id,
-                ds_name=DatasetFormatter.format_dataset_by_name(
-                    rag_ds_create.dataset_name
-                ),  # ds_name should be same as collectioname in vector db
+                ds_name=table_name,  # ds_name should be same as collectioname in vector db
             )
+            ds_repo.create_datasset(account_id=current_user.id, dataset_create=DatasetCreate(
+                dataset_name=rag_ds_create.dataset_name,
+                table_name=table_name,
+                des=""
+            ))
         case False:
             return LoadRAGDSResponse(dataset_name=rag_ds_create.dataset_name, status=status)
 

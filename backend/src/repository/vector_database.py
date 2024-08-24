@@ -1,13 +1,12 @@
 import loguru
 
-from src.config.settings.const import DEFAULT_COLLECTION
+from src.config.settings.const import DEFAULT_COLLECTION, DATASET_LANCEDB
 
 import lancedb
 
 class LanceHelper:
     def __init__(self):
-        uri = "/vdata/default-lancedb"
-        self.db = lancedb.connect(uri)
+        self.db = lancedb.connect(DATASET_LANCEDB)
 
     def create_table(self, table_name=DEFAULT_COLLECTION, data: list =[], recreate=True):
         try:
@@ -38,6 +37,5 @@ class LanceHelper:
         except Exception as e:
             loguru.logger.error(e)
         return None
-
-# vector_db: MilvusHelper = MilvusHelper()
+    
 vector_db: LanceHelper = LanceHelper()

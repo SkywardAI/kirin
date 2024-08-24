@@ -22,6 +22,7 @@ from src.models.schemas.base import BaseSchemaModel
 
 class DatasetCreate(BaseSchemaModel):
     dataset_name: str = Field(..., title="DataSet Name", description="DataSet Name")
+    table_name: str = Field(..., title="Table Name", description="Table Name")
     des: str | None = Field(..., title="Details", description="Details")
 
 
@@ -53,3 +54,15 @@ class LoadRAGDSResponse(BaseSchemaModel):
     # created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
     # updated_at: datetime.datetime | None = Field(..., title="Update  time", description="Update time")
     # ratio: Optional[float] = Field(..., title="Ratio", description="Ratio")
+
+class DataSet(BaseSchemaModel):  # type: ignore
+    uuid: str
+    name: str
+    account_id: int
+    table_name:str
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(**data)

@@ -60,15 +60,3 @@
     cp .env.example .env
     ```
 
-
-8. (IMPORTANT) Database setup:
-
-   ```shell
-    # (Docker) Generate revision for the database auto-migrations
-    docker exec backend_app alembic revision --autogenerate -m "YOUR MIGRATION TITLE"
-    docker exec backend_app alembic upgrade head    # to register the database classes
-    
-    # (Local) Generate revision for the database auto-migrations
-    alembic revision --autogenerate -m "YOUR MIGRATION TITLE"
-    alembic upgrade head    # to register the database classes
-   ```

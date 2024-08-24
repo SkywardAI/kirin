@@ -80,7 +80,6 @@ When the `Docker` is started, these are the URL addresses:
 Well, the easy answer is **Asynchronousity** and **Speed**!
 
 * **FastAPI** is crowned as the fastest web framework for Python and thus we use it for our backend development.
-* The database of my choice is the **asynchronous** version of **PostgreSQL** (via [SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html)). Read [this blog from Packt](https://subscription.packtpub.com/book/programming/9781838821135/6/ch06lvl1sec32/synchronous-asynchronous-and-threaded-execution) if you want to educate yourself further about the topic **Asynchronous, Synchronous, Concurrency,** and **Parallelism**.
 * **Docker** is a technology that packages an application into standardized units called containers that have everything the software needs to run including libraries, system tools, code, and runtime.
 
 
@@ -92,7 +91,6 @@ The above-listed technologies are just the main ones. There are other technologi
 * [PyTest](https://docs.pytest.org/en/7.2.x/) $\rightarrow$ The testing framework for Python code.
 * [DBDiagram](https://dbdiagram.io/home) $\rightarrow$ A platform that lets your design your database by writing SQL and converting it into ERD. This platform provides a complete symbol for entity relationships (not like many other platforms!).
 * [GitHub Actions](https://github.com/features/actions) $\rightarrow$ The platform to setup our CI/CD by GitHub.
-* [SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html) $\rightarrow$ The go-to database interface library for Python. The 2.0 is the most recent update where it provides an asynchronous setup.
 * [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) $\rightarrow$ A file for distributing the responsibilities in our project to each team/teammate.
 
 
@@ -100,7 +98,6 @@ The above-listed technologies are just the main ones. There are other technologi
 
 * [LocalAI](https://github.com/mudler/LocalAI)
 * [FastAPI](https://fastapi.tiangolo.com/)
-* [SQLAlchemy](https://www.sqlalchemy.org/)
 * [llama.cpp](https://github.com/ggerganov/llama.cpp)
 * [HuggingFace Community](https://huggingface.co/aisuko)
 * [RMIT Race Hub](https://race.rmit.edu.au)

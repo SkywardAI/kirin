@@ -17,7 +17,7 @@
 import unittest
 import fastapi
 from fastapi.testclient import TestClient
-from src.models.db.account import Account
+from src.models.schemas.account import Account
 from src.repository.crud.base import BaseCRUDRepository
 from src.repository.crud.account import AccountCRUDRepository
 from src.api.routes import authentication

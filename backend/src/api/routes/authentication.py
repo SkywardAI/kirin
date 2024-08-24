@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import fastapi
+import loguru
 from typing import Annotated
 from src.api.dependencies.repository import get_repository
 from src.models.schemas.account import AccountInCreate, AccountInLogin, AccountInResponse, AccountWithToken
@@ -64,13 +65,13 @@ async def signup(
     """
 
     try:
-        await account_repo.is_username_taken(username=account_create.username)
-        await account_repo.is_email_taken(email=account_create.email)
+        account_repo.is_username_taken(username=account_create.username)
+        account_repo.is_email_taken(email=account_create.email)
 
     except EntityAlreadyExists:
         raise await http_exc_400_credentials_bad_signup_request()
 
-    new_account = await account_repo.create_account(account_create=account_create)
+    new_account = account_repo.create_account(account_create=account_create)
     access_token = jwt_generator.generate_access_token(account=new_account)
 
     return AccountInResponse(
@@ -125,7 +126,7 @@ async def signin(
         raise await http_exc_400_credentials_bad_signin_request()
 
     try:
-        db_account = await account_repo.read_user_by_password_authentication(account_login=account_login)
+        db_account = account_repo.read_user_by_password_authentication(account_login=account_login)
 
     except Exception:
         raise await http_exc_400_credentials_bad_signin_request()
@@ -167,7 +168,7 @@ async def get_token(
     - **token**: The access token for the anonymous user
     """
     anonymous_user = AccountInLogin(username=ANONYMOUS_USER, password=ANONYMOUS_PASS)
-    db_account = await account_repo.read_user_by_password_authentication(account_login=anonymous_user)
+    db_account = account_repo.read_user_by_password_authentication(account_login=anonymous_user)
     access_token = jwt_generator.generate_access_token(account=db_account)
 
     return {"token": access_token}
@@ -193,10 +194,11 @@ async def login_for_access_token(
     - **token_type**: The token type
     """
     try:
-        db_account = await account_repo.read_user_by_password_authentication(
+        db_account = account_repo.read_user_by_password_authentication(
             account_login=AccountInLogin(username=form_data.username, password=form_data.password)
         )
-    except Exception:
+    except Exception as e:
+        loguru.logger.error(f"{e}")
         raise await http_exc_400_failed_validate_request()
     access_token = jwt_generator.generate_access_token(account=db_account)
     return {"access_token": access_token, "token_type": "bearer"}
