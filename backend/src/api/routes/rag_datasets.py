@@ -72,6 +72,8 @@ async def get_dataset_list(
         list_ds = ds_repo.get_dataset_list()
     else:
         list_ds = ds_repo.get_dataset_list_by_account_id(account_id=account_id)
+    if not list_ds:
+        list_ds = [settings.DEFAULT_RAG_DS_NAME]
 
     return [RagDatasetResponse(dataset_name=ds_name) for ds_name in list_ds]
 

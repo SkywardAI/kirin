@@ -244,13 +244,12 @@ async def chat(
     session = session_repo.read_create_sessions_by_uuid(
         session_uuid=chat_in_msg.sessionUuid, account_id=current_user.id, name=chat_in_msg.message[:20]
     )
-
     match session.session_type:
         case "rag":
             stream_func: ContentStream = rag_chat_repo.inference_with_rag(
                 session_uuid=session.session_uuid,
                 input_msg=chat_in_msg.message,
-                collection_name=chat_in_msg.collection_name,
+                collection_name=session.dataset_name,
                 temperature=chat_in_msg.temperature,
                 top_k=chat_in_msg.top_k,
                 top_p=chat_in_msg.top_p,
