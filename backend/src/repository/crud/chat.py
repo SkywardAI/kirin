@@ -58,17 +58,17 @@ class SessionCRUDRepository(BaseCRUDRepository):
 
     def update_sessions_by_uuid(self, session: SessionUpdate, account_id: int) -> Session:
         try:
-            self.tbl.search().where(f"session_uuid = '{session.session_uuid}' , account_id = {account_id}", prefilter=True).limit(1).to_list()[0]
+            self.tbl.search().where(f"session_uuid = '{session.sessionUuid}' , account_id = {account_id}", prefilter=True).limit(1).to_list()[0]
         except Exception as e:
             loguru.logger.error(f"{e}")
             raise EntityDoesNotExist("Session with uuid `{session.session_uuid}}` does not exist!")
         
         if session.name:
-            self.tbl.update(where=f"session_uuid = '{session.session_uuid}'", values={"name": session.name})
+            self.tbl.update(where=f"session_uuid = '{session.sessionUuid}'", values={"name": session.name})
         if session.session_type:
-            self.tbl.update(where=f"session_uuid = '{session.session_uuid}'", values={"session_type": session.session_type})
-        update_session = self.tbl.search().where(f"session_uuid = {session.session_uuid}", prefilter=True).limit(1).to_list()[0]
-        loguru.logger.info(f"Update session {uuid}")
+            self.tbl.update(where=f"session_uuid = '{session.sessionUuid}'", values={"session_type": session.session_type})
+        update_session = self.tbl.search().where(f"session_uuid = '{session.sessionUuid}'", prefilter=True).limit(1).to_list()[0]
+        loguru.logger.info(f"Update session {session.sessionUuid}")
         return Session.from_dict(update_session)
 
     def delete_session_by_uuid(self, uuid: str, account_id: int) -> Session:

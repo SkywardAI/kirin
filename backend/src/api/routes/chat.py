@@ -84,11 +84,11 @@ async def update_session(
     """
     current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     try:
-        sessions = await session_repo.update_sessions_by_uuid(session=session_info, account_id=current_user.id)
+        sessions = session_repo.update_sessions_by_uuid(session=session_info, account_id=current_user.id)
 
     except EntityDoesNotExist:
         raise await http_404_exc_uuid_not_found_request(uuid=session_info.sessionUuid)
-    return ChatUUIDResponse(sessionUuid=sessions.uuid)
+    return ChatUUIDResponse(sessionUuid=session_info.sessionUuid)
 
 
 @router.delete(
