@@ -1,37 +1,4 @@
 services:
-  # db:
-  #   image: postgres:16.3
-  #   container_name: db
-  #   restart: always
-  #   environment:
-  #     - POSTGRES_USER=${POSTGRES_USERNAME}
-  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-  #     - POSTGRES_DB=${POSTGRES_DB}
-  #     - PGDATA=/var/lib/postgresql/data/
-  #   volumes:
-  #     - postgresql_db_data:/var/lib/postgresql/data/
-  #   expose:
-  #     - 5432
-  #   ports:
-  #     - 5433:5432
-
-  # db_editor:
-  #   image: adminer:4.8.1
-  #   container_name: db_editor
-  #   restart: always
-  #   environment:
-  #     - POSTGRES_USER=${POSTGRES_USERNAME}
-  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-  #     - POSTGRES_HOST=${POSTGRES_HOST}
-  #     - POSTGRES_PORT=${POSTGRES_PORT}
-  #     - POSTGRES_DB=${POSTGRES_DB}
-  #   expose:
-  #     - 8080
-  #   ports:
-  #     - 8081:8080
-  #   depends_on:
-  #     - db
-
   kirin:
     container_name: kirin
     restart: always
@@ -41,23 +8,10 @@ services:
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - DEBUG=${DEBUG}
-      # - POSTGRES_DB=${POSTGRES_DB}
-      # - POSTGRES_HOST=${POSTGRES_HOST}
-      # - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      # - POSTGRES_PORT=${POSTGRES_PORT}
-      # - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
-      # - POSTGRES_USERNAME=${POSTGRES_USERNAME}
       - BACKEND_SERVER_HOST=${BACKEND_SERVER_HOST}
       - BACKEND_SERVER_PORT=${BACKEND_SERVER_PORT}
       - BACKEND_SERVER_WORKERS=${BACKEND_SERVER_WORKERS}
       - BACKEND_SERVER_VERSION=${BACKEND_SERVER_VERSION}
-      # - DB_TIMEOUT=${DB_TIMEOUT}
-      # - DB_POOL_SIZE=${DB_POOL_SIZE}
-      # - DB_MAX_POOL_CON=${DB_MAX_POOL_CON}
-      # - DB_POOL_OVERFLOW=${DB_POOL_OVERFLOW}
-      # - IS_DB_ECHO_LOG=${IS_DB_ECHO_LOG}
-      # - IS_DB_EXPIRE_ON_COMMIT=${IS_DB_EXPIRE_ON_COMMIT}
-      # - IS_DB_FORCE_ROLLBACK=${IS_DB_FORCE_ROLLBACK}
       - IS_ALLOWED_CREDENTIALS=${IS_ALLOWED_CREDENTIALS}
       - API_TOKEN=${API_TOKEN}
       - AUTH_TOKEN=${AUTH_TOKEN}
@@ -142,20 +96,4 @@ services:
       - 80:80
     depends_on:
       - kirin
-      # - yeager
 
-  # yeager:
-  #   container_name: yeager
-  #   image: ghcr.io/skywardai/yeager:v0.1.0
-  #   restart: always
-  #   entrypoint: ["python3", "-m", "tensorboard.main","--port=80","--bind_all","--logdir=${METRICS_PATHS}"]
-  #   volumes:
-  #     - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/runs:/app/runs
-  #   expose:
-  #     - 80
-  #   ports:
-  #     - 6006:80
-
-
-# volumes:
-#   postgresql_db_data:

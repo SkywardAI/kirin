@@ -99,6 +99,7 @@ The above-listed technologies are just the main ones. There are other technologi
 * [LocalAI](https://github.com/mudler/LocalAI)
 * [FastAPI](https://fastapi.tiangolo.com/)
 * [llama.cpp](https://github.com/ggerganov/llama.cpp)
+* [LanceDB](https://lancedb.github.io/lancedb/)
 * [HuggingFace Community](https://huggingface.co/aisuko)
 * [RMIT Race Hub](https://race.rmit.edu.au)
 * [Microsoft Phi-3 Series](https://huggingface.co/aisuko/Phi-3-mini-4k-instruct-gguf)
