@@ -124,6 +124,9 @@ async def load_dataset(
     current_user = account_repo.read_account_by_username(username=jwt_payload.username)
     # Here we don't use async because load_dataset is a sync function in HF ds
     # status: bool = True if DatasetEng.load_dataset(rag_ds_create.dataset_name).get("insert_count") > 0 else False
+    session = session_repo.read_create_sessions_by_uuid(
+        session_uuid=rag_ds_create.sessionUuid, account_id=current_user.id, name="new session"
+    )
     try:
         # Here we use async because we need to update the session db
         DatasetEng.load_dataset(rag_ds_create.dataset_name)
@@ -138,7 +141,7 @@ async def load_dataset(
                     rag_ds_create.dataset_name
                 )
             session_repo.append_ds_name_to_session(
-                session_uuid=rag_ds_create.sessionUuid,
+                session_uuid=session.session_uuid,
                 account_id=current_user.id,
                 ds_name=table_name,  # ds_name should be same as collectioname in vector db
             )
@@ -148,6 +151,6 @@ async def load_dataset(
                 des=""
             ))
         case False:
-            return LoadRAGDSResponse(dataset_name=rag_ds_create.dataset_name, status=status)
+            return LoadRAGDSResponse(dataset_name=rag_ds_create.dataset_name, session_uuid=session.session_uuid, status=status)
 
-    return LoadRAGDSResponse(dataset_name=rag_ds_create.dataset_name, status=status)
+    return LoadRAGDSResponse(dataset_name=rag_ds_create.dataset_name, session_uuid=session.session_uuid, status=status)
