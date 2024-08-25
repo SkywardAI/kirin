@@ -1,37 +1,4 @@
 services:
-  db:
-    image: postgres:16.3
-    container_name: db
-    restart: always
-    environment:
-      - POSTGRES_USER=${POSTGRES_USERNAME}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - PGDATA=/var/lib/postgresql/data/
-    volumes:
-      - postgresql_db_data:/var/lib/postgresql/data/
-    expose:
-      - 5432
-    ports:
-      - 5433:5432
-
-  db_editor:
-    image: adminer:4.8.1
-    container_name: db_editor
-    restart: always
-    environment:
-      - POSTGRES_USER=${POSTGRES_USERNAME}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_DB=${POSTGRES_DB}
-    expose:
-      - 8080
-    ports:
-      - 8081:8080
-    depends_on:
-      - db
-
   kirin:
     container_name: kirin
     restart: always
@@ -39,23 +6,10 @@ services:
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - DEBUG=${DEBUG}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
-      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
       - BACKEND_SERVER_HOST=${BACKEND_SERVER_HOST}
       - BACKEND_SERVER_PORT=${BACKEND_SERVER_PORT}
       - BACKEND_SERVER_WORKERS=${BACKEND_SERVER_WORKERS}
       - BACKEND_SERVER_VERSION=${BACKEND_SERVER_VERSION}
-      - DB_TIMEOUT=${DB_TIMEOUT}
-      - DB_POOL_SIZE=${DB_POOL_SIZE}
-      - DB_MAX_POOL_CON=${DB_MAX_POOL_CON}
-      - DB_POOL_OVERFLOW=${DB_POOL_OVERFLOW}
-      - IS_DB_ECHO_LOG=${IS_DB_ECHO_LOG}
-      - IS_DB_EXPIRE_ON_COMMIT=${IS_DB_EXPIRE_ON_COMMIT}
-      - IS_DB_FORCE_ROLLBACK=${IS_DB_FORCE_ROLLBACK}
       - IS_ALLOWED_CREDENTIALS=${IS_ALLOWED_CREDENTIALS}
       - API_TOKEN=${API_TOKEN}
       - AUTH_TOKEN=${AUTH_TOKEN}
@@ -86,68 +40,20 @@ services:
       - METRICS_PATHS=${METRICS_PATHS}
       - DEFAULT_RAG_DS_NAME=${DEFAULT_RAG_DS_NAME}
     volumes:
+      - ./backend/:/app/
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/models:/models
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/vdata:/vdata
     expose:
       - 8000
     ports:
       - 8000:8000
     depends_on:
-      - db
-      - standalone
+      # - db
       - llamacpp
       - embedding_eng
 
-
-  etcd:
-    container_name: milvus-etcd
-    image: quay.io/coreos/etcd:v3.5.0
-    environment:
-      - ETCD_AUTO_COMPACTION_MODE=${ETCD_AUTO_COMPACTION_MODE}
-      - ETCD_AUTO_COMPACTION_RETENTION=${ETCD_AUTO_COMPACTION_RETENTION}
-      - ETCD_QUOTA_BACKEND_BYTES=${ETCD_QUOTA_BACKEND_BYTES}
-    volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
-    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
-
-  minio:
-    container_name: milvus-minio
-    image: minio/minio:RELEASE.2020-12-03T00-03-10Z
-    environment:
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
-    volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/minio:/minio_data
-    command: minio server /minio_data
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-f",
-          "http://localhost:9000/minio/health/live"
-        ]
-      interval: 30s
-      timeout: 20s
-      retries: 3
-
-  standalone:
-    container_name: milvus-standalone
-    image: milvusdb/milvus:v2.3.12
-    command: [ "milvus", "run", "standalone" ]
-    environment:
-      ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
-    volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/milvus:/var/lib/milvus
-    ports:
-      - "19530:19530"
-    depends_on:
-      - "etcd"
-      - "minio"
-
-
   llamacpp:
-    container_name: llamacpp
+    container_name: ${INFERENCE_ENG}
     image: gclub/llama.cpp:${INFERENCE_ENG_VERSION}
     restart: always
     deploy: # https://github.com/compose-spec/compose-spec/blob/master/deploy.md
@@ -161,7 +67,6 @@ services:
     ports:
       - 8080:8080
     command: ["-m", "models/${LANGUAGE_MODEL_NAME}","-c","8192"]
-
 
   embedding_eng:
     container_name: ${EMBEDDING_ENG}
@@ -179,7 +84,6 @@ services:
       - 8082:8080
     command: ["-m", "models/${EMBEDDING_MODEL_NAME}","--embeddings","--pooling","mean","-c","512"]
 
-
   rebel:
     container_name: rebel
     image: ghcr.io/skywardai/rebel:v0.1.9
@@ -191,5 +95,3 @@ services:
     depends_on:
       - kirin
 
-volumes:
-  postgresql_db_data:

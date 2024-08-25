@@ -37,7 +37,6 @@ async def get_version() -> ServiceVersionResponse:
 
     Return ServiceVersionResponse:
     - **kirin**: The version of the API aggregator
-    - **milvus**: The version of the vector database
     - **inference_engine**: The version of the inference engine
     """
 
