@@ -31,9 +31,9 @@ class LanceHelper:
             tbl = self.db.open_table(table_name)
             df = tbl.search(data) \
                 .limit(n_results) \
-                .select(["answer"]) \
+                .select(["context"]) \
                 .to_list()
-            return df[0].get("answer")
+            return df[0].get("context")
         except Exception as e:
             loguru.logger.error(e)
         return None

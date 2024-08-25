@@ -60,7 +60,7 @@ async def get_dataset_list(
     ```
     [
         {
-            "dataset_name": "aisuko/squad01"
+            "dataset_name": "aisuko/squad01-v2"
         }
     ]
     ```
@@ -107,7 +107,7 @@ async def load_dataset(
     -H 'Content-Type: application/json' \
     -d '{
     "sessionUuid": "0a38c59f-b8fd-4ec4-abd7-581f731aebd7",
-    "name": "aisuko/squad01",
+    "name": "aisuko/squad01-v2",
     "des": "string",
     "ratio": 0
     }'
@@ -116,7 +116,7 @@ async def load_dataset(
     Returns:
     ```
     {
-    "name": "aisuko/squad01",
+    "name": "aisuko/squad01-v2",
     "status": true
     }
     ```

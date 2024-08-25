@@ -60,7 +60,7 @@ ADMIN_PASS:=admin
 METRICS_PATHS:=runs
 
 # DEFAULT_RAG_DS_NAME
-DEFAULT_RAG_DS_NAME:=aisuko/squad01
+DEFAULT_RAG_DS_NAME:=aisuko/squad01-v2
 
 
 .PHONY: env
