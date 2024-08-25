@@ -107,7 +107,6 @@ class RAGChatModelRepository(BaseRAGRepository):
 
     async def inference_with_rag(
         self,
-        session_uuid: str,
         input_msg: str,
         collection_name: str,
         temperature: float = 0.2,
@@ -146,7 +145,7 @@ class RAGChatModelRepository(BaseRAGRepository):
                 context = f"Please answer the question based on answer {context}"
             else:
                 context = InferenceHelper.instruction
-
+            loguru.logger.info(f"Context: {context}")
             return context
 
         current_context = await get_context_by_question(input_msg)

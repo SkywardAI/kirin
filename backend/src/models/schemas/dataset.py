@@ -51,6 +51,7 @@ class RagDatasetResponse(BaseSchemaModel):
 class LoadRAGDSResponse(BaseSchemaModel):
     dataset_name: str = Field(..., title="DataSet Name", description="DataSet Name")
     status: bool = Field(default=False, title="Status", description="Status")
+    session_uuid: str = Field(..., title="Session UUID", description="Session UUID")
     # created_at: datetime.datetime | None = Field(..., title="Creation time", description="Creation time")
     # updated_at: datetime.datetime | None = Field(..., title="Update  time", description="Update time")
     # ratio: Optional[float] = Field(..., title="Ratio", description="Ratio")

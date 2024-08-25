@@ -246,15 +246,26 @@ async def chat(
     )
     match session.session_type:
         case "rag":
-            stream_func: ContentStream = rag_chat_repo.inference_with_rag(
-                session_uuid=session.session_uuid,
-                input_msg=chat_in_msg.message,
-                collection_name=session.dataset_name,
-                temperature=chat_in_msg.temperature,
-                top_k=chat_in_msg.top_k,
-                top_p=chat_in_msg.top_p,
-                n_predict=chat_in_msg.n_predict,
-            )
+            # Verify dataset_name exist
+            if session.dataset_name is None:
+                stream_func: ContentStream = rag_chat_repo.inference(
+                    session_uuid=session.session_uuid,
+                    input_msg=chat_in_msg.message,
+                    temperature=chat_in_msg.temperature,
+                    top_k=chat_in_msg.top_k,
+                    top_p=chat_in_msg.top_p,
+                    n_predict=chat_in_msg.n_predict,
+                )
+            else:
+                stream_func: ContentStream = rag_chat_repo.inference_with_rag(
+                    session_uuid=session.session_uuid,
+                    input_msg=chat_in_msg.message,
+                    collection_name=session.dataset_name,
+                    temperature=chat_in_msg.temperature,
+                    top_k=chat_in_msg.top_k,
+                    top_p=chat_in_msg.top_p,
+                    n_predict=chat_in_msg.n_predict,
+                )
         case _:  # default is chat robot
             stream_func: ContentStream = rag_chat_repo.inference(
                 session_uuid=session.session_uuid,
