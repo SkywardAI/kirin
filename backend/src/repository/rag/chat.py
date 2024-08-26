@@ -136,6 +136,7 @@ class RAGChatModelRepository(BaseRAGRepository):
 
     async def inference_with_rag(
         self,
+        session_uuid: str,
         input_msg: str,
         collection_name: str,
         temperature: float = 0.2,

@@ -1,5 +1,4 @@
 import loguru
-
 from src.config.settings.const import DEFAULT_COLLECTION, DATASET_LANCEDB
 
 import lancedb
@@ -22,8 +21,9 @@ class LanceHelper:
         try:
             tbl = self.db.open_table(table_name)
             tbl.add(data_list)
+            loguru.logger.info(f"Vector Databse --- Inserted {len(data_list)} records")
         except Exception as e:
-            loguru.logger.info(f"Vector Databse --- Error: {e}")
+            loguru.logger.error(f"Vector Databse --- Error: {e}")
     
     def search(self, data, n_results, table_name=DEFAULT_COLLECTION):
         print(table_name)
