@@ -86,6 +86,7 @@ async def get_dataset_list(
 )
 async def load_dataset(
     rag_ds_create: RagDatasetCreate,
+    background_tasks: fastapi.BackgroundTasks,
     token: str = fastapi.Depends(oauth2_scheme),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
     ds_repo: DataSetCRUDRepository = fastapi.Depends(get_repository(repo_type=DataSetCRUDRepository)),
@@ -125,16 +126,17 @@ async def load_dataset(
     # Here we don't use async because load_dataset is a sync function in HF ds
     # status: bool = True if DatasetEng.load_dataset(rag_ds_create.dataset_name).get("insert_count") > 0 else False
     session = session_repo.read_create_sessions_by_uuid(
-        session_uuid=rag_ds_create.sessionUuid, account_id=current_user.id, name="new session"
+        session_uuid=rag_ds_create.sessionUuid, account_id=current_user.id, name="new session", session_type="rag"
     )
     try:
         # Here we use async because we need to update the session db
-        DatasetEng.load_dataset(rag_ds_create.dataset_name)
+        dataset_list = DatasetEng.validate_dataset(rag_ds_create.dataset_name)
         status: bool =True
     except Exception:
         status: bool = False
-        
 
+    async def load_dataset_task(dataset_name: str, ds_list: list):
+        DatasetEng.load_dataset(dataset_name, ds_list)
     match status:
         case True:
             table_name = DatasetFormatter.format_dataset_by_name(
@@ -150,6 +152,7 @@ async def load_dataset(
                 table_name=table_name,
                 des=""
             ))
+            background_tasks.add_task(load_dataset_task, rag_ds_create.dataset_name, dataset_list)
         case False:
             return LoadRAGDSResponse(dataset_name=rag_ds_create.dataset_name, session_uuid=session.session_uuid, status=status)
 

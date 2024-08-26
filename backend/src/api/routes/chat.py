@@ -28,6 +28,8 @@ from src.models.schemas.chat import (
     ChatsWithTime,
     ChatInMessage,
     ChatInResponse,
+    SearchInMessage,
+    SearchResponse,
     SessionUpdate,
     SessionResponse,
     ChatUUIDResponse,
@@ -174,6 +176,78 @@ async def chat_uuid(
     session_uuid = new_session.session_uuid
 
     return ChatUUIDResponse(sessionUuid=session_uuid)
+
+
+@router.post(
+    "/search",
+    name="chat:chatbot",
+    response_model=SearchResponse,
+    status_code=fastapi.status.HTTP_200_OK,
+)
+async def search(
+    search_in_msg: SearchInMessage,
+    token: str = fastapi.Depends(oauth2_scheme),
+    session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),
+    rag_chat_repo: RAGChatModelRepository = fastapi.Depends(get_rag_repository(repo_type=RAGChatModelRepository)),
+    account_repo: AccountCRUDRepository = fastapi.Depends(get_repository(repo_type=AccountCRUDRepository)),
+    jwt_payload: dict = fastapi.Depends(jwt_required),
+) -> SearchResponse:
+    """
+    Search rag result with give messages and session.
+
+    **Note:**
+
+    You need to sing up and sign in before calling this API. If you are using
+    the Swagger UI. You can get the token automatically by login in through `api/auth/verify` API.
+
+    **Anonymous users**, we will create anonymous usef infor in the database. So, you can login through Authorize button in Swagger UI.
+    - **username**: anonymous
+    - **password**: Marlboro@2211
+
+    **Example of the request body:**
+
+    ```bash
+    curl -X 'POST'
+    'http://localhost:8000/api/chat'
+    -H 'accept: application/json'
+    -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFub255bW91cyIsImVtYWlsIjoiYW5vbnltb3VzQGFub255LmNvbSIsImV4cCI6MTcyMTA3MTI0MCwic3ViIjoiWU9VUi1KV1QtU1VCSkVDVCJ9.hip3zPA2yN-MOwKHFOm_KhZuvaC4soY4MgwegyYJu2s'
+    -H 'Content-Type: application/json'
+    -d '{
+    "sessionUuid": "string",
+    "message": "do you know RMIT?",
+    }'
+    ```
+
+    **Return StreamingResponse:**
+    data: {"context":" Yes","score":100}
+
+    """
+
+    ##############################################################################################################################
+    # Note: await keyword will cause issue. See https://github.com/sqlalchemy/sqlalchemy/discussions/9757
+    #
+
+    current_user = account_repo.read_account_by_username(username=jwt_payload.username)
+
+    # TODO: Only read session here @Micost
+    session = session_repo.read_create_sessions_by_uuid(
+        session_uuid=search_in_msg.sessionUuid, account_id=current_user.id, name=search_in_msg.message[:20]
+    )
+    match session.session_type:
+        case "rag":
+            # Verify dataset_name exist
+            if session.dataset_name is None:
+                return SearchResponse(context= None, score=0)
+            else:
+                context = rag_chat_repo.search_context(
+                    input_msg=search_in_msg.message,
+                    collection_name=session.dataset_name
+                    )
+        case _:  
+            return SearchResponse(context= None, score=0)
+    return SearchResponse(
+        context= context, score=100
+    )
 
 
 @router.post(

@@ -116,7 +116,7 @@ class SessionCRUDRepository(BaseCRUDRepository):
         loguru.logger.info(f"Update session {session_uuid}")
         return Session.from_dict(update_session)
 
-    def read_create_sessions_by_uuid(self, session_uuid: str, account_id: int, name: str) -> Session:
+    def read_create_sessions_by_uuid(self, session_uuid: str, account_id: int, name: str, session_type: str = "chat") -> Session:
         try:
             session=self.tbl.search().where(f"session_uuid = '{session_uuid}' , account_id = {account_id}", prefilter=True).limit(1).to_list()[0]
         except Exception:
@@ -127,7 +127,7 @@ class SessionCRUDRepository(BaseCRUDRepository):
                 "session_uuid": uuid_id,
                 "account_id": account_id,
                 "name": name,
-                "session_type": "chat",
+                "session_type": session_type,
                 "dataset_name": "",
                 "created_at": current_time
             }])
