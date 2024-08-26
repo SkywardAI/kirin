@@ -125,7 +125,7 @@ async def load_dataset(
     # Here we don't use async because load_dataset is a sync function in HF ds
     # status: bool = True if DatasetEng.load_dataset(rag_ds_create.dataset_name).get("insert_count") > 0 else False
     session = session_repo.read_create_sessions_by_uuid(
-        session_uuid=rag_ds_create.sessionUuid, account_id=current_user.id, name="new session"
+        session_uuid=rag_ds_create.sessionUuid, account_id=current_user.id, name="new session", session_type="rag"
     )
     try:
         # Here we use async because we need to update the session db

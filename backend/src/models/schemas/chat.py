@@ -69,7 +69,7 @@ class SearchInMessage(BaseSchemaModel):
     message: str = Field(..., title="Message", description="Message")
 
 class SearchResponse(BaseSchemaModel):
-    coontext: str | None = Field(..., title="Context", description="Context")
+    context: str | None = Field(..., title="Context", description="Context")
     score: float = Field(..., title="Score", description="Score of the search")
 
 

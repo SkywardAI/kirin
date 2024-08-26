@@ -131,6 +131,7 @@ class RAGChatModelRepository(BaseRAGRepository):
         context = vector_db.search(
             list(embedd_input), 1, table_name=DatasetFormatter.format_dataset_by_name(collection_name)
         )
+        loguru.logger.info(f"Context: {context}")
         return context
 
     async def inference_with_rag(

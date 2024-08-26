@@ -181,7 +181,7 @@ async def chat_uuid(
 @router.post(
     "/search",
     name="chat:chatbot",
-    response_model=ChatInResponse,
+    response_model=SearchResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
 async def chat(
