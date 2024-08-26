@@ -184,7 +184,7 @@ async def chat_uuid(
     response_model=SearchResponse,
     status_code=fastapi.status.HTTP_200_OK,
 )
-async def chat(
+async def search(
     search_in_msg: SearchInMessage,
     token: str = fastapi.Depends(oauth2_scheme),
     session_repo: SessionCRUDRepository = fastapi.Depends(get_repository(repo_type=SessionCRUDRepository)),

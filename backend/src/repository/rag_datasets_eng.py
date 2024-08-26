@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import loguru
+
 from datasets import load_dataset
 from src.repository.vector_database import vector_db
 from src.utilities.formatters.ds_formatter import DatasetFormatter
