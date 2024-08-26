@@ -53,6 +53,26 @@ class ChatInMessage(BaseSchemaModel):
     collection_name: Optional[str] | None = Field(default=None, title="Collection Name", description="Collection Name")
 
 
+class SearchInMessage(BaseSchemaModel):
+    """
+    Object for the request body of the chatbot endpoint.
+
+    Attributes:
+    -----------
+    sessionUuid: Optional[str] | None
+        Session UUID
+    message: str
+        Message
+    """
+
+    sessionUuid: Optional[str] | None = Field(..., title="Session UUID", description="Session UUID")
+    message: str = Field(..., title="Message", description="Message")
+
+class SearchResponse(BaseSchemaModel):
+    coontext: str | None = Field(..., title="Context", description="Context")
+    score: float = Field(..., title="Score", description="Score of the search")
+
+
 class ChatInResponse(BaseSchemaModel):
     sessionUuid: str = Field(..., title="Session UUID", description="Session UUID")
     message: str = Field(..., title="Message", description="Message")

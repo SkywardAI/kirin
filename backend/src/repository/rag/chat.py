@@ -105,6 +105,34 @@ class RAGChatModelRepository(BaseRAGRepository):
         except httpx.HTTPStatusError as e:
             loguru.logger.error(f"Error response {e.response.status_code} while requesting {e.request.url!r}.")
 
+    def search_context(self, input_msg: str, collection_name: str) -> str:
+        """
+        Search the context from the vector database
+
+        Args:
+        input_msg (str): input message
+        collection_name (str): collection name
+
+        Returns:
+        str: context
+        """
+        try:
+            res = httpx_kit.sync_client.post(
+                InferenceHelper.instruct_embedding_url(),
+                headers={"Content-Type": "application/json"},
+                json={"content": input_msg},
+                timeout=httpx.Timeout(timeout=None),
+            )
+            res.raise_for_status()
+            embedd_input = res.json().get("embedding")
+        except Exception as e:
+            loguru.logger.error(e)
+        # collection name for testing
+        context = vector_db.search(
+            list(embedd_input), 1, table_name=DatasetFormatter.format_dataset_by_name(collection_name)
+        )
+        return context
+
     async def inference_with_rag(
         self,
         input_msg: str,
