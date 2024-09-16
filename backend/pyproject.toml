@@ -59,7 +59,7 @@ trio = "0.25.0"
 uvicorn = "0.30.6"
 openai = "1.43.0"
 pre-commit="3.7.0"
-pytest="8.1.1"
+pytest="8.3.3"
 datasets = "2.21.0"
 lancedb = "^0.12.0"
 
