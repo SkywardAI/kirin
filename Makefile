@@ -121,6 +121,10 @@ up: build lm
 	docker compose -f docker-compose.yaml up -d
 
 
+.PHONY: down
+down:
+	docker compose -f docker-compose.yaml down
+
 .PHONY: stop
 stop:
 	docker compose -f docker-compose.yaml stop
