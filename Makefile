@@ -45,7 +45,8 @@ EMBEDDING_ENG_PORT:=8080
 # Language model, default is phi3-mini-4k-instruct-q4.gguf
 # https://github.com/SkywardAI/llama.cpp/blob/9b2f16f8055265c67e074025350736adc1ea0666/tests/test-chat-template.cpp#L91-L92
 LANGUAGE_MODEL_NAME:=Phi3-mini-4k-instruct-Q4.gguf
-#HF_URL:=https://huggingface.co/
+HF_URL:=https://huggingface.co/
+# HF_URL:=https://hf-mirror.com/
 
 LANGUAGE_MODEL:=aisuko/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi3-mini-4k-instruct-Q4.gguf?download=true
 
@@ -176,8 +177,8 @@ ruff:
 
 .PHONY: lm
 lm:
-	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(HF_URL)$(LANGUAGE_MODEL_URL)
-	@mkdir -p volumes/models && [ -f volumes/models/$(EMBEDDING_MODEL_NAME) ] || wget -O volumes/models/$(EMBEDDING_MODEL_NAME) $(HF_URL)$(EMBEDDING_MODEL_URL)
+	@mkdir -p volumes/models && [ -f volumes/models/$(LANGUAGE_MODEL_NAME) ] || wget -O volumes/models/$(LANGUAGE_MODEL_NAME) $(HF_URL)$(LANGUAGE_MODEL)
+	@mkdir -p volumes/models && [ -f volumes/models/$(EMBEDDING_MODEL_NAME) ] || wget -O volumes/models/$(EMBEDDING_MODEL_NAME) $(HF_URL)$(EMBEDDING_MODEL)
 
 
 .PHONY: localinfer
