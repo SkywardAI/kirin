@@ -56,7 +56,8 @@ services:
 
   llamacpp:
     container_name: ${INFERENCE_ENG}
-    image: gclub/llama.cpp:${INFERENCE_ENG_VERSION}
+    # image: gclub/llama.cpp:${INFERENCE_ENG_VERSION}
+    image: ghcr.io/ggml-org/llama.cpp:server
     restart: always
     deploy: # https://github.com/compose-spec/compose-spec/blob/master/deploy.md
       resources:
