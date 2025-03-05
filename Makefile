@@ -44,8 +44,8 @@ EMBEDDING_ENG_PORT:=8080
 
 # Language model, default is phi3-mini-4k-instruct-q4.gguf
 # https://github.com/SkywardAI/llama.cpp/blob/9b2f16f8055265c67e074025350736adc1ea0666/tests/test-chat-template.cpp#L91-L92
-LANGUAGE_MODEL_NAME:=Phi3-mini-4k-instruct-Q4.gguf
-# LANGUAGE_MODEL_NAME:=deepseek-8b-q4km.gguf
+# LANGUAGE_MODEL_NAME:=Phi3-mini-4k-instruct-Q4.gguf
+LANGUAGE_MODEL_NAME:=deepseek-8b-q4km.gguf
 
 HF_URL:=https://huggingface.co/
 # HF_URL:=https://hf-mirror.com/
